@@ -179,7 +179,7 @@ func (c *BuildCache) cleanupStaleEntries() {
     cutoff := time.Now().Add(-5 * time.Minute) // Same as IsValid check
     
     for key, entry := range c.entries {
-        if time.Since(entry.Timestamp) > 5*time.Minute || !fileExists(entry.OutputPath) {
+        if entry.Timestamp.Before(cutoff) || !fileExists(entry.OutputPath) {
             delete(c.entries, key)
         }
     }
