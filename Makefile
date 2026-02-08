@@ -3,7 +3,7 @@
 .PHONY: install-deps wasm server build run dev
 
 install-deps:
-    @echo "Installing dependencies..."
+	@echo "Installing dependencies..."
 	go get -u github.com/fsnotify/fsnotify
 	go get -u github.com/gorilla/websocket
 	go get -u github.com/maxence-charriere/go-app/v10
