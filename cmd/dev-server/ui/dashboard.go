@@ -2,7 +2,7 @@
 package ui
 
 import (
-    "github.com/maxenglander/go-app/v10/pkg/app"
+    "github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
 type DevDashboard struct {
