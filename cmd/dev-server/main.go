@@ -11,9 +11,9 @@ import (
     "sync"
     "time"
     
-    "github.com/your-org/go-ui-library/cmd/dev-server/build"
-    "github.com/your-org/go-ui-library/cmd/dev-server/handlers"
-    "github.com/your-org/go-ui-library/cmd/dev-server/watch"
+    "github.com/mmcnicol/go-app-component-library/cmd/dev-server/build"
+    "github.com/mmcnicol/go-app-component-library/cmd/dev-server/handlers"
+    "github.com/mmcnicol/go-app-component-library/cmd/dev-server/watch"
 )
 
 //go:embed static/*
@@ -133,36 +133,3 @@ func (s *Server) serveWasm(w http.ResponseWriter, r *http.Request) {
     
     http.ServeFile(w, r, wasmPath)
 }
-
-} 
-// cmd/dev-server/main.go - Main development server
-package main
-
-import (
-    "context"
-    "fmt"
-    "log"
-    "net/http"
-    "os"
-    "os/exec"
-    "path/filepath"
-    "sync"
-    "time"
-    
-    "github.com/fsnotify/fsnotify"
-    "github.com/maxenglander/go-app/v9/pkg/app"
-)
-
-// DevelopmentServer orchestrates the dev environment
-type DevelopmentServer struct {
-    port           int
-    wasmPath       string
-    goSourceDir    string
-    staticDir      string
-    watcher        *fsnotify.Watcher
-    reloadClients  map[chan bool]bool
-    reloadMu       sync.RWMutex
-    buildInProgress bool
-    buildMu        sync.Mutex
-}
-

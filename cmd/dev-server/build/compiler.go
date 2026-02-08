@@ -95,3 +95,26 @@ func (c *Compiler) BuildOnlyChanged(ctx context.Context, changedFiles []string) 
     return c.BuildWasm(ctx, tempMain, changedFiles)
 }
 
+func (c *Compiler) analyzeDependencies(changedFiles []string) []string {
+    // Parse Go files to build import graph
+    importGraph := c.buildImportGraph()
+    
+    affectedPackages := make(map[string]bool)
+    for _, changedFile := range changedFiles {
+        pkg := c.fileToPackage(changedFile)
+        if pkg == "" {
+            continue
+        }
+        
+        // Find all packages that depend on this package
+        c.findDependents(pkg, importGraph, affectedPackages)
+    }
+    
+    // Convert to slice
+    result := make([]string, 0, len(affectedPackages))
+    for pkg := range affectedPackages {
+        result = append(result, pkg)
+    }
+    
+    return result
+}
