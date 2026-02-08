@@ -38,6 +38,12 @@ func (c *BuildCache) IsValid(mainFile string, changedFiles []string) bool {
            fileExists(entry.OutputPath)
 }
 
+// fileExists is a helper function
+func fileExists(path string) bool {
+    _, err := os.Stat(path)
+    return err == nil
+}
+
 // calculateHash computes a unique hash for the build based on:
 // 1. The content of the main file
 // 2. The content of all changed files (dependencies)
@@ -98,23 +104,4 @@ func addFileContentToHash(hasher io.Writer, filePath string) error {
     }
     
     return nil
-}
-
-func (c *BuildCache) IsValid(mainFile string, changedFiles []string) bool {
-    entry, exists := c.entries[mainFile]
-    if !exists {
-        return false
-    }
-    
-    // Check if any dependency changed
-    currentHash := c.calculateHash(mainFile, changedFiles)
-    return entry.Hash == currentHash && 
-           time.Since(entry.Timestamp) < 5*time.Minute &&
-           fileExists(entry.OutputPath)
-}
-
-// fileExists is a helper function
-func fileExists(path string) bool {
-    _, err := os.Stat(path)
-    return err == nil
 }
