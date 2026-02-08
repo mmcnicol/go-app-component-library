@@ -4,9 +4,9 @@
 
 install-deps:
     @echo "Installing dependencies..."
-    go get -u github.com/fsnotify/fsnotify
-    go get -u github.com/gorilla/websocket
-    go get -u github.com/maxence-charriere/go-app/v10
+	go get -u github.com/fsnotify/fsnotify
+	go get -u github.com/gorilla/websocket
+	go get -u github.com/maxence-charriere/go-app/v10
 
 # Build the Frontend (WebAssembly)
 # Note: GOOS=js and GOARCH=wasm are required for go-app to run in the browser
@@ -27,15 +27,15 @@ run: build
 	./server
 
 dev: install-deps
-    @echo "Starting development server..."
-    @go run ./cmd/dev-server --port=8080 --watch
+	@echo "Starting development server..."
+	@go run ./cmd/dev-server --port=8080 --watch
 
 dev-with-dashboard:
-    @go run ./cmd/dev-server --port=8080 --watch --dashboard
+	@go run ./cmd/dev-server --port=8080 --watch --dashboard
 
 dev-profile:
-    @go run ./cmd/dev-server --port=8080 --watch --profile
+	@go run ./cmd/dev-server --port=8080 --watch --profile
 
 # Hot reload for specific components
 dev-components:
-    @find ./pkg/components -name "*.go" | entr -r make dev
+	@find ./pkg/components -name "*.go" | entr -r make dev
