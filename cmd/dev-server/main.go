@@ -1,4 +1,4 @@
-// cmd/dev-server/main.go - Complete implementation
+// cmd/dev-server/main.go
 package main
 
 import (
