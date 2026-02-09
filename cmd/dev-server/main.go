@@ -2,6 +2,7 @@
 package main
 
 import (
+    "bytes"
     "context"
     "embed"
     "encoding/json"
@@ -10,6 +11,7 @@ import (
     "log"
     "net/http"
     "os"
+    "os/exec"
     "path/filepath"
     "runtime"
     "strings"
