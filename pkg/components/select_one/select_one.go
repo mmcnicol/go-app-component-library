@@ -35,7 +35,7 @@ func (o *SelectOne) Render() app.UI {
 		
 		app.Select().
 			Class("picklist-select").
-			Value(o.selectedValue). // Keeps the UI in sync with Go state
+			SelectedValue(o.selectedValue). // Keeps the UI in sync with Go state
 			OnChange(o.onSelectChange).
 			Body(
 				app.Option().
