@@ -1,5 +1,5 @@
 // pkg/components/hello/hello.go
-package components
+package hello
 
 import "github.com/maxence-charriere/go-app/v10/pkg/app"
 
@@ -9,6 +9,6 @@ type Hello struct {
 
 func (n *Hello) Render() app.UI {
     return app.Div().Body(
-        app.P().Text("Hello World! 3"),
+        app.P().Text("Hello World!"),
     )
 }

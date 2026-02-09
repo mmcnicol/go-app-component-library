@@ -4,7 +4,7 @@ package main
 import (
 	"encoding/json"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
-	"github.com/mmcnicol/go-app-component-library/pkg/components"
+	"github.com/mmcnicol/go-app-component-library/pkg/components/hello"
 	"log"
 	"net/http"
 	"strings"
@@ -14,7 +14,7 @@ import (
 func main() {
 	// CRITICAL: The server MUST know the route exists
 	// Register the components that correspond to routes
-	app.Route("/", func() app.Composer { return &components.hello.Hello{} })
+	app.Route("/", func() app.Composer { return &hello.Hello{} })
 
 	h := &app.Handler{
 		Name:      "go-app component library",
