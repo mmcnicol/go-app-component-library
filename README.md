@@ -5,54 +5,64 @@ TODO List:
 Built In
 - [x] Div
 - [x] InputText
+- [ ] InputTextArea
 - [x] Select
 - [ ] Button
-* [ ] Table
-* [ ] Meter
-* [ ] Progress
-* [ ] Dialog
-* [ ] Form
-* [ ] Canvas
-
-Data
-* [ ] Table with column sorting and paging
-* [ ] Table with column sorting and server-side paging
-* [ ] TreeTable
-* [ ] Tree
-
-Panel
-* [ ] Panel
+- [ ] Table
+- [ ] Meter
+- [ ] Progress
+- [ ] Dialog
+- [ ] Form
+- [ ] Canvas
 
 Form
-* [ ] InputTextArea
-* [ ] DatePicker
-* [ ] AutoComplete
+- [x] SelectOne
+- [x] ToggleSwitch
+- [x] InputText
+- [ ] InputTextArea
+- [ ] DatePicker
+- [ ] AutoComplete
+- [ ] Form
+- [ ] Form Validation
 
 Messages
-* [ ] StaticMessage
-* [ ] Growl
-* [ ] Tooltip
-* [ ] NotificationBar / CookieConsent
+- [x] PhaseBanner
+- [ ] StaticMessage
+- [ ] Growl
+- [ ] Tooltip
+- [ ] NotificationBar / CookieConsent
+
+Data
+- [ ] Table
+- [ ] Table with column sorting
+- [ ] Table with column sorting and paging
+- [ ] Table with column sorting and server-side paging
+- [ ] Tree
+- [ ] TreeTable
+
+Panel
+- [ ] Panel
 
 Overlay
-* [ ] Dialogue
-* [ ] ConfirmDialogue
-* [ ] ConfirmPopup
+- [ ] Dialogue
+- [ ] ConfirmDialogue
+- [ ] ConfirmPopup
 
 Navigation
-* [ ] MenuBar / navbar
-* [ ] sidebar
-* [ ] sidenav?
+- [ ] MenuBar / Navbar
+- [ ] Sidebar
+- [ ] Sidenav?
 
 Misc
-* [ ] Skeleton
+- [ ] Skeleton
+- [ ] Themes
 
 Chart
-* [ ] Chart
+- [ ] Chart
 
 Outstanding CSS issues
-* [ ] ToggleSwitch
-* [ ] Themes
+* ToggleSwitch
+
 
 
 This go-app component library creates a development environment that rivals the best JavaScript tooling, with instant visual feedback and minimal context switching.
