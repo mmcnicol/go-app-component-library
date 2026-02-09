@@ -28,14 +28,22 @@ func (o *SelectOne) Render() app.UI {
 
     o.shouldRender = false
 
-	return app.Div().Class("picklist-container").Body(
+	containerClass := ""
+	if t.Disabled {
+        containerClass += "selectOne-container-select-disabled"
+    }
+
+	return app.Div().Class("selectOne-container").Body(
 
 		app.If(o.Label != "", func() app.UI {
-			return app.Label().Text(o.Label)
+			return app.Label().
+				Class("selectOne-container-label").
+				Text(o.Label)
 		}),
 		
 		app.Select().
-			Class("picklist-select").
+			Class("selectOne-container-select").
+			Class(containerClass).
 			Disabled(o.Disabled).
 			//SelectedValue(o.selectedValue). // Keeps the UI in sync with Go state
 			OnChange(o.onSelectChange).
