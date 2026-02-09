@@ -12,7 +12,7 @@ func init() {
 	storybook.Register("Phase Banner", "Beta", func() app.UI {
 		return &PhaseBanner{
 			Phase: "Beta",
-			Message: app.Text("This is a new service – your "),
+			//Message: app.Text("This is a new service – your "),
 			// You can nest elements inside the message
 			Message: app.Span().Body(
 				app.Text("This is a new service – your "),
