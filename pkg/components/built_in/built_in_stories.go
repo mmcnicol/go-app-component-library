@@ -140,11 +140,12 @@ func init() {
 				Value(valueString).
 				Placeholder(placeholderString).
 				Disabled(isDisabled).
-				OnChange(func(ctx app.Context, e app.Event) {
-					val := ctx.JSSrc().Get("value").String()
-					controls["valueString"].Value = val
+				OnInput(func(ctx app.Context, e app.Event) {
+					newVal := ctx.JSSrc().Get("value").String()
+					controls["Value"].Value = newVal
 					ctx.Update()
-				})
+				},
+			)
 		},
 	)
 
