@@ -10,7 +10,13 @@ type ToggleSwitch struct {
 	app.Compo
 	IsOn         bool
 	Label        string
-    shouldRender  bool
+    shouldRender bool
+}
+
+func (t *ToggleSwitch) OnMount(ctx app.Context) {
+	if app.IsClient {
+		app.Log("ToggleSwitch OnMount()")
+	}
 }
 
 // OnClick handles the toggle logic
