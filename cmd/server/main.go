@@ -29,6 +29,8 @@ func main() {
 			"/web/style/main.css",
 			"/web/style/phase_banner.css",
 			"/web/style/toggle_switch.css",
+			"/web/style/select_one.css",
+			"/web/style/input_text.css",
 		},
 		Icon: app.Icon{
 			//Default: "/web/images/logo.png",
