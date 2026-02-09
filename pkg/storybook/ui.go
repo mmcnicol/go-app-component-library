@@ -126,6 +126,22 @@ func (s *Shell) selectStory(ctx app.Context, compName, storyName string) {
 	//ctx.Update()
 }
 
+func (s *Shell) getActiveStory() Story {
+	if app.IsClient {
+		app.Log("Shell getActiveStory()")
+	}
+	for _, comp := range GetRegistry() {
+		if comp.Name == s.activeComponent {
+			for _, story := range comp.Stories {
+				if story.Name == s.activeStory {
+					return story
+				}
+			}
+		}
+	}
+	return &Story{}
+}
+
 func (s *Shell) renderActiveStory() app.UI {
 	if app.IsClient {
 		app.Log("Shell renderActiveStory()")
