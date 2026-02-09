@@ -47,8 +47,8 @@ func (o *SelectOne) Render() app.UI {
 			OnChange(func(ctx app.Context, e app.Event) {
 				val := ctx.JSSrc().Get("value").String()
 				o.SelectedValue = val
-				if s.OnSelect != nil {
-					s.OnSelect(ctx, val)
+				if o.OnSelect != nil {
+					o.OnSelect(ctx, val)
 				}
 				//ctx.Update()
 			}).
