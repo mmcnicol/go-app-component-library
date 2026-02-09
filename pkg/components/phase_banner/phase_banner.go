@@ -1,3 +1,4 @@
+// pkg/components/phase_banner/phase_banner.go
 package phase_banner
 
 import (

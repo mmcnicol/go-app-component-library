@@ -1,5 +1,5 @@
 //go:build dev
-// pkg/components/phase-banner/phase-banner_stories.go
+// pkg/components/phase_banner/phase_banner_stories.go
 package phase-banner
 
 import (
