@@ -153,6 +153,9 @@ func (s *Shell) onClearSearch(ctx app.Context, e app.Event) {
 	s.shouldRender = true
 	//ctx.Update()
 
+	elem := app.Window().Get("document").Call("getElementById", "sidebar-search-input")
+	elem.Set("value", "")
+
 	// Optional: Put the cursor back in the search box after clearing
     app.Window().GetElementByID("sidebar-search-input").Call("focus")
 }
