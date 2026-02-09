@@ -15,11 +15,13 @@ func (t *InputText) Render() app.UI {
 	if app.IsClient {
 		app.Log("InputText Render()")
 	}
-	return app.Input().
-		Type("text").
-		Value(t.value).
-		//Placeholder("What is your name?").
-		//AutoFocus(true).
-		OnChange(t.ValueTo(&t.value)),
+
+	return app.Div().Class("inputText-container").Body(
+		app.Input().
+			Type("text").
+			Value(t.value).
+			//Placeholder("What is your name?").
+			//AutoFocus(true).
+			OnChange(t.ValueTo(&t.value)),
 	)
 }
