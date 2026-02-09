@@ -21,6 +21,10 @@ inputText-container {
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
+.inputText-container-input-disabled {
+    background-color: #757171;
+}
+
 /* The blue ring effect on focus */
 .inputText-container-input:focus {
     color: #495057;

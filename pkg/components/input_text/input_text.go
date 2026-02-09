@@ -19,6 +19,11 @@ func (t *InputText) Render() app.UI {
 		app.Log("InputText Render()")
 	}
 
+	containerClass := ""
+	if t.Disabled {
+        containerClass += "inputText-container-input-disabled"
+    }
+
 	return app.Div().Class("inputText-container").Body(
 
 		app.If(t.Label != "", func() app.UI {
@@ -29,6 +34,7 @@ func (t *InputText) Render() app.UI {
 
 		app.Input().
 			Class("inputText-container-input").
+			Class(containerClass).
 			Type("text").
 			Value(t.Value).
 			Disabled(t.Disabled).
