@@ -39,12 +39,6 @@ func init() {
 	})
 	*/
 
-	inputTextReadOnly := &InputText{
-		Label: "Label text.",
-		Value: "this is a test",
-		Disabled: true,
-	}
-
 	storybook.Register("Built In", "Input Text", 
 		map[string]*storybook.Control{
 			"Label": {Label: "Label Text", Type: storybook.ControlText, Value: "Label Text."},
