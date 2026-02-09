@@ -57,3 +57,43 @@
     border-left: 4px solid #0056b3;
     padding-left: 8px; /* Offset the padding to account for the border */
 }
+
+/* Container to hold both input and X */
+.search-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.sidebar-search {
+    width: 100%;
+    padding: 8px 30px 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.sidebar-search:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* The Clear Button (X) */
+.search-clear {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%); /* Centers it vertically */
+    cursor: pointer;
+    color: #adb5bd;
+    font-size: 16px;
+    line-height: 1;
+    user-select: none; /* Prevents accidental text selection on click */
+    transition: color 0.2s;
+}
+
+.search-clear:hover {
+    color: #495057; /* Darker grey on hover */
+}

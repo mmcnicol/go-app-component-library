@@ -10,6 +10,7 @@ type Shell struct {
 	
 	activeComponent string
 	activeStory     string
+	searchQuery     string
 }
 
 func (s *Shell) OnMount(ctx app.Context) {
@@ -22,11 +23,40 @@ func (s *Shell) OnMount(ctx app.Context) {
 }
 
 func (s *Shell) Render() app.UI {
-	components := GetRegistry()
+	allComponents := GetRegistry()
+	
+	// Filter components based on search query
+	filteredComponents := make([]Component, 0)
+	for _, c := range allComponents {
+		// Simple case-insensitive match
+		if s.searchQuery == "" || 
+		   app.ToLwr(c.Name) == app.ToLwr(s.searchQuery) || 
+		   contains(app.ToLwr(c.Name), app.ToLwr(s.searchQuery)) {
+			filteredComponents = append(filteredComponents, c)
+		}
+	}
 
 	return app.Div().Class("storybook-layout").Body(
 		app.Aside().Class("storybook-sidebar").Body(
 			app.H2().Text("Components"),
+
+			// Search Container
+            app.Div().Class("search-container").Body(
+                app.Input().
+                    Class("sidebar-search").
+                    Placeholder("Filter components...").
+                    Value(s.searchQuery).
+                    OnInput(s.onSearch),
+                
+                // Only show the clear button if there is text in the search box
+                app.If(s.searchQuery != "", func() app.UI {
+                    return app.Span().
+                        Class("search-clear").
+                        Text("✕"). // Multiplications X symbol
+                        OnClick(s.onClearSearch)
+                }),
+            ),
+
 			app.Ul().Body(
 				app.Range(components).Slice(func(i int) app.UI {
 					comp := components[i]
@@ -97,4 +127,25 @@ func (s *Shell) renderActiveStory() app.UI {
 		}
 	}
 	return app.Div().Text("Story not found")
+}
+
+func (s *Shell) onSearch(ctx app.Context, e app.Event) {
+	s.searchQuery = ctx.JSSrc().Get("value").String()
+	// No s.Update() needed in v10; the UI refreshes after the event
+}
+
+// Simple helper for string containment
+func contains(s, substr string) bool {
+    // If the search box is empty, we usually want to show everything
+    if substr == "" {
+        return true
+    }
+    // Standard case-insensitive check
+    return strings.Contains(strings.ToLower(s), strings.ToLower(substr))
+}
+
+// Add this handler to the Shell struct
+func (s *Shell) onClearSearch(ctx app.Context, e app.Event) {
+    s.searchQuery = ""
+    // In v10, updating the state variable triggers the re-render automatically
 }
