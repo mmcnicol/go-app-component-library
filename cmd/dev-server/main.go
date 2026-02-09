@@ -11,6 +11,7 @@ import (
     "net/http"
     "os"
     "path/filepath"
+    "runtime"
     "sync"
     "time"
     
@@ -534,7 +535,6 @@ func main() {
     var (
         port          = flag.Int("port", 8080, "Port to listen on")
         workDir       = flag.String("dir", ".", "Working directory")
-        outputDir     = flag.String("output", "", "Output directory for wasm files")
         watch         = flag.Bool("watch", true, "Enable file watching")
         dashboard     = flag.Bool("dashboard", false, "Enable dashboard")
         profile       = flag.Bool("profile", false, "Enable profiling")
@@ -542,7 +542,7 @@ func main() {
     
     flag.Parse()
     
-    server, err := NewServer(*port, *workDir, *outputDir, *dashboard, *profile)
+    server, err := NewServer(*port, *workDir, *dashboard, *profile)
     if err != nil {
         log.Fatalf("Failed to create server: %v", err)
     }
