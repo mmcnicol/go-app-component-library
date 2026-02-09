@@ -59,6 +59,9 @@ func (o *SelectOne) onSelectChange(ctx app.Context, e app.Event) {
 		app.Log("SelectOne onSelectChange()")
 	}
 	o.selectedValue = ctx.JSSrc().Get("value").String()
+	if app.IsClient {
+		app.Logf("SelectOne state is now: %v", o.selectedValue)
+	}
 	o.shouldRender = true
 }
 
