@@ -35,17 +35,17 @@ func init() {
 
     storybook.Register("Form", "Select One", 
 		map[string]*storybook.Control{
-			"Label": {Label: "Label", Type: storybook.ControlText, Value: "Label Text."},
+			"PromptText": {Label: "Prompt Text", Type: storybook.ControlText, Value: "Choose an option..."},
 			"Disabled": {Label: "Disabled", Type: storybook.ControlBool, Value: false},
 			"Options":    {Label: "Options", Type: storybook.ControlText, Value: selectOptions}, 
 		},
 		func(controls map[string]*storybook.Control) app.UI {
-			labelString := controls["Label"].Value.(string)
+			promptText := controls["PromptText"].Value.(string)
 			isDisabled := controls["Disabled"].Value.(bool)
 			opts := controls["Options"].Value.([]string)
 
 			return &SelectOne{
-				Label: labelString,
+				PromptText: promptText,
 				Disabled: isDisabled,
 				Options: opts,
 			}

@@ -10,9 +10,9 @@ type SelectOne struct {
 	app.Compo
 	Options       []string
 	selectedValue string
-	Label         string
+	PromptText    string
 	Disabled      bool
-    shouldRender  bool
+    //shouldRender  bool
 }
 
 func (o *SelectOne) OnMount(ctx app.Context) {
@@ -26,7 +26,7 @@ func (o *SelectOne) Render() app.UI {
 		app.Log("SelectOne Render()")
 	}
 
-    o.shouldRender = false
+    //o.shouldRender = false
 
 	containerClass := ""
 	if o.Disabled {
@@ -34,12 +34,6 @@ func (o *SelectOne) Render() app.UI {
     }
 
 	return app.Div().Class("selectOne-container").Body(
-
-		app.If(o.Label != "", func() app.UI {
-			return app.Label().
-				Class("selectOne-container-label").
-				Text(o.Label)
-		}),
 		
 		app.Select().
 			Class("selectOne-container-select").
@@ -51,7 +45,7 @@ func (o *SelectOne) Render() app.UI {
 				app.Option().
 					Disabled(true).
 					Selected(o.selectedValue == "").
-					Text("Choose an option..."),
+					Text(o.PromptText),
 				app.Range(o.Options).Slice(func(i int) app.UI {
 					opt := o.Options[i]
 					return app.Option().
@@ -69,15 +63,17 @@ func (o *SelectOne) onSelectChange(ctx app.Context, e app.Event) {
 		app.Log("SelectOne onSelectChange()")
 	}
 	o.selectedValue = ctx.JSSrc().Get("value").String()
+	//o.shouldRender = true
 	if app.IsClient {
 		app.Logf("SelectOne state is now: %v", o.selectedValue)
 	}
-	o.shouldRender = true
 }
 
+/*
 func (o *SelectOne) Update(ctx app.Context) bool {
 	if app.IsClient {
 		app.Log("SelectOne Update()")
 	}
 	return o.shouldRender
 }
+*/

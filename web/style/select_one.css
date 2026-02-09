@@ -1,15 +1,6 @@
 /* web/styles/select_one.css */
 .selectOne-container {
-    display: flex;
-    flex-direction: column;
     margin-bottom: 1rem;
-}
-
-.selectOne-container-label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-bottom: 4px;
-    color: #333;
 }
 
 .selectOne-container-select {
