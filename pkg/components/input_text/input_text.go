@@ -50,6 +50,7 @@ func (t *InputText) Render() app.UI {
 					o.OnInput(ctx, val)
 				}
 				//ctx.Update()
-			}).
+			},
+		)
 	)
 }
