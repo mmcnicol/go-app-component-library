@@ -29,7 +29,7 @@ func (o *SelectOne) Render() app.UI {
 
 	return app.Div().Class("picklist-container").Body(
 
-		app.If(.Label != "", func() app.UI {
+		app.If(o.Label != "", func() app.UI {
 			return app.Label().Text(o.Label)
 		}),
 		
