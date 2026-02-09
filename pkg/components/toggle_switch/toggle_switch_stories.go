@@ -9,17 +9,22 @@ import (
 
 // Use init() to auto-register when this package is imported
 func init() {
+
+    toggleOff := &ToggleSwitch{
+        IsOn:  false,
+        Label: "Label text.",
+    }
+
     storybook.Register("Toggle Switch", "Off", func() app.UI {
-        return &ToggleSwitch{
-            IsOn:  false,
-            Label: "Label text.",
-        }
+        return toggleOff
     })
     
+    toggleOn := &ToggleSwitch{
+        IsOn:  true,
+        Label: "Label text.",
+    }
+
     storybook.Register("Toggle Switch", "On", func() app.UI {
-        return &ToggleSwitch{
-            IsOn:  true,
-            Label: "Label text.",
-        }
+        return toggleOn
     })
 }
