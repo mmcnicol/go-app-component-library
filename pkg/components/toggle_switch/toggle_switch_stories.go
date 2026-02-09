@@ -46,6 +46,13 @@ func init() {
                 IsOn:  isOn,
                 Label: labelString,
                 Disabled: isDisabled,
+                OnClick: func(ctx app.Context, val string) {
+                    // Update the shared registry state
+                    controls["isOn"].Value = val
+                    
+                    // Refresh the UI so the Shell's Controls Panel sees the change
+                    ctx.Update()
+                },
             }
 		},
 	)

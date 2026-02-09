@@ -12,12 +12,49 @@ type ToggleSwitch struct {
 	Label        string
 	Disabled     bool
     //shouldRender bool
+	OnClick      func(ctx app.Context, val bool)
 }
 
 func (t *ToggleSwitch) OnMount(ctx app.Context) {
 	if app.IsClient {
 		app.Log("ToggleSwitch OnMount()")
 	}
+}
+
+func (t *ToggleSwitch) Render() app.UI {
+	if app.IsClient {
+		app.Log("ToggleSwitch Render()")
+	}
+
+    //t.shouldRender = false
+
+    containerClass := ""
+    if t.IsOn {
+        containerClass = "toggleSwitch-container-active"
+    }
+	if t.Disabled {
+        containerClass += " toggleSwitch-container-disabled"
+    }
+
+    return app.Div().
+        Class("toggleSwitch-container").
+        Class(containerClass).
+        OnClick(func(ctx app.Context, e app.Event) {
+            t.onClick(ctx, e)
+			if t.OnClick != nil {
+				t.OnClick(ctx, t.IsOn)
+			}
+        }).
+        Body(
+            app.Div().Class("toggleSwitch-container-switch").Body(
+                app.Span().Class("toggleSwitch-container-switch-inner"),
+            ),
+            app.If(t.Label != "", func() app.UI {
+                return app.Div().Class("toggleSwitch-container-label").Body(
+					app.Text(t.Label),
+				)
+            }),
+        )
 }
 
 // OnClick handles the toggle logic
@@ -45,39 +82,6 @@ func (t *ToggleSwitch) onClick(ctx app.Context, e app.Event) {
 		app.Logf("ToggleSwitch state is now: %v", t.IsOn)
 	}
 
-}
-
-func (t *ToggleSwitch) Render() app.UI {
-	if app.IsClient {
-		app.Log("ToggleSwitch Render()")
-	}
-
-    //t.shouldRender = false
-
-    containerClass := ""
-    if t.IsOn {
-        containerClass = "toggleSwitch-container-active"
-    }
-	if t.Disabled {
-        containerClass += " toggleSwitch-container-disabled"
-    }
-
-    return app.Div().
-        Class("toggleSwitch-container").
-        Class(containerClass).
-        OnClick(func(ctx app.Context, e app.Event) {
-            t.onClick(ctx, e)
-        }).
-        Body(
-            app.Div().Class("toggleSwitch-container-switch").Body(
-                app.Span().Class("toggleSwitch-container-switch-inner"),
-            ),
-            app.If(t.Label != "", func() app.UI {
-                return app.Div().Class("toggleSwitch-container-label").Body(
-					app.Text(t.Label),
-				)
-            }),
-        )
 }
 
 /*
