@@ -1,7 +1,5 @@
 /* web/styles/toggle_switch.css */
 .toggleSwitch-container {
-    display: flex;
-    flex-direction: column;
     margin-bottom: 1rem;
     cursor: pointer;
     user-select: none;
