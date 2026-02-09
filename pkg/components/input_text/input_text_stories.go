@@ -54,6 +54,13 @@ func init() {
 				Value: valueString,
 				Disabled: isDisabled,
 				Placeholder: placeholderString,
+				OnInput: func(ctx app.Context, val string) {
+                    // Update the shared registry state
+                    controls["Value"].Value = val
+                    
+                    // Refresh the UI so the Shell's Controls Panel sees the change
+                    ctx.Update()
+                },
 			}
 		},
 	)

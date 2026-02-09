@@ -11,6 +11,7 @@ type InputText struct {
 	Value       string
 	Placeholder string
 	Disabled    bool
+	OnInput     func(ctx app.Context, val string)
 }
 
 func (t *InputText) Render() app.UI {
@@ -41,6 +42,14 @@ func (t *InputText) Render() app.UI {
 			Disabled(t.Disabled).
 			Placeholder(t.Placeholder).
 			//AutoFocus(true).
-			OnChange(t.ValueTo(&t.Value)),
+			//OnChange(t.ValueTo(&t.Value)),
+			OnInput(func(ctx app.Context, e app.Event) {
+				val := ctx.JSSrc().Get("value").String()
+				o.Value = val
+				if o.OnInput != nil {
+					o.OnInput(ctx, val)
+				}
+				//ctx.Update()
+			}).
 	)
 }
