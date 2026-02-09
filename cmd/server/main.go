@@ -7,8 +7,8 @@ import (
 	
     // Import your components so their init() functions run and register stories
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/hello"
-	_ "github.com/mmcnicol/go-app-component-library/pkg/components/phase-banner"
-	
+	_ "github.com/mmcnicol/go-app-component-library/pkg/components/phase_banner"
+
 	"log"
 	"net/http"
 )
