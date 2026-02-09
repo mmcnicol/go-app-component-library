@@ -238,13 +238,21 @@ func (s *Server) onFileChange(changedFiles []string) {
     s.dashboardData.AddFileChanges(changedFiles)
     s.dashboardData.SetBuildStatus("building")
     
-    // Try incremental build first
-    wasmPath, err := s.compiler.BuildOnlyChanged(context.Background(), changedFiles)
-    if err != nil || wasmPath == "" {
-        // Fall back to full build
-        wasmPath, err = s.buildWasm()
+    // Filter only Go files
+    var goFiles []string
+    for _, file := range changedFiles {
+        if strings.HasSuffix(file, ".go") {
+            goFiles = append(goFiles, file)
+        }
     }
     
+    if len(goFiles) == 0 {
+        log.Println("No Go files changed, skipping rebuild")
+        return
+    }
+    
+    // Rebuild the wasm
+    wasmPath, err := s.buildWasm()
     if err != nil {
         log.Printf("Build failed: %v", err)
         s.dashboardData.AddError(err.Error())
@@ -260,8 +268,17 @@ func (s *Server) onFileChange(changedFiles []string) {
         // Clear errors on successful build
         s.dashboardData.Clear()
         
-        // Notify clients to reload
-        s.liveReload.BroadcastReload("file change")
+        // Force browser cache invalidation with timestamp
+        timestamp := time.Now().Unix()
+        
+        // Notify clients to reload with cache busting
+        s.liveReload.BroadcastMessage("reload", map[string]interface{}{
+            "reason":    "file change",
+            "timestamp": timestamp,
+            "files":     goFiles,
+        })
+        
+        log.Printf("Rebuilt successfully, notifying clients")
     }
 }
 
@@ -380,111 +397,187 @@ func (s *Server) serveWasmExec(w http.ResponseWriter, r *http.Request) {
 
 // serveApp serves the main application HTML page
 func (s *Server) serveApp(w http.ResponseWriter, r *http.Request) {
-    html := `<!DOCTYPE html>
+    // Generate a unique timestamp for cache busting
+    timestamp := time.Now().Unix()
+    
+    html := fmt.Sprintf(`<!DOCTYPE html>
 <html>
 <head>
-    <title>Go App Component Library - Dev Server</title>
+    <title>Go App Component Library - Development</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script>
-        // Live reload WebSocket
-        const ws = new WebSocket('ws://' + window.location.host + '/ws');
-        
-        ws.onmessage = function(event) {
-            const data = JSON.parse(event.data);
-            if (data.type === 'reload') {
-                console.log('Reloading application due to:', data.reason);
-                window.location.reload();
-            }
-        };
-        
-        ws.onopen = function() {
-            console.log('Live reload WebSocket connected');
-        };
-        
-        ws.onerror = function(error) {
-            console.error('WebSocket error:', error);
-        };
-        
-        // Auto-refresh when wasm changes
-        let currentWasmTime = Date.now();
-        
-        function checkForUpdates() {
-            fetch('/app.wasm?check=' + currentWasmTime)
-                .then(response => {
-                    const lastModified = response.headers.get('last-modified');
-                    if (lastModified) {
-                        const serverTime = new Date(lastModified).getTime();
-                        if (serverTime > currentWasmTime) {
-                            console.log('WebAssembly updated, reloading...');
-                            window.location.reload();
-                        }
-                    }
-                })
-                .catch(err => console.log('Update check failed:', err));
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
         }
-        
-        // Check for updates every 2 seconds
-        setInterval(checkForUpdates, 2000);
-    </script>
+        #app {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0%% { transform: rotate(0deg); }
+            100%% { transform: rotate(360deg); }
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%%;
+            margin-right: 8px;
+        }
+        .status-connected { background: #28a745; }
+        .status-disconnected { background: #dc3545; }
+    </style>
 </head>
 <body>
     <div id="app">
-        <div style="padding: 20px; font-family: sans-serif;">
-            <h1>Loading Go WebAssembly...</h1>
-            <p>If this message persists, check the browser console for errors.</p>
-            <div id="loading-status" style="margin-top: 20px;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <div id="spinner" style="width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                    <span>Compiling and loading WebAssembly...</span>
-                </div>
-                <style>
-                    @keyframes spin {
-                        0% { transform: rotate(0deg); }
-                        100% { transform: rotate(360deg); }
-                    }
-                </style>
-            </div>
+        <div class="loading">
+            <div class="spinner"></div>
+            <h2>Loading Go WebAssembly...</h2>
+            <p>Hot reload development server is running.</p>
+            <p id="connection-status">
+                <span class="status-indicator status-disconnected"></span>
+                Connecting to live reload...
+            </p>
         </div>
     </div>
     
-    <script src="/wasm_exec.js"></script>
+    <script src="/wasm_exec.js?t=%d"></script>
     <script>
-        // Load WebAssembly with error handling
+        let isConnected = false;
+        let wasmInstance = null;
+        
+        // Live reload WebSocket
+        function connectWebSocket() {
+            const ws = new WebSocket('ws://' + window.location.host + '/ws');
+            
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                console.log('WebSocket message:', data);
+                
+                if (data.type === 'reload' || (data.type === 'message' && data.data.type === 'reload')) {
+                    console.log('Reloading due to:', data.reason || data.data.reason);
+                    
+                    // Force reload with cache busting
+                    const timestamp = data.timestamp || data.data.timestamp || Date.now();
+                    window.location.href = window.location.pathname + '?t=' + timestamp;
+                }
+            };
+            
+            ws.onopen = function() {
+                console.log('Live reload WebSocket connected');
+                isConnected = true;
+                updateConnectionStatus();
+            };
+            
+            ws.onclose = function() {
+                console.log('Live reload WebSocket disconnected');
+                isConnected = false;
+                updateConnectionStatus();
+                
+                // Try to reconnect after 2 seconds
+                setTimeout(connectWebSocket, 2000);
+            };
+            
+            ws.onerror = function(error) {
+                console.error('WebSocket error:', error);
+            };
+        }
+        
+        function updateConnectionStatus() {
+            const statusEl = document.getElementById('connection-status');
+            if (statusEl) {
+                const indicator = statusEl.querySelector('.status-indicator');
+                if (isConnected) {
+                    indicator.className = 'status-indicator status-connected';
+                    statusEl.innerHTML = '<span class="status-indicator status-connected"></span>Connected to live reload';
+                } else {
+                    indicator.className = 'status-indicator status-disconnected';
+                    statusEl.innerHTML = '<span class="status-indicator status-disconnected"></span>Disconnected - attempting to reconnect...';
+                }
+            }
+        }
+        
+        // Load WebAssembly
         async function loadWasm() {
+            if (typeof Go === 'undefined') {
+                document.getElementById('app').innerHTML = 
+                    '<div style="color: red; padding: 20px; text-align: center;">' +
+                    '<h2>Error: wasm_exec.js not loaded</h2>' +
+                    '<p>Make sure web/wasm_exec.js exists in your project.</p>' +
+                    '</div>';
+                return;
+            }
+            
             const go = new Go();
-            const importObject = go.importObject;
             
             try {
-                const response = await fetch('/app.wasm?t=' + Date.now());
+                // Use cache busting timestamp
+                const response = await fetch('/app.wasm?t=%d');
                 if (!response.ok) {
-                    throw new Error('Failed to fetch WebAssembly');
+                    throw new Error('Failed to fetch WebAssembly: ' + response.status);
                 }
                 
                 const bytes = await response.arrayBuffer();
-                const result = await WebAssembly.instantiate(bytes, importObject);
+                const result = await WebAssembly.instantiate(bytes, go.importObject);
                 
-                document.getElementById('loading-status').innerHTML = 
-                    '<div style="color: green;">✓ WebAssembly loaded, starting app...</div>';
-                
-                go.run(result.instance);
+                wasmInstance = result.instance;
+                go.run(wasmInstance);
             } catch (err) {
                 console.error('Failed to load WebAssembly:', err);
                 document.getElementById('app').innerHTML = 
-                    '<div style="padding: 20px; color: red;">' +
+                    '<div style="color: red; padding: 20px; text-align: center;">' +
                     '<h2>Failed to load application</h2>' +
                     '<p>Error: ' + err.message + '</p>' +
-                    '<p>Check the browser console for details.</p>' +
-                    '<button onclick="window.location.reload()" style="padding: 8px 16px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">Retry</button>' +
+                    '<p>Check console for details.</p>' +
+                    '<button onclick="window.location.reload()" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">Retry</button>' +
                     '</div>';
             }
         }
         
-        // Start loading
+        // Initialize
+        connectWebSocket();
         loadWasm();
+        
+        // Periodically check for updates (fallback)
+        setInterval(() => {
+            fetch('/app.wasm?check=' + Date.now())
+                .then(res => {
+                    // Check if file was modified
+                    const lastModified = res.headers.get('last-modified');
+                    if (lastModified) {
+                        const currentTime = new Date(lastModified).getTime();
+                        if (currentTime > window.lastWasmTime) {
+                            console.log('WASM updated (fallback detection), reloading...');
+                            window.location.reload();
+                        }
+                    }
+                })
+                .catch(() => {});
+        }, 3000);
     </script>
 </body>
-</html>`
+</html>`, timestamp, timestamp)
     
     w.Header().Set("Content-Type", "text/html; charset=utf-8")
     w.Write([]byte(html))
