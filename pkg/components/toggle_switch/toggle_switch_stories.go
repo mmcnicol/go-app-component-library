@@ -10,6 +10,7 @@ import (
 // Use init() to auto-register when this package is imported
 func init() {
 
+    /*
     toggleSwitchDefault := &ToggleSwitch{
         IsOn:  false,
         Label: "Label text.",
@@ -28,5 +29,25 @@ func init() {
     storybook.Register("Toggle Switch", "ReadOnly", func() app.UI {
         return toggleSwitchReadOnly
     })
+    */
+
+    storybook.Register("Form", "Toggle Switch", 
+		map[string]*storybook.Control{
+			"On": {Label: "isOn", Type: storybook.ControlBool, Value: false},
+			"Label": {Label: "Label", Type: storybook.ControlText, Value: "Label Text."}, 
+            "Disabled": {Label: "Disabled", Type: storybook.ControlBool, Value: false},
+		},
+		func(controls map[string]*storybook.Control) app.UI {
+			isOn := controls["On"].Value.(bool)
+            labelString := controls["Label"].Value.(string)
+			isDisabled := controls["Disabled"].Value.(bool)
+            
+			return &ToggleSwitch{
+                IsOn:  isOn,
+                Label: labelString,
+                Disabled: isDisabled,
+            }
+		},
+	)
     
 }
