@@ -92,14 +92,22 @@ func init() {
 			"Disabled":   {Label: "Disabled", Type: storybook.ControlBool, Value: false},
 			// Make sure to set the Value field so the type assertion doesn't panic
 			"Options":    {Label: "Options", Type: storybook.ControlText, Value: selectOptions}, 
+			"SelectedValue": {Label: "Selected Value", Type: storybook.ControlText, Value: ""}, 
 		},
 		func(controls map[string]*storybook.Control) app.UI {
 			promptText := controls["PromptText"].Value.(string)
 			isDisabled := controls["Disabled"].Value.(bool)
 			opts := controls["Options"].Value.([]string)
+			selectedValue := controls["SelectedValue"].Value.(string)
 
 			return app.Select().
 				Disabled(isDisabled).
+				Value(selectedValue).
+				OnChange(func(ctx app.Context, e app.Event) {
+					val := ctx.JSSrc().Get("value").String()
+					controls["SelectedValue"].Value = val
+					ctx.Update()
+				}).
 				Body(
 				app.Option().Text(promptText),
 				app.Range(opts).Slice(func(i int) app.UI {
