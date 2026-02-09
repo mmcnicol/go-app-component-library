@@ -9,6 +9,8 @@ import (
 
 // Use init() to auto-register when this package is imported
 func init() {
+
+	/*
 	storybook.Register("Phase Banner", "Beta", func() app.UI {
 		return &PhaseBanner{
 			Phase: "Beta",
@@ -28,4 +30,22 @@ func init() {
 			Message: app.Text("This is a brand new service in development."),
 		}
 	})
+	*/
+
+	storybook.Register("Messages", "Phase Banner", 
+		map[string]*storybook.Control{
+			"Phase": {Label: "Phase", Type: storybook.ControlText, Value: "Alpha"},
+			"Message": {Label: "Message", Type: storybook.ControlText, Value: "This is a brand new service in development."},
+		},
+		func(controls map[string]*storybook.Control) app.UI {
+			phaseString := controls["Phase"].Value.(string)
+			messageString := controls["Message"].Value.(string)
+
+			return &PhaseBanner{
+				Phase: phaseString,
+				Message: app.Text(messageString),
+			}
+		},
+	)
+	
 }

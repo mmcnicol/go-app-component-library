@@ -98,7 +98,9 @@ func init() {
 			isDisabled := controls["Disabled"].Value.(bool)
 			opts := controls["Options"].Value.([]string)
 
-			return app.Select().Disabled(isDisabled).Body(
+			return app.Select().
+				Disabled(isDisabled).
+				Body(
 				app.Option().Text(promptText),
 				app.Range(opts).Slice(func(i int) app.UI {
 					return app.Option().Text(opts[i]).Value(opts[i])
