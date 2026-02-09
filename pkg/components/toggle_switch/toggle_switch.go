@@ -15,7 +15,7 @@ type ToggleSwitch struct {
 // OnClick handles the toggle logic
 func (t *ToggleSwitch) OnClick(ctx app.Context, e app.Event) {
 	t.IsOn = !t.IsOn
-	//t.Update()
+	ctx.Update()
 }
 
 func (t *ToggleSwitch) Render() app.UI {
