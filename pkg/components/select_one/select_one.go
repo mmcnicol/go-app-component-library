@@ -40,9 +40,14 @@ func (o *SelectOne) Render() app.UI {
 			Class(containerClass).
 			Disabled(o.Disabled).
 			//SelectedValue(o.SelectedValue). // Keeps the UI in sync with Go state
-			OnChange(o.onSelectChange).
+			//OnChange(o.onSelectChange).
 			//OnChange(o.ValueTo(&o.SelectedValue)).
 			//OnSelect(o.ValueTo(&o.SelectedValue)).
+			OnChange(func(ctx app.Context, e app.Event) {
+				val := ctx.JSSrc().Get("value").String()
+				o.SelectedValue = val
+				ctx.Update()
+			}).
 			Body(
 				app.Option().
 					Disabled(true).
@@ -60,6 +65,7 @@ func (o *SelectOne) Render() app.UI {
 	)
 }
 
+/*
 func (o *SelectOne) onSelectChange(ctx app.Context, e app.Event) {
 	if app.IsClient {
 		app.Log("SelectOne onSelectChange()")
@@ -71,6 +77,7 @@ func (o *SelectOne) onSelectChange(ctx app.Context, e app.Event) {
 	}
 	ctx.Update()
 }
+*/
 
 /*
 func (o *SelectOne) Update(ctx app.Context) bool {
