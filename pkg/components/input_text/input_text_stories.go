@@ -41,13 +41,13 @@ func init() {
 
 	storybook.Register("Built In", "Input Text", 
 		map[string]*storybook.Control{
-			"Label": {Label: "Label Text", Type: storybook.ControlText, Value: "Label Text."},
+			"Label": {Label: "Label", Type: storybook.ControlText, Value: "Label Text."},
 			"Value": {Label: "Value", Type: storybook.ControlText, Value: ""}, 
 			"Disabled": {Label: "Disabled", Type: storybook.ControlBool, Value: false},
 			"Placeholder": {Label: "Placeholder", Type: storybook.ControlText, Value: "First Name"}, 
 		},
 		func(controls map[string]*storybook.Control) app.UI {
-			labelText := controls["Label Text"].Value.(string)
+			labelText := controls["Label"].Value.(string)
 			valueString := controls["Value"].Value.(string)
 			isDisabled := controls["Disabled"].Value.(bool)
 			placeholderString := controls["Placeholder"].Value.(string)
