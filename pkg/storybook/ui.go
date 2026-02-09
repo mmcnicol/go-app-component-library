@@ -5,9 +5,8 @@ import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
-// Shell is the main layout for the component library
 type Shell struct {
-	app.Compo // This embedding is crucial: it gives you s.Update()
+	app.Compo
 	
 	activeComponent string
 	activeStory     string
@@ -18,14 +17,14 @@ func (s *Shell) OnMount(ctx app.Context) {
 	url := ctx.Page().URL()
 	s.activeComponent = url.Query().Get("component")
 	s.activeStory = url.Query().Get("story")
-	s.Update()
+	// In v10, you don't need to call Update here; 
+	// modifying the struct and letting the lifecycle finish is enough.
 }
 
 func (s *Shell) Render() app.UI {
 	components := GetRegistry()
 
 	return app.Div().Class("storybook-layout").Body(
-		// 1. Sidebar
 		app.Aside().Class("storybook-sidebar").Body(
 			app.H2().Text("Components"),
 			app.Ul().Body(
@@ -38,7 +37,6 @@ func (s *Shell) Render() app.UI {
 								story := comp.Stories[j]
 								isActive := s.activeComponent == comp.Name && s.activeStory == story.Name
 								
-								// Calculate class string manually since ClassIf isn't standard
 								linkClass := "story-link"
 								if isActive {
 									linkClass += " active"
@@ -59,7 +57,6 @@ func (s *Shell) Render() app.UI {
 			),
 		),
 
-		// 2. Preview Area
 		app.Main().Class("storybook-preview").Body(
 			app.If(s.activeComponent != "", func() app.UI {
 				return s.renderActiveStory()
@@ -74,16 +71,20 @@ func (s *Shell) selectStory(ctx app.Context, compName, storyName string) {
 	s.activeComponent = compName
 	s.activeStory = storyName
 	
-	// Update URL without reloading so sharing works
-	ctx.Page().URL().Query().Set("component", compName)
-	ctx.Page().URL().Query().Set("story", storyName)
-	ctx.Navigate("?component=" + compName + "&story=" + storyName)
+	// Update URL query params
+	u := ctx.Page().URL()
+	q := u.Query()
+	q.Set("component", compName)
+	q.Set("story", storyName)
+	u.RawQuery = q.Encode()
 	
-	s.Update()
+	ctx.Navigate(u.String())
+	
+	// In v10, the UI refreshes automatically after an event handler.
+	// No s.Update() or ctx.Update() needed here.
 }
 
 func (s *Shell) renderActiveStory() app.UI {
-	// Find the render function in the registry
 	for _, comp := range GetRegistry() {
 		if comp.Name == s.activeComponent {
 			for _, story := range comp.Stories {
