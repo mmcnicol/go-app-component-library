@@ -138,4 +138,5 @@ func (s *Shell) onSearch(ctx app.Context, e app.Event) {
 
 func (s *Shell) onClearSearch(ctx app.Context, e app.Event) {
 	s.searchQuery = ""
+	ctx.Update()
 }
