@@ -13,6 +13,7 @@ type SelectOne struct {
 	PromptText    string
 	Disabled      bool
     //shouldRender  bool
+	OnSelect      func(ctx app.Context, val string)
 }
 
 func (o *SelectOne) OnMount(ctx app.Context) {
@@ -46,7 +47,10 @@ func (o *SelectOne) Render() app.UI {
 			OnChange(func(ctx app.Context, e app.Event) {
 				val := ctx.JSSrc().Get("value").String()
 				o.SelectedValue = val
-				ctx.Update()
+				if s.OnSelect != nil {
+					s.OnSelect(ctx, val)
+				}
+				//ctx.Update()
 			}).
 			Body(
 				app.Option().

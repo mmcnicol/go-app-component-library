@@ -51,6 +51,13 @@ func init() {
 				Disabled: isDisabled,
 				Options: opts,
                 SelectedValue: selectedValue,
+                OnSelect: func(ctx app.Context, val string) {
+                    // Update the shared registry state
+                    controls["SelectedValue"].Value = val
+                    
+                    // Refresh the UI so the Shell's Controls Panel sees the change
+                    ctx.Update()
+                },
 			}
 		},
 	)
