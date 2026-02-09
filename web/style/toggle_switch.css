@@ -42,16 +42,16 @@
     background-color: #4cd964;
 }
 
-.toggleSwitch-container.toggleSwitch-container-active .toggleSwitch-container-switch-inner {
+.toggleSwitch-container-active .toggleSwitch-container-switch-inner {
     transform: translateX(24px);
 }
 
-.toggleSwitch-container.toggleSwitch-container-disabled {
+.toggleSwitch-container-disabled {
     opacity: 0.5;                /* Visual cue for inactivity */
     cursor: not-allowed;         /* Shows the 'circle-slash' cursor */
     pointer-events: none;        /* Prevents the browser from even firing the click event */
 }
 
-.toggleSwitch-container.toggleSwitch-container-disabled .toggleSwitch-container-switch {
+.toggleSwitch-container-disabled .toggleSwitch-container-switch {
     background-color: #e0e0e0;   /* Desaturate the background */
 }
