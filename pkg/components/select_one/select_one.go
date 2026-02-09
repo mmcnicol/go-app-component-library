@@ -28,7 +28,10 @@ func (o *SelectOne) Render() app.UI {
     o.shouldRender = false
 
 	return app.Div().Class("picklist-container").Body(
-		app.If(o.Label != "", app.Label().Text(o.Label)),
+
+		app.If(.Label != "", func() app.UI {
+			return app.Label().Text(o.Label))
+		}),
 		
 		app.Select().
 			Class("picklist-select").
