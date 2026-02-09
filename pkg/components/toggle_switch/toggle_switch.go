@@ -11,7 +11,7 @@ type ToggleSwitch struct {
 	IsOn         bool
 	Label        string
 	Disabled     bool
-    shouldRender bool
+    //shouldRender bool
 }
 
 func (t *ToggleSwitch) OnMount(ctx app.Context) {
@@ -36,7 +36,7 @@ func (t *ToggleSwitch) OnClick(ctx app.Context, e app.Event) {
     }
 
 	t.IsOn = !t.IsOn
-	t.shouldRender = true
+	//t.shouldRender = true
 	//ctx.Update()
 
 	// Only logs if the app was built with "-tags dev"
@@ -52,7 +52,7 @@ func (t *ToggleSwitch) Render() app.UI {
 		app.Log("ToggleSwitch Render()")
 	}
 
-    t.shouldRender = false
+    //t.shouldRender = false
 
     containerClass := ""
     if t.IsOn {
@@ -66,7 +66,7 @@ func (t *ToggleSwitch) Render() app.UI {
         Class("toggleSwitch-container").
         Class(containerClass).
         OnClick(func(ctx app.Context, e app.Event) {
-            t.OnClick(ctx, e)
+            t.onClick(ctx, e)
         }).
         Body(
             app.Div().Class("toggleSwitch-container-switch").Body(
@@ -80,9 +80,11 @@ func (t *ToggleSwitch) Render() app.UI {
         )
 }
 
+/*
 func (t *ToggleSwitch) Update(ctx app.Context) bool {
 	if app.IsClient {
 		app.Log("ToggleSwitch Update()")
 	}
 	return t.shouldRender
 }
+*/

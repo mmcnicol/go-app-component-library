@@ -69,6 +69,7 @@ func (o *SelectOne) onSelectChange(ctx app.Context, e app.Event) {
 	if app.IsClient {
 		app.Logf("SelectOne state is now: %v", o.SelectedValue)
 	}
+	ctx.Update()
 }
 
 /*
