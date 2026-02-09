@@ -47,13 +47,13 @@ func init() {
 			"Placeholder": {Label: "Placeholder", Type: storybook.ControlText, Value: "First Name"}, 
 		},
 		func(controls map[string]*storybook.Control) app.UI {
-			labelText := controls["Label"].Value.(string)
+			labelString := controls["Label"].Value.(string)
 			valueString := controls["Value"].Value.(string)
 			isDisabled := controls["Disabled"].Value.(bool)
 			placeholderString := controls["Placeholder"].Value.(string)
 
 			return &InputText{
-				Label: labelText,
+				Label: labelString,
 				Value: valueString,
 				Disabled: isDisabled,
 				Placeholder: placeholderString,
