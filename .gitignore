@@ -1,3 +1,4 @@
 server
 dev-server
 web/app.wasm
+web/.buildcache

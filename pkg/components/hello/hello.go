@@ -9,6 +9,6 @@ type Hello struct {
 
 func (n *Hello) Render() app.UI {
     return app.Div().Body(
-        app.P().Text("Hello World!"),
+        app.P().Text("Hello World! 2"),
     )
 }
