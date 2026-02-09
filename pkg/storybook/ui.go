@@ -44,7 +44,7 @@ func (s *Shell) Render() app.UI {
 
 			app.Div().Class("search-container").Body(
 				app.Input().
-					.ID("sidebar-search-input")
+					ID("sidebar-search-input").
 					Class("sidebar-search").
 					Placeholder("Filter components...").
 					Value(s.searchQuery).
