@@ -3,7 +3,7 @@ package main
 
 import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
-	"github.com/mmcnicol/go-app-component-library/pkg/components"
+	"go-app-component-library/pkg/components"
 )
 
 func main() {
