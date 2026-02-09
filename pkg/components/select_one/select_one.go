@@ -24,5 +24,5 @@ func (o *SelectOne) Render() app.UI {
 		app.Log("SelectOne Render()")
 	}
 
-    t.shouldRender = false
+    o.shouldRender = false
 }
