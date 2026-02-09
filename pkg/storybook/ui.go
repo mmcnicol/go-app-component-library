@@ -51,6 +51,7 @@ func (s *Shell) Render() app.UI {
 					Placeholder("Filter components...").
 					Value(s.searchQuery).
 					//AutoFocus(true).
+					//OnChange(s.ValueTo(&s.searchQuery)),
 					OnInput(s.onSearch),
 
 				app.If(s.searchQuery != "", func() app.UI {
