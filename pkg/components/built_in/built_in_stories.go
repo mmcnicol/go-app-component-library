@@ -107,5 +107,23 @@ func init() {
 		},
 	)
 
+	storybook.Register("Built In", "InputText", 
+		map[string]*storybook.Control{
+			"Value": {Label: "Value", Type: storybook.ControlText, Value: ""}, 
+			"Disabled": {Label: "Disabled", Type: storybook.ControlBool, Value: false},
+			"Placeholder": {Label: "Placeholder", Type: storybook.ControlText, Value: "First Name"}, 
+		},
+		func(controls map[string]*storybook.Control) app.UI {
+			valueString := controls["Value"].Value.(string)
+			isDisabled := controls["Disabled"].Value.(bool)
+			placeholderString := controls["Placeholder"].Value.(string)
+
+			return app.Input().
+				Type("text").
+				Value(valueString).
+				Placeholder(placeholderString).
+				Disabled(isDisabled)
+		},
+	)
 
 }

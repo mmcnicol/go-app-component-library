@@ -39,7 +39,7 @@ func init() {
 	})
 	*/
 
-	storybook.Register("Built In", "Input Text", 
+	storybook.Register("Form", "Input Text", 
 		map[string]*storybook.Control{
 			"Label": {Label: "Label", Type: storybook.ControlText, Value: "Label Text."},
 			"Value": {Label: "Value", Type: storybook.ControlText, Value: ""}, 
