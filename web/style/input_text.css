@@ -22,7 +22,10 @@ inputText-container {
 }
 
 .inputText-container-input-disabled {
-    background-color: #d6d6d6;
+    background-color: #e0e0e0;   /* Desaturate the background */
+    opacity: 0.5;                /* Visual cue for inactivity */
+    cursor: not-allowed;         /* Shows the 'circle-slash' cursor */
+    pointer-events: none;        /* Prevents the browser from even firing the click event */
 }
 
 /* The blue ring effect on focus */

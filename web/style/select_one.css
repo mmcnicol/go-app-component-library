@@ -1,4 +1,10 @@
 /* web/styles/select_one.css */
+.picklist-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+}
+
 .picklist-select {
     padding: 8px 12px;
     border-radius: 4px;
