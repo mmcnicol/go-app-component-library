@@ -51,6 +51,6 @@ func (t *InputText) Render() app.UI {
 				}
 				//ctx.Update()
 			},
-		)
+		),
 	)
 }
