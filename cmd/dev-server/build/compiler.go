@@ -38,7 +38,6 @@ func NewCompiler(workDir, outputDir string) (*Compiler, error) {
     }, nil
 }
 
-// BuildWasm compiles Go to WebAssembly with caching
 func (c *Compiler) BuildWasm(ctx context.Context, mainFile string, changedFiles []string) (string, error) {
     // Check cache for unchanged files
     if c.cache.IsValid(mainFile, changedFiles) {
@@ -50,7 +49,7 @@ func (c *Compiler) BuildWasm(ctx context.Context, mainFile string, changedFiles 
     outputPath := filepath.Join(c.outputDir, 
         fmt.Sprintf("app-%d.wasm", time.Now().UnixNano()))
     
-    // Build command
+    // Build command - Add GO111MODULE=on and proper module flags
     cmd := exec.CommandContext(ctx, c.goBinary, "build",
         "-o", outputPath,
         "-tags", joinTags(c.buildTags),
@@ -59,9 +58,13 @@ func (c *Compiler) BuildWasm(ctx context.Context, mainFile string, changedFiles 
     )
     
     cmd.Dir = c.workDir
+    
+    // Set proper environment for Go modules
     cmd.Env = append(os.Environ(),
         "GOOS=js",
         "GOARCH=wasm",
+        "GO111MODULE=on",
+        "GOPROXY=direct", // Try without proxy for local modules
     )
     
     var stdout, stderr bytes.Buffer
@@ -73,6 +76,13 @@ func (c *Compiler) BuildWasm(ctx context.Context, mainFile string, changedFiles 
     buildTime := time.Since(start)
     
     if err != nil {
+        // Print more detailed error information
+        log.Printf("Build failed with error: %v", err)
+        log.Printf("Stderr output: %s", stderr.String())
+        log.Printf("Stdout output: %s", stdout.String())
+        log.Printf("Working directory: %s", c.workDir)
+        log.Printf("Main file: %s", mainFile)
+        
         return "", fmt.Errorf("build failed: %v\n%s", err, stderr.String())
     }
     
