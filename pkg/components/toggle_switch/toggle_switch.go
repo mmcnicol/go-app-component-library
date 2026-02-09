@@ -14,7 +14,7 @@ type ToggleSwitch struct {
 
 // OnClick handles the toggle logic
 func (t *ToggleSwitch) OnClick(ctx app.Context, e app.Event) {
-	e.StopPropagation() // Prevents the event from reaching the Storybook Shell
+	//e.StopPropagation() // Prevents the event from reaching the Storybook Shell
 
 	t.IsOn = !t.IsOn
 
