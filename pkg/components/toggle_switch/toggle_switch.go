@@ -18,7 +18,7 @@ func (t *ToggleSwitch) OnClick(ctx app.Context, e app.Event) {
 	ctx.Update()
 }
 
-ffunc (t *ToggleSwitch) Render() app.UI {
+func (t *ToggleSwitch) Render() app.UI {
     activeClass := ""
     if t.IsOn {
         activeClass = "active"
