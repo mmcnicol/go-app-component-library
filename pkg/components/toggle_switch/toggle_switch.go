@@ -14,6 +14,8 @@ type ToggleSwitch struct {
 
 // OnClick handles the toggle logic
 func (t *ToggleSwitch) OnClick(ctx app.Context, e app.Event) {
+	e.StopPropagation() // Prevents the event from reaching the Storybook Shell
+
 	t.IsOn = !t.IsOn
 
 	// Only logs if the app was built with "-tags dev"
@@ -24,7 +26,7 @@ func (t *ToggleSwitch) OnClick(ctx app.Context, e app.Event) {
 		app.Logf("ToggleSwitch state is now: %v", t.IsOn)
 	}
 
-	//ctx.Update()
+	ctx.Update()
 }
 
 func (t *ToggleSwitch) Render() app.UI {
