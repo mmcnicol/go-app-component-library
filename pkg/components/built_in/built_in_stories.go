@@ -102,17 +102,24 @@ func init() {
 
 			return app.Select().
 				Disabled(isDisabled).
-				Value(selectedValue).
+				//Value(selectedValue).
 				OnChange(func(ctx app.Context, e app.Event) {
 					val := ctx.JSSrc().Get("value").String()
 					controls["SelectedValue"].Value = val
 					ctx.Update()
 				}).
 				Body(
-				app.Option().Text(promptText),
-				app.Range(opts).Slice(func(i int) app.UI {
-					return app.Option().Text(opts[i]).Value(opts[i])
-				}),
+					// Placeholder option
+					app.Option().Text(promptText).Value("").Selected(selectedValue == ""),
+					
+					app.Range(opts).Slice(func(i int) app.UI {
+						optVal := opts[i]
+						return app.Option().
+							Text(optVal).
+							Value(optVal).
+							Selected(optVal == selectedValue) 
+					},
+				),
 			)
 		},
 	)
