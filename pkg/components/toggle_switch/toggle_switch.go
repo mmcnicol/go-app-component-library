@@ -19,15 +19,19 @@ func (t *ToggleSwitch) OnClick(ctx app.Context, e app.Event) {
 	// Only logs if the app was built with "-tags dev"
 	if app.IsClient {
 		// Simple log
-		app.Log("Toggle clicked!")
+		app.Log("ToggleSwitch clicked!")
 		// Formatted log
-		app.Logf("Toggle state is now: %v", t.IsOn)
+		app.Logf("ToggleSwitch state is now: %v", t.IsOn)
 	}
 
-	ctx.Update()
+	//ctx.Update()
 }
 
 func (t *ToggleSwitch) Render() app.UI {
+	if app.IsClient {
+		app.Log("ToggleSwitch Render()")
+	}
+
     activeClass := ""
     if t.IsOn {
         activeClass = "active"

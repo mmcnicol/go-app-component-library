@@ -15,12 +15,18 @@ type Shell struct {
 }
 
 func (s *Shell) OnMount(ctx app.Context) {
+	if app.IsClient {
+		app.Log("Shell OnMount()")
+	}
 	url := ctx.Page().URL()
 	s.activeComponent = url.Query().Get("component")
 	s.activeStory = url.Query().Get("story")
 }
 
 func (s *Shell) Render() app.UI {
+	if app.IsClient {
+		app.Log("Shell Render()")
+	}
 	allComponents := GetRegistry()
 	query := strings.ToLower(s.searchQuery)
 
@@ -93,6 +99,9 @@ func (s *Shell) Render() app.UI {
 }
 
 func (s *Shell) selectStory(ctx app.Context, compName, storyName string) {
+	if app.IsClient {
+		app.Log("Shell selectStory()")
+	}
 	s.activeComponent = compName
 	s.activeStory = storyName
 
@@ -106,6 +115,9 @@ func (s *Shell) selectStory(ctx app.Context, compName, storyName string) {
 }
 
 func (s *Shell) renderActiveStory() app.UI {
+	if app.IsClient {
+		app.Log("Shell renderActiveStory()")
+	}
 	for _, comp := range GetRegistry() {
 		if comp.Name == s.activeComponent {
 			for _, story := range comp.Stories {

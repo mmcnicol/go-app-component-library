@@ -8,6 +8,9 @@ type Hello struct {
 }
 
 func (n *Hello) Render() app.UI {
+    if app.IsClient {
+		app.Log("Hello Render()")
+	}
     return app.Div().Body(
         app.P().Text("Hello World!"),
     )

@@ -13,6 +13,9 @@ type PhaseBanner struct {
 }
 
 func (p *PhaseBanner) Render() app.UI {
+	if app.IsClient {
+		app.Log("PhaseBanner Render()")
+	}
 	return app.Div().Class("phase-banner").Body(
 		app.P().Class("phase-banner__content").Body(
 			app.Strong().
