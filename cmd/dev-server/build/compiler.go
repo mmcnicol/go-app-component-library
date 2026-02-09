@@ -39,44 +39,53 @@ func NewCompiler(workDir, outputDir string) (*Compiler, error) {
 }
 
 func (c *Compiler) BuildWasm(ctx context.Context, mainFile string, changedFiles []string) (string, error) {
-    // Check cache for unchanged files
+    // Check cache
     if c.cache.IsValid(mainFile, changedFiles) {
         if entry, exists := c.cache.Get(mainFile); exists {
             return entry.OutputPath, nil
         }
     }
     
-    outputPath := filepath.Join(c.outputDir, 
-        fmt.Sprintf("app-%d.wasm", time.Now().UnixNano()))
+    outputPath := filepath.Join(c.outputDir, fmt.Sprintf("app-%d.wasm", time.Now().UnixNano()))
     
-    // Use absolute path for main file
+    // Use the WORKDIR as the module root
     absMainFile, err := filepath.Abs(mainFile)
     if err != nil {
-        absMainFile = mainFile
+        return "", fmt.Errorf("failed to get absolute path: %v", err)
     }
     
-    // Build command with module mode
+    // Build with explicit module mode
     cmd := exec.CommandContext(ctx, c.goBinary, "build",
         "-o", outputPath,
         "-tags", joinTags(c.buildTags),
         "-ldflags", c.ldflags,
-        absMainFile,
     )
     
-    cmd.Dir = c.workDir
+    // For local packages, use the directory containing go.mod
+    cmd.Args = append(cmd.Args, "./"+filepath.ToSlash(strings.TrimPrefix(absMainFile, c.workDir+string(filepath.Separator))))
     
-    // Set environment for building with local packages
+    cmd.Dir = c.workDir  // This is CRITICAL - must be the module root
+    
+    // Set environment to help with local module resolution
     env := os.Environ()
-    env = append(env,
+    
+    // Remove any GOPROXY that might interfere
+    var cleanEnv []string
+    for _, e := range env {
+        if !strings.HasPrefix(e, "GOPROXY=") && !strings.HasPrefix(e, "GOPRIVATE=") {
+            cleanEnv = append(cleanEnv, e)
+        }
+    }
+    
+    cleanEnv = append(cleanEnv,
         "GOOS=js",
         "GOARCH=wasm",
         "GO111MODULE=on",
+        "GOPROXY=direct",           // Don't use proxy for local builds
+        "GOPRIVATE=github.com/mmcnicol/go-app-component-library", // Treat our package as private
     )
     
-    // For local development, we might need to disable proxy
-    env = append(env, "GOPROXY=direct")
-    
-    cmd.Env = env
+    cmd.Env = cleanEnv
     
     var stdout, stderr bytes.Buffer
     cmd.Stdout = &stdout
@@ -87,12 +96,8 @@ func (c *Compiler) BuildWasm(ctx context.Context, mainFile string, changedFiles 
     buildTime := time.Since(start)
     
     if err != nil {
-        // Try one more time with different approach
-        log.Printf("First build attempt failed: %v", err)
-        log.Printf("Error output: %s", stderr.String())
-        
-        // Try building with module in vendor mode
-        return c.tryVendorBuild(ctx, mainFile, outputPath)
+        // Try one more approach - build from current directory
+        return c.buildFromCurrentDir(mainFile, outputPath)
     }
     
     // Update cache
@@ -368,5 +373,36 @@ func (c *Compiler) BuildWasmToPath(ctx context.Context, mainFile string, changed
     }
     
     log.Printf("Built %s in %v", filepath.Base(outputPath), buildTime)
+    return outputPath, nil
+}
+
+func (c *Compiler) buildFromCurrentDir(mainFile, outputPath string) (string, error) {
+    // Alternative: build using the current directory approach
+    relPath, err := filepath.Rel(c.workDir, mainFile)
+    if err != nil {
+        return "", fmt.Errorf("failed to get relative path: %v", err)
+    }
+    
+    cmd := exec.Command("go", "build",
+        "-o", outputPath,
+        "-tags", joinTags(c.buildTags),
+        "-ldflags", c.ldflags,
+        "./"+filepath.ToSlash(relPath),
+    )
+    
+    cmd.Dir = c.workDir
+    cmd.Env = append(os.Environ(),
+        "GOOS=js",
+        "GOARCH=wasm",
+        "GO111MODULE=on",
+    )
+    
+    var stderr bytes.Buffer
+    cmd.Stderr = &stderr
+    
+    if err := cmd.Run(); err != nil {
+        return "", fmt.Errorf("fallback build failed: %v\n%s", err, stderr.String())
+    }
+    
     return outputPath, nil
 }
