@@ -126,22 +126,21 @@ func (s *Shell) selectStory(ctx app.Context, compName, storyName string) {
 	//ctx.Update()
 }
 
-func (s *Shell) getActiveStory() Story {
-	if app.IsClient {
-		app.Log("Shell getActiveStory()")
-	}
-	for _, comp := range GetRegistry() {
-		if comp.Name == s.activeComponent {
-			for _, story := range comp.Stories {
-				if story.Name == s.activeStory {
-					return story
-				}
-			}
-		}
-	}
-	return &Story{}
+func (s *Shell) getActiveStory() *Story {
+    for _, comp := range GetRegistry() {
+        if comp.Name == s.activeComponent {
+            for i := range comp.Stories {
+                if comp.Stories[i].Name == s.activeStory {
+                    // Return the address of the story in the registry
+                    return &comp.Stories[i]
+                }
+            }
+        }
+    }
+    return nil
 }
 
+/*
 func (s *Shell) renderActiveStory() app.UI {
 	if app.IsClient {
 		app.Log("Shell renderActiveStory()")
@@ -158,6 +157,18 @@ func (s *Shell) renderActiveStory() app.UI {
 		}
 	}
 	return app.Div().Text("Story not found")
+}
+*/
+
+func (s *Shell) renderActiveStory() app.UI {
+    story := s.getActiveStory()
+    if story == nil {
+        return app.Div().Text("Story not found")
+    }
+    
+    return app.Div().Class("story-container").Body(
+        story.Render(story.Controls), // Pass the map here
+    )
 }
 
 func (s *Shell) onSearch(ctx app.Context, e app.Event) {

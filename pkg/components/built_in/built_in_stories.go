@@ -57,6 +57,7 @@ func init() {
 	})
 	*/
 
+	/*
 	storybook.Register("Built In", "Select", 
 		map[string]*storybook.Control{
 			"PromptText": {Label: "Prompt Text", Type: storybook.ControlText, Value: "Choose an option..."},
@@ -79,6 +80,28 @@ func init() {
 					return app.Option().
 						Value(opt).
 						Text(opt)
+				}),
+			)
+		},
+	)
+	*/
+
+	storybook.Register("Built In", "Select", 
+		map[string]*storybook.Control{
+			"PromptText": {Label: "Prompt Text", Type: storybook.ControlText, Value: "Choose an option..."},
+			"Disabled":   {Label: "Disabled", Type: storybook.ControlBool, Value: false},
+			// Make sure to set the Value field so the type assertion doesn't panic
+			"Options":    {Label: "Options", Type: storybook.ControlText, Value: selectOptions}, 
+		},
+		func(controls map[string]*storybook.Control) app.UI {
+			promptText := controls["PromptText"].Value.(string)
+			isDisabled := controls["Disabled"].Value.(bool)
+			opts := controls["Options"].Value.([]string)
+
+			return app.Select().Disabled(isDisabled).Body(
+				app.Option().Text(promptText),
+				app.Range(opts).Slice(func(i int) app.UI {
+					return app.Option().Text(opts[i]).Value(opts[i])
 				}),
 			)
 		},
