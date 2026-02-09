@@ -10,13 +10,23 @@ import (
 // Use init() to auto-register when this package is imported
 func init() {
 
-    selectOne := &SelectOne{
+    selectOneDefault := &SelectOne{
         Label: "Label text.",
         Options: []string{"Go", "Python", "Rust", "JavaScript"},
     }
 
     storybook.Register("Select One", "Default", func() app.UI {
-        return selectOne
+        return selectOneDefault
+    })
+
+    selectOneReadOnly := &SelectOne{
+        Label: "Label text.",
+        Options: []string{"Go", "Python", "Rust", "JavaScript"},
+        Disabled: true,
+    }
+
+    storybook.Register("Select One", "ReadOnly", func() app.UI {
+        return selectOneReadOnly
     })
     
 }

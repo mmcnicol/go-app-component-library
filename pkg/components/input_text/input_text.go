@@ -8,7 +8,10 @@ import (
 // InputText indicates service status
 type InputText struct {
 	app.Compo
-	value     string
+	Value       string
+	Label       string
+	Placeholfer string
+	Disabled    bool
 }
 
 func (t *InputText) Render() app.UI {
@@ -17,11 +20,21 @@ func (t *InputText) Render() app.UI {
 	}
 
 	return app.Div().Class("inputText-container").Body(
+
+		app.If(t.Label != "", func() app.UI {
+			return app.Label().
+				Class("inputText-container-label").
+				Text(t.Label)
+		}),
+
 		app.Input().
+			Class("inputText-container-input").
 			Type("text").
-			Value(t.value).
+			Value(t.Value).
+			Disabled(t.Disabled).
+			Placeholder(t.Placeholder).
 			//Placeholder("What is your name?").
 			//AutoFocus(true).
-			OnChange(t.ValueTo(&t.value)),
+			OnChange(t.ValueTo(&t.Value)),
 	)
 }

@@ -11,6 +11,7 @@ type SelectOne struct {
 	Options       []string
 	selectedValue string
 	Label         string
+	Disabled      bool
     shouldRender  bool
 }
 
@@ -35,6 +36,7 @@ func (o *SelectOne) Render() app.UI {
 		
 		app.Select().
 			Class("picklist-select").
+			Disabled(o.Disabled).
 			//SelectedValue(o.selectedValue). // Keeps the UI in sync with Go state
 			OnChange(o.onSelectChange).
 			Body(

@@ -10,8 +10,27 @@ import (
 // Use init() to auto-register when this package is imported
 func init() {
 
+	inputTextDefault := &InputText{}
+
 	storybook.Register("Input Text", "Default", func() app.UI {
-		return &InputText{}
+		return inputTextDefault
+	})
+
+	inputTextPlaceholder := &InputText{
+		Placeholder: "sample placeholder text."
+	}
+
+	storybook.Register("Input Text", "Placeholder", func() app.UI {
+		return inputTextPlaceholder
+	})
+
+	inputTextReadOnly := &InputText{
+		Value: "this is a test"
+		Disabled: true
+	}
+
+	storybook.Register("Input Text", "ReadOnly", func() app.UI {
+		return inputTextReadOnly
 	})
 
 }
