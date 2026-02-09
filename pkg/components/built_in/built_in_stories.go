@@ -139,7 +139,12 @@ func init() {
 				Type("text").
 				Value(valueString).
 				Placeholder(placeholderString).
-				Disabled(isDisabled)
+				Disabled(isDisabled).
+				OnChange(func(ctx app.Context, e app.Event) {
+					val := ctx.JSSrc().Get("value").String()
+					controls["valueString"].Value = val
+					ctx.Update()
+				})
 		},
 	)
 
