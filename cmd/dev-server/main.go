@@ -3,7 +3,6 @@ package main
 
 import (
     "bytes"
-    "embed"
     "encoding/json"
     "flag"
     "fmt"
@@ -12,7 +11,6 @@ import (
     "os"
     "os/exec"
     "path/filepath"
-    "runtime"
     "strings"
     "sync"
     "time"
