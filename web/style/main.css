@@ -32,3 +32,16 @@
     color: #007bff;
     font-weight: bold;
 }
+
+.story-link {
+    cursor: pointer;          /* Changes arrow to a hand/pointer */
+    text-decoration: none;    /* Optional: removes default underline */
+    display: block;           /* Makes the whole line clickable */
+    padding: 4px 8px;         /* Adds some hit-area for the mouse */
+    color: inherit;           /* Keeps your text color consistent */
+}
+
+.story-link:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+    color: #007bff;
+}
