@@ -8,8 +8,9 @@ import (
 // ToggleSwitch defines the UI component
 type ToggleSwitch struct {
 	app.Compo
-	IsOn  bool
-	Label string
+	IsOn         bool
+	Label        string
+    shouldRender  bool
 }
 
 // OnClick handles the toggle logic
@@ -26,6 +27,7 @@ func (t *ToggleSwitch) OnClick(ctx app.Context, e app.Event) {
 		app.Logf("ToggleSwitch state is now: %v", t.IsOn)
 	}
 
+    t.shouldRender = true
 	//ctx.Update()
 }
 
@@ -33,6 +35,8 @@ func (t *ToggleSwitch) Render() app.UI {
 	if app.IsClient {
 		app.Log("ToggleSwitch Render()")
 	}
+
+    t.shouldRender = false
 
     activeClass := ""
     if t.IsOn {
@@ -53,4 +57,11 @@ func (t *ToggleSwitch) Render() app.UI {
                 return app.Span().Text(t.Label)
             }),
         )
+}
+
+func (t *ToggleSwitch) Update(ctx app.Context) {
+	if app.IsClient {
+		app.Log("ToggleSwitch Update()")
+	}
+	return t.shouldRender
 }
