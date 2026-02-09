@@ -17,7 +17,7 @@ func init() {
 	})
 
 	inputTextPlaceholder := &InputText{
-		Placeholder: "sample placeholder text."
+		Placeholder: "sample placeholder text.",
 	}
 
 	storybook.Register("Input Text", "Placeholder", func() app.UI {
@@ -25,8 +25,8 @@ func init() {
 	})
 
 	inputTextReadOnly := &InputText{
-		Value: "this is a test"
-		Disabled: true
+		Value: "this is a test",
+		Disabled: true,
 	}
 
 	storybook.Register("Input Text", "ReadOnly", func() app.UI {
