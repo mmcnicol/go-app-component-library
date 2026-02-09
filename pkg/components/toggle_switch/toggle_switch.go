@@ -74,7 +74,7 @@ func (t *ToggleSwitch) Render() app.UI {
             ),
             app.If(t.Label != "", func() app.UI {
                 return app.Div().Class("toggleSwitch-container-label").Body(
-					app.Text(t.Label)
+					app.Text(t.Label),
 				)
             }),
         )
