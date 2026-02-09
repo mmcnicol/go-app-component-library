@@ -7,7 +7,8 @@ import (
 
 // Shell is the main layout for the component library
 type Shell struct {
-	app.Compo
+	app.Compo // This embedding is crucial: it gives you s.Update()
+	
 	activeComponent string
 	activeStory     string
 }
@@ -37,10 +38,15 @@ func (s *Shell) Render() app.UI {
 								story := comp.Stories[j]
 								isActive := s.activeComponent == comp.Name && s.activeStory == story.Name
 								
+								// Calculate class string manually since ClassIf isn't standard
+								linkClass := "story-link"
+								if isActive {
+									linkClass += " active"
+								}
+
 								return app.Li().Body(
 									app.A().
-										Class("story-link").
-										ClassIf("active", isActive).
+										Class(linkClass).
 										Text(story.Name).
 										OnClick(func(ctx app.Context, e app.Event) {
 											s.selectStory(ctx, comp.Name, story.Name)
@@ -83,7 +89,7 @@ func (s *Shell) renderActiveStory() app.UI {
 			for _, story := range comp.Stories {
 				if story.Name == s.activeStory {
 					return app.Div().Class("story-container").Body(
-						story.Render(), // <--- The magic happens here
+						story.Render(), 
 					)
 				}
 			}
