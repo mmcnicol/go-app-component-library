@@ -59,7 +59,7 @@ func (t *ToggleSwitch) Render() app.UI {
         )
 }
 
-func (t *ToggleSwitch) Update(ctx app.Context) {
+func (t *ToggleSwitch) Update(ctx app.Context) bool {
 	if app.IsClient {
 		app.Log("ToggleSwitch Update()")
 	}

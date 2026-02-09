@@ -156,7 +156,7 @@ func (s *Shell) onClearSearch(ctx app.Context, e app.Event) {
     app.Window().GetElementByID("sidebar-search-input").Call("focus")
 }
 
-func (s *Shell) Update(ctx app.Context) {
+func (s *Shell) Update(ctx app.Context) bool {
 	if app.IsClient {
 		app.Log("Shell Update()")
 	}
