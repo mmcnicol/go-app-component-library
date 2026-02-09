@@ -133,10 +133,19 @@ func (s *Shell) renderActiveStory() app.UI {
 }
 
 func (s *Shell) onSearch(ctx app.Context, e app.Event) {
+	if app.IsClient {
+		app.Log("Shell onSearch()")
+	}
 	s.searchQuery = ctx.JSSrc().Get("value").String()
 }
 
 func (s *Shell) onClearSearch(ctx app.Context, e app.Event) {
+	if app.IsClient {
+		app.Log("Shell onClearSearch()")
+	}
 	s.searchQuery = ""
 	ctx.Update()
+
+	// Optional: Put the cursor back in the search box after clearing
+    app.Window().GetElementByID("sidebar-search-input").Call("focus")
 }
