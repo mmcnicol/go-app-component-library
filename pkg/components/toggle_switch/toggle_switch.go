@@ -10,6 +10,7 @@ type ToggleSwitch struct {
 	app.Compo
 	IsOn         bool
 	Label        string
+	Disabled     bool
     shouldRender bool
 }
 
@@ -23,18 +24,27 @@ func (t *ToggleSwitch) OnMount(ctx app.Context) {
 func (t *ToggleSwitch) OnClick(ctx app.Context, e app.Event) {
 	e.PreventDefault() // Prevents the event from reaching the Storybook Shell
 	
-	t.IsOn = !t.IsOn
-
 	// Only logs if the app was built with "-tags dev"
 	if app.IsClient {
 		// Simple log
 		app.Log("ToggleSwitch clicked!")
+	}
+
+	// 1. Guard clause: Stop execution if disabled
+    if t.Disabled {
+        return 
+    }
+
+	t.IsOn = !t.IsOn
+	t.shouldRender = true
+	//ctx.Update()
+
+	// Only logs if the app was built with "-tags dev"
+	if app.IsClient {
 		// Formatted log
 		app.Logf("ToggleSwitch state is now: %v", t.IsOn)
 	}
 
-    t.shouldRender = true
-	//ctx.Update()
 }
 
 func (t *ToggleSwitch) Render() app.UI {
@@ -44,20 +54,23 @@ func (t *ToggleSwitch) Render() app.UI {
 
     t.shouldRender = false
 
-    activeClass := ""
+    containerClass := ""
     if t.IsOn {
-        activeClass = "active"
+        containerClass = "toggleSwitch-container-active"
+    }
+	if t.Disabled {
+        containerClass += " toggleSwitch-container-disabled"
     }
 
     return app.Div().
-        Class("toggle-container").
-        Class(activeClass).
+        Class("toggleSwitch-container").
+        Class(containerClass).
         OnClick(func(ctx app.Context, e app.Event) {
             t.OnClick(ctx, e)
         }).
         Body(
-            app.Div().Class("switch").Body(
-                app.Span().Class("switch-inner"),
+            app.Div().Class("toggleSwitch-container-switch").Body(
+                app.Span().Class("toggleSwitch-container-switch-inner"),
             ),
             app.If(t.Label != "", func() app.UI {
                 return app.Span().Text(t.Label)
