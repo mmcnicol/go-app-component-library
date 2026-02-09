@@ -18,24 +18,24 @@ func (t *ToggleSwitch) OnClick(ctx app.Context, e app.Event) {
 	ctx.Update()
 }
 
-func (t *ToggleSwitch) Render() app.UI {
-	
-	activeClass := ""
-	if t.IsOn {
-		activeClass = "active"
-	}
+ffunc (t *ToggleSwitch) Render() app.UI {
+    activeClass := ""
+    if t.IsOn {
+        activeClass = "active"
+    }
 
-	return app.Div().
-		Class("toggle-container").
-		Class(activeClass).
-		OnClick(t.OnClick).
-		Body(
-			app.Div().Class("switch").Body(
-				app.Span().Class("switch-inner"),
-			),
-			// app.If expects (bool, func() app.UI)
-			app.If(t.Label != "", func() app.UI {
-				return app.Span().Text(t.Label)
-			}),
-		)
+    return app.Div().
+        Class("toggle-container").
+        Class(activeClass).
+        OnClick(func(ctx app.Context, e app.Event) {
+            t.OnClick(ctx, e)
+        }).
+        Body(
+            app.Div().Class("switch").Body(
+                app.Span().Class("switch-inner"),
+            ),
+            app.If(t.Label != "", func() app.UI {
+                return app.Span().Text(t.Label)
+            }),
+        )
 }
