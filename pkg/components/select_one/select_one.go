@@ -29,7 +29,7 @@ func (o *SelectOne) Render() app.UI {
     o.shouldRender = false
 
 	containerClass := ""
-	if t.Disabled {
+	if o.Disabled {
         containerClass += "selectOne-container-select-disabled"
     }
 
