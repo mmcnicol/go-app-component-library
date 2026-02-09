@@ -54,4 +54,6 @@
     background-color: #007bff; /* Primary blue background */
     color: #ffffff;            /* White text */
     font-weight: 600;          /* Bold text */
+    border-left: 4px solid #0056b3;
+    padding-left: 8px; /* Offset the padding to account for the border */
 }
