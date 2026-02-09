@@ -15,6 +15,15 @@ type ToggleSwitch struct {
 // OnClick handles the toggle logic
 func (t *ToggleSwitch) OnClick(ctx app.Context, e app.Event) {
 	t.IsOn = !t.IsOn
+
+	// Only logs if the app was built with "-tags dev"
+	if app.IsClient {
+		// Simple log
+		app.Log("Toggle clicked!")
+		// Formatted log
+		app.Logf("Toggle state is now: %v", t.IsOn)
+	}
+
 	ctx.Update()
 }
 
