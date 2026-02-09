@@ -6,10 +6,27 @@ import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
+type ControlType string
+
+const (
+    ControlText   ControlType = "text"
+    ControlBool   ControlType = "bool"
+    ControlNumber ControlType = "number"
+)
+
+type Control struct {
+    Label   string
+    Type    ControlType
+    Value   any
+    Options []string // For select inputs
+}
+
 // Story represents a single view of a component (e.g., "Primary", "Disabled")
 type Story struct {
 	Name   string
-	Render func() app.UI
+	Controls map[string]*Control
+    // Render now accepts the current state of controls
+    Render   func(controls map[string]*Control) app.UI
 }
 
 // ComponentContainer holds all stories for a specific component

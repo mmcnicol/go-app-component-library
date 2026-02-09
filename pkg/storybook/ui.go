@@ -168,3 +168,44 @@ func (s *Shell) Update(ctx app.Context) bool {
 	}
 	return s.shouldRender
 }
+
+func (s *Shell) renderControls() app.UI {
+    story := s.getActiveStory()
+    if story == nil || len(story.Controls) == 0 {
+        return app.Div().Text("No controls available")
+    }
+
+    return app.Div().Class("storybook-controls").Body(
+        app.H3().Text("Properties"),
+        app.Table().Body(
+            app.Range(story.Controls).Map(func(k string) app.UI {
+                ctrl := story.Controls[k]
+                return app.Tr().Body(
+                    app.Td().Text(ctrl.Label),
+                    app.Td().Body(
+                        s.renderControlInput(k, ctrl),
+                    ),
+                )
+            }),
+        ),
+    )
+}
+
+func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
+    switch ctrl.Type {
+    case ControlBool:
+        return app.Input().Type("checkbox").Checked(ctrl.Value.(bool)).
+            OnChange(func(ctx app.Context, e app.Event) {
+                ctrl.Value = ctx.JSSrc().Get("checked").Bool()
+                s.shouldRender = true // Trigger Shell update
+            })
+    case ControlText:
+        return app.Input().Type("text").Value(ctrl.Value).
+            OnInput(func(ctx app.Context, e app.Event) {
+                ctrl.Value = ctx.JSSrc().Get("value").String()
+                s.shouldRender = true
+            })
+    default:
+        return app.Text("Unsupported control")
+    }
+}
