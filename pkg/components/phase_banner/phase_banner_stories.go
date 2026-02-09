@@ -1,6 +1,6 @@
 //go:build dev
 // pkg/components/phase_banner/phase_banner_stories.go
-package phase-banner
+package phase_banner
 
 import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
