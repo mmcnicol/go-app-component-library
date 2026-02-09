@@ -12,6 +12,7 @@ func init() {
 
     selectOne := &SelectOne{
         Label: "Label text.",
+        Options: []string{"Go", "Python", "Rust", "JavaScript"},
     }
 
     storybook.Register("Select One", "Default", func() app.UI {
