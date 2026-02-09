@@ -4,9 +4,8 @@
 
 install-deps:
 	@echo "Installing dependencies..."
-	go get -u github.com/fsnotify/fsnotify
-	go get -u github.com/gorilla/websocket
-	go get -u github.com/maxence-charriere/go-app/v10
+	go mod download
+	go mod tidy
 
 # Build the Frontend (WebAssembly)
 # Note: GOOS=js and GOARCH=wasm are required for go-app to run in the browser

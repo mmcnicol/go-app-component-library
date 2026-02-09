@@ -418,7 +418,7 @@ func (s *Server) serveWasmExec(w http.ResponseWriter, r *http.Request) {
     }
     
     // Fallback: try to read from go-app package
-    wasmExecPath := filepath.Join(s.workDir, "vendor", "github.com", "maxence-charriere", "go-app", "v10", "cmd", "wasm_exec.js")
+    wasmExecPath := filepath.Join(s.workDir, "github.com", "maxence-charriere", "go-app", "v10", "cmd", "wasm_exec.js")
     
     if _, err := os.Stat(wasmExecPath); err == nil {
         http.ServeFile(w, r, wasmExecPath)

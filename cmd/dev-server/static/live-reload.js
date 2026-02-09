@@ -1,4 +1,4 @@
-<!-- static/live-reload.js -->
+<!-- cmd/dev-server/static/live-reload.js -->
 (function() {
     // Only in development
     if (window.location.hostname !== 'localhost' && 
