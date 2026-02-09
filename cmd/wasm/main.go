@@ -1,12 +1,12 @@
 //go:build dev
-
+// cmd/wasm/main.go
 package main
 
 import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/mmcnicol/go-app-component-library/pkg/storybook"
 	
-    // Import your components so their init() functions run and register stories
+	// Import your components so their init() functions run and register stories
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/hello"
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/phase_banner"
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/toggle_switch"

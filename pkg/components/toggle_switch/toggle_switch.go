@@ -19,14 +19,23 @@ func (t *ToggleSwitch) OnClick(ctx app.Context, e app.Event) {
 }
 
 func (t *ToggleSwitch) Render() app.UI {
+	
+	activeClass := ""
+	if t.IsOn {
+		activeClass = "active"
+	}
+
 	return app.Div().
 		Class("toggle-container").
-		Class(app.If(t.IsOn, "active").Else("")). // Dynamic class binding
+		Class(activeClass).
 		OnClick(t.OnClick).
 		Body(
 			app.Div().Class("switch").Body(
 				app.Span().Class("switch-inner"),
 			),
-			app.If(t.Label != "", app.Span().Text(t.Label)),
+			// app.If expects (bool, func() app.UI)
+			app.If(t.Label != "", func() app.UI {
+				return app.Span().Text(t.Label)
+			}),
 		)
 }
