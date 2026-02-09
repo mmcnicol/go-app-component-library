@@ -73,7 +73,7 @@ func (t *ToggleSwitch) Render() app.UI {
                 app.Span().Class("toggleSwitch-container-switch-inner"),
             ),
             app.If(t.Label != "", func() app.UI {
-                return app.Span().Text(t.Label)
+                return app.Span().Class("toggleSwitch-container-label").Text(t.Label)
             }),
         )
 }

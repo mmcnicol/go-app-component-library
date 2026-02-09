@@ -1,10 +1,17 @@
 /* web/styles/toggle_switch.css */
-.toggle-container {
+.toggleSwitch-container {
     display: flex;
     flex-direction: column;
     margin-bottom: 1rem;
     cursor: pointer;
     user-select: none;
+}
+
+.toggleSwitch-container-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #333;
 }
 
 .toggleSwitch-container-switch {
