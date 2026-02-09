@@ -26,6 +26,7 @@
 .story-container {
     border: 1px dashed #ccc; /* Visual aid to see component boundaries */
     padding: 20px;
+    width: 100%;
 }
 
 .active {
