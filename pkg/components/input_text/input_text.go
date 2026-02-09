@@ -45,9 +45,9 @@ func (t *InputText) Render() app.UI {
 			//OnChange(t.ValueTo(&t.Value)),
 			OnInput(func(ctx app.Context, e app.Event) {
 				val := ctx.JSSrc().Get("value").String()
-				o.Value = val
-				if o.OnInput != nil {
-					o.OnInput(ctx, val)
+				t.Value = val
+				if t.OnInput != nil {
+					t.OnInput(ctx, val)
 				}
 				//ctx.Update()
 			},
