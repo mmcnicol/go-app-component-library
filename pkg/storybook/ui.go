@@ -13,12 +13,14 @@ type Shell struct {
 	activeStory     string
 	searchQuery     string
 	shouldRender    bool
+	showControls    bool
 }
 
 func (s *Shell) OnMount(ctx app.Context) {
 	if app.IsClient {
 		app.Log("Shell OnMount()")
 	}
+	s.showControls = true // Default to open
 	url := ctx.Page().URL()
 	s.activeComponent = url.Query().Get("component")
 	s.activeStory = url.Query().Get("story")
@@ -40,6 +42,7 @@ func (s *Shell) Render() app.UI {
 	}
 
 	return app.Div().Class("storybook-layout").Body(
+		// LEFT SIDEBAR
 		app.Aside().Class("storybook-sidebar").Body(
 			app.H2().Text("Components"),
 
@@ -91,6 +94,8 @@ func (s *Shell) Render() app.UI {
 			),
 		),
 
+		// MAIN CONTENT AREA
+		/*
 		app.Main().Class("storybook-preview").Body(
 
 			app.If(s.activeComponent != "", func() app.UI {
@@ -105,6 +110,37 @@ func (s *Shell) Render() app.UI {
 			}),
 
 		),
+		*/
+		app.Main().Class("storybook-main").Body(
+            app.Div().Class("canvas-header").Body(
+                app.Button().
+                    Class("toggle-controls-btn").
+                    Text("⚙ Controls").
+                    OnClick(func(ctx app.Context, e app.Event) {
+                        s.showControls = !s.showControls
+                        s.shouldRender = true
+                    }),
+            ),
+            
+            app.Div().Class("canvas-content").Body(
+                app.If(s.activeComponent != "", func() app.UI {
+                    story := s.getActiveStory()
+                    return app.Div().Class("story-container").Body(
+                        story.Render(story.Controls),
+                    )
+                }).Else(func() app.UI {
+                    return app.Div().Class("empty-state").Text("Select a story")
+                }),
+            ),
+        ),
+
+		// RIGHT CONTROLS PANEL (Conditional)
+		app.If(s.showControls, func() app.UI {
+            return app.Aside().Class("storybook-controls-panel").Body(
+                s.renderControls(),
+            )
+        }),
+
 	)
 }
 
