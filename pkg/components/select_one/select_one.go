@@ -37,7 +37,7 @@ func (o *SelectOne) Render() app.UI {
 			Body(
 				app.Option().
 					Disabled(true).
-					Selected(p.SelectedValue == "").
+					Selected(o.SelectedValue == "").
 					Text("Choose an option..."),
 				app.Range(o.Options).Slice(func(i int) app.UI {
 					opt := o.Options[i]
