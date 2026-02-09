@@ -21,7 +21,7 @@ func (t *ToggleSwitch) OnMount(ctx app.Context) {
 }
 
 // OnClick handles the toggle logic
-func (t *ToggleSwitch) OnClick(ctx app.Context, e app.Event) {
+func (t *ToggleSwitch) onClick(ctx app.Context, e app.Event) {
 	e.PreventDefault() // Prevents the event from reaching the Storybook Shell
 	
 	// Only logs if the app was built with "-tags dev"
