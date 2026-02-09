@@ -10,7 +10,7 @@ type InputText struct {
 	app.Compo
 	Value       string
 	Label       string
-	Placeholfer string
+	Placeholder string
 	Disabled    bool
 }
 
