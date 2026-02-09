@@ -10,13 +10,16 @@ import (
 // Use init() to auto-register when this package is imported
 func init() {
 
-	inputTextDefault := &InputText{}
+	inputTextDefault := &InputText{
+		Label: "Label text.",
+	}
 
 	storybook.Register("Input Text", "Default", func() app.UI {
 		return inputTextDefault
 	})
 
 	inputTextPlaceholder := &InputText{
+		Label: "Label text.",
 		Placeholder: "sample placeholder text.",
 	}
 
@@ -25,6 +28,7 @@ func init() {
 	})
 
 	inputTextReadOnly := &InputText{
+		Label: "Label text.",
 		Value: "this is a test",
 		Disabled: true,
 	}
