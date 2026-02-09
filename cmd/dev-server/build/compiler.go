@@ -49,41 +49,50 @@ func (c *Compiler) BuildWasm(ctx context.Context, mainFile string, changedFiles 
     outputPath := filepath.Join(c.outputDir, 
         fmt.Sprintf("app-%d.wasm", time.Now().UnixNano()))
     
-    // Build command - Add GO111MODULE=on and proper module flags
+    // Use absolute path for main file
+    absMainFile, err := filepath.Abs(mainFile)
+    if err != nil {
+        absMainFile = mainFile
+    }
+    
+    // Build command with module mode
     cmd := exec.CommandContext(ctx, c.goBinary, "build",
         "-o", outputPath,
         "-tags", joinTags(c.buildTags),
         "-ldflags", c.ldflags,
-        mainFile,
+        absMainFile,
     )
     
     cmd.Dir = c.workDir
     
-    // Set proper environment for Go modules
-    cmd.Env = append(os.Environ(),
+    // Set environment for building with local packages
+    env := os.Environ()
+    env = append(env,
         "GOOS=js",
         "GOARCH=wasm",
         "GO111MODULE=on",
-        "GOPROXY=direct", // Try without proxy for local modules
     )
+    
+    // For local development, we might need to disable proxy
+    env = append(env, "GOPROXY=direct")
+    
+    cmd.Env = env
     
     var stdout, stderr bytes.Buffer
     cmd.Stdout = &stdout
     cmd.Stderr = &stderr
     
     start := time.Now()
-    err := cmd.Run()
+    err = cmd.Run()
     buildTime := time.Since(start)
     
     if err != nil {
-        // Print more detailed error information
-        log.Printf("Build failed with error: %v", err)
-        log.Printf("Stderr output: %s", stderr.String())
-        log.Printf("Stdout output: %s", stdout.String())
-        log.Printf("Working directory: %s", c.workDir)
-        log.Printf("Main file: %s", mainFile)
+        // Try one more time with different approach
+        log.Printf("First build attempt failed: %v", err)
+        log.Printf("Error output: %s", stderr.String())
         
-        return "", fmt.Errorf("build failed: %v\n%s", err, stderr.String())
+        // Try building with module in vendor mode
+        return c.tryVendorBuild(ctx, mainFile, outputPath)
     }
     
     // Update cache
@@ -99,6 +108,36 @@ func (c *Compiler) BuildWasm(ctx context.Context, mainFile string, changedFiles 
     }
     
     log.Printf("Built %s in %v", filepath.Base(outputPath), buildTime)
+    return outputPath, nil
+}
+
+// tryVendorBuild tries to build using vendor directory
+func (c *Compiler) tryVendorBuild(ctx context.Context, mainFile, outputPath string) (string, error) {
+    cmd := exec.CommandContext(ctx, c.goBinary, "build",
+        "-o", outputPath,
+        "-tags", joinTags(c.buildTags),
+        "-ldflags", c.ldflags,
+        "-mod=vendor",
+        mainFile,
+    )
+    
+    cmd.Dir = c.workDir
+    cmd.Env = append(os.Environ(),
+        "GOOS=js",
+        "GOARCH=wasm",
+        "GO111MODULE=on",
+    )
+    
+    var stdout, stderr bytes.Buffer
+    cmd.Stdout = &stdout
+    cmd.Stderr = &stderr
+    
+    log.Printf("Trying vendor build...")
+    
+    if err := cmd.Run(); err != nil {
+        return "", fmt.Errorf("vendor build also failed: %v\n%s", err, stderr.String())
+    }
+    
     return outputPath, nil
 }
 

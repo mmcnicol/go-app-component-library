@@ -155,66 +155,46 @@ func NewServer(port int, workDir string, enableDashboard, profile bool) (*Server
 
 // buildWasm builds the WebAssembly binary
 func (s *Server) buildWasm() (string, error) {
-    // Create a simple wasm file for development
-    tempDir, err := os.MkdirTemp("", "dev-wasm-*")
-    if err != nil {
-        return "", fmt.Errorf("failed to create temp dir: %v", err)
-    }
-    defer os.RemoveAll(tempDir)
+    // Use the real wasm main file from cmd/wasm/main.go
+    wasmMainFile := filepath.Join(s.workDir, "cmd/wasm/main.go")
     
-    mainFile := filepath.Join(tempDir, "main.go")
-    
-    content := `package main
-
-import (
-    "github.com/maxence-charriere/go-app/v10/pkg/app"
-)
-
-type DevApp struct {
-    app.Compo
-}
-
-func (d *DevApp) Render() app.UI {
-    return app.Div().Body(
-        app.H1().Text("Go App Component Library - Development"),
-        app.P().Text("✅ Development server is running!"),
-        app.P().Text("✨ Hot reload is active - edit your components and see changes instantly."),
-        app.P().Text("📁 Serving from web/ folder with wasm_exec.js"),
-        app.Hr(),
-        app.Div().Style("margin-top", "20px").Body(
-            app.H3().Text("Getting Started:"),
-            app.Ul().Body(
-                app.Li().Text("Edit components in pkg/components/"),
-                app.Li().Text("Save changes"),
-                app.Li().Text("Watch the browser reload automatically"),
-            ),
-        ),
-        app.Div().Style("margin-top", "20px").Body(
-            app.H3().Text("File Structure:"),
-            app.Ul().Body(
-                app.Li().Text("web/app.wasm - WebAssembly binary (auto-generated)"),
-                app.Li().Text("web/wasm_exec.js - WebAssembly runtime (from Go)"),
-                app.Li().Text("web/styles.css - Custom styles (optional)"),
-            ),
-        ),
-    )
-}
-
-func main() {
-    app.Route("/", func() app.Composer { return &DevApp{} })
-    app.RunWhenOnBrowser()
-}`
-    
-    if err := os.WriteFile(mainFile, []byte(content), 0644); err != nil {
-        return "", fmt.Errorf("failed to write temp main file: %v", err)
+    // Check if the file exists
+    if _, err := os.Stat(wasmMainFile); os.IsNotExist(err) {
+        return "", fmt.Errorf("wasm main file not found: %s", wasmMainFile)
     }
     
     // Build to web/app.wasm (fixed name for simplicity)
     outputPath := filepath.Join(s.outputDir, "app.wasm")
     
-    wasmPath, err := s.compiler.BuildWasmToPath(context.Background(), mainFile, nil, outputPath)
+    // First, let's try to build with the existing BuildWasm method
+    wasmPath, err := s.compiler.BuildWasm(context.Background(), wasmMainFile, nil)
+    if err != nil {
+        // If that fails, try a direct build
+        log.Printf("Build failed, trying direct approach: %v", err)
+        wasmPath, err = s.buildDirect(wasmMainFile, outputPath)
+    }
+    
     if err != nil {
         return "", fmt.Errorf("build failed: %v", err)
+    }
+    
+    // If we got a random filename, rename it to app.wasm
+    if filepath.Base(wasmPath) != "app.wasm" {
+        finalPath := outputPath
+        if err := os.Rename(wasmPath, finalPath); err != nil {
+            // If rename fails, copy it
+            data, err := os.ReadFile(wasmPath)
+            if err != nil {
+                return wasmPath, fmt.Errorf("failed to read wasm file: %v", err)
+            }
+            if err := os.WriteFile(finalPath, data, 0644); err != nil {
+                return wasmPath, fmt.Errorf("failed to write wasm file: %v", err)
+            }
+            os.Remove(wasmPath)
+            wasmPath = finalPath
+        } else {
+            wasmPath = finalPath
+        }
     }
     
     log.Printf("Built WebAssembly to: %s", wasmPath)
@@ -622,6 +602,35 @@ func (s *Server) handleClearCache(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
     w.Header().Set("Access-Control-Allow-Origin", "*")
     json.NewEncoder(w).Encode(map[string]string{"status": "cache_cleared"})
+}
+
+// buildDirect builds wasm directly using go command
+func (s *Server) buildDirect(mainFile, outputPath string) (string, error) {
+    cmd := exec.Command("go", "build",
+        "-o", outputPath,
+        "-tags", "dev",
+        "-ldflags", "-s -w",
+        mainFile,
+    )
+    
+    cmd.Dir = s.workDir
+    cmd.Env = append(os.Environ(),
+        "GOOS=js",
+        "GOARCH=wasm",
+        "GO111MODULE=on",
+    )
+    
+    var stdout, stderr bytes.Buffer
+    cmd.Stdout = &stdout
+    cmd.Stderr = &stderr
+    
+    log.Printf("Building: go build -o %s %s", outputPath, mainFile)
+    
+    if err := cmd.Run(); err != nil {
+        return "", fmt.Errorf("direct build failed: %v\n%s", err, stderr.String())
+    }
+    
+    return outputPath, nil
 }
 
 // main is the entry point for the dev-server
