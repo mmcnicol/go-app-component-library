@@ -32,12 +32,12 @@ func (o *SelectOne) Render() app.UI {
 		
 		app.Select().
 			Class("picklist-select").
-			Value(o.SelectedValue). // Keeps the UI in sync with Go state
+			Value(o.selectedValue). // Keeps the UI in sync with Go state
 			OnChange(o.onSelectChange).
 			Body(
 				app.Option().
 					Disabled(true).
-					Selected(o.SelectedValue == "").
+					Selected(o.selectedValue == "").
 					Text("Choose an option..."),
 				app.Range(o.Options).Slice(func(i int) app.UI {
 					opt := o.Options[i]
@@ -45,7 +45,7 @@ func (o *SelectOne) Render() app.UI {
 						Value(opt).
 						Text(opt).
 						// Set the "selected" attribute explicitly if it matches
-						Selected(opt == o.SelectedValue)
+						Selected(opt == o.selectedValue)
 				}),
 			),
 	)
