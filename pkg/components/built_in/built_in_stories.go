@@ -19,7 +19,7 @@ func init() {
 			)
 	})
 
-	selectOptions := []string{"Go", "Python", "Rust", "JavaScript"},
+	selectOptions := []string{"Go", "Python", "Rust", "JavaScript"}
 
 	storybook.Register("Built In", "Select", func() app.UI {
 		return app.Select().
