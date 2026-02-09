@@ -120,7 +120,9 @@ func NewServer(port int, workDir string, enableDashboard, profile bool) (*Server
     // Create compiler with error handling
     compiler, err := build.NewCompiler(workDir, outputDir)
     if err != nil {
-        return nil, fmt.Errorf("failed to create compiler: %v", err)
+        // Log the error but continue - the compiler might still work
+        log.Printf("Warning: failed to create compiler: %v", err)
+        // Don't return error here, we'll try to build directly
     }
     
     s := &Server{
@@ -144,9 +146,13 @@ func NewServer(port int, workDir string, enableDashboard, profile bool) (*Server
     // Initial build - output to web/app.wasm
     initialWasm, err := s.buildWasm()
     if err != nil {
-        return nil, fmt.Errorf("initial build failed: %v", err)
+        log.Printf("Initial build warning: %v", err)
+        // Don't fail here - the server can still start
+        // Create a dummy wasm file or continue without it
+        s.currentWasm = ""
+    } else {
+        s.currentWasm = initialWasm
     }
-    s.currentWasm = initialWasm
     
     // Start monitoring connected clients
     go s.monitorClients()
@@ -155,39 +161,50 @@ func NewServer(port int, workDir string, enableDashboard, profile bool) (*Server
 }
 
 // buildWasm builds the WebAssembly binary
-// cmd/dev-server/main.go - Simplified buildWasm method
-
 func (s *Server) buildWasm() (string, error) {
     outputPath := filepath.Join(s.outputDir, "app.wasm")
     
-    // First, ensure we're building from the correct directory
+    // The wasm entry point is at cmd/wasm/main.go
+    mainPackage := "./cmd/wasm"
+    
+    // First verify the package exists
+    verifyCmd := exec.Command("go", "list", mainPackage)
+    verifyCmd.Dir = s.workDir
+    if output, err := verifyCmd.CombinedOutput(); err != nil {
+        log.Printf("Package verification failed: %s", output)
+        // Continue anyway, the build might still work
+    }
+    
     cmd := exec.Command("go", "build",
         "-o", outputPath,
         "-tags", "dev",
         "-ldflags", "-s -w",
-        "./cmd/wasm",  // Use ./ notation for local package
+        mainPackage,
     )
     
     cmd.Dir = s.workDir
     
-    // Critical: Set GOPRIVATE to tell Go this is a private/local package
+    // Set environment variables
     env := os.Environ()
-    
-    // Filter out any problematic env vars
     var cleanEnv []string
+    
+    // Filter and set environment
     for _, e := range env {
-        // Remove GOPROXY for local builds to avoid proxy issues
-        if !strings.HasPrefix(e, "GOPROXY=") {
+        // Keep most env vars but override some
+        if !strings.HasPrefix(e, "GOOS=") &&
+           !strings.HasPrefix(e, "GOARCH=") &&
+           !strings.HasPrefix(e, "GO111MODULE=") &&
+           !strings.HasPrefix(e, "GOPROXY=") {
             cleanEnv = append(cleanEnv, e)
         }
     }
     
+    // Add required env vars for wasm build
     cleanEnv = append(cleanEnv,
         "GOOS=js",
         "GOARCH=wasm",
         "GO111MODULE=on",
-        "GOPROXY=direct",  // Bypass proxy
-        "GOPRIVATE=github.com/mmcnicol/go-app-component-library",  // Mark as private
+        "GOPROXY=direct",
     )
     
     cmd.Env = cleanEnv
@@ -196,10 +213,15 @@ func (s *Server) buildWasm() (string, error) {
     cmd.Stdout = &stdout
     cmd.Stderr = &stderr
     
-    log.Printf("Building WebAssembly from %s", s.workDir)
+    log.Printf("Building WebAssembly from %s (package: %s)", s.workDir, mainPackage)
+    log.Printf("Command: go build -o %s -tags dev -ldflags \"-s -w\" %s", outputPath, mainPackage)
     
     if err := cmd.Run(); err != nil {
-        // Try alternative approach
+        // Try an alternative approach if the first fails
+        log.Printf("Build failed: %v", err)
+        log.Printf("Stderr: %s", stderr.String())
+        log.Printf("Stdout: %s", stdout.String())
+        
         return s.buildWasmAlternative(outputPath)
     }
     
@@ -208,21 +230,16 @@ func (s *Server) buildWasm() (string, error) {
 }
 
 func (s *Server) buildWasmAlternative(outputPath string) (string, error) {
-    // Alternative: Use go list to verify the package exists
-    cmd := exec.Command("go", "list", "./...")
-    cmd.Dir = s.workDir
-    output, err := cmd.Output()
-    if err != nil {
-        return "", fmt.Errorf("failed to list packages: %v", err)
-    }
-    log.Printf("Available packages:\n%s", output)
+    // Try building with the full path to main.go
+    mainFile := filepath.Join(s.workDir, "cmd", "wasm", "main.go")
     
-    // Try building with module mode off (for local development)
-    cmd = exec.Command("go", "build",
+    log.Printf("Trying alternative build with main file: %s", mainFile)
+    
+    cmd := exec.Command("go", "build",
         "-o", outputPath,
         "-tags", "dev",
         "-ldflags", "-s -w",
-        "./cmd/wasm",
+        mainFile,
     )
     
     cmd.Dir = s.workDir
@@ -370,8 +387,16 @@ func (s *Server) serveWasm(w http.ResponseWriter, r *http.Request) {
     s.wasmMu.RUnlock()
     
     if wasmPath == "" {
-        http.Error(w, "No WebAssembly binary available", http.StatusNotFound)
-        return
+        // Try to build on-demand
+        log.Println("No WebAssembly binary available, attempting to build...")
+        wasmPath, err := s.buildWasm()
+        if err != nil {
+            http.Error(w, "No WebAssembly binary available and build failed: "+err.Error(), http.StatusNotFound)
+            return
+        }
+        s.wasmMu.Lock()
+        s.currentWasm = wasmPath
+        s.wasmMu.Unlock()
     }
     
     // Add cache busting headers
