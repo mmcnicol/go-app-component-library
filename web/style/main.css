@@ -37,11 +37,21 @@
     cursor: pointer;          /* Changes arrow to a hand/pointer */
     text-decoration: none;    /* Optional: removes default underline */
     display: block;           /* Makes the whole line clickable */
-    padding: 4px 8px;         /* Adds some hit-area for the mouse */
+    padding: 6px 12px;         /* Adds some hit-area for the mouse */
     color: inherit;           /* Keeps your text color consistent */
+    color: #495057;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    margin: 2px 0;
+}
+ 
+.story-link:hover {
+    background-color: #e9ecef;
+    color: #007bff;
 }
 
-.story-link:hover {
-    background-color: rgba(0, 123, 255, 0.1);
-    color: #007bff;
+.story-link.active {
+    background-color: #007bff; /* Primary blue background */
+    color: #ffffff;            /* White text */
+    font-weight: 600;          /* Bold text */
 }
