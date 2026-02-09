@@ -1,0 +1,36 @@
+/* web/styles/phase_banner.css */
+.phase-banner {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #b1b4b6;
+    font-family: sans-serif;
+    font-size: 16px;
+}
+
+.phase-banner__content {
+    display: flex;
+    align-items: center;
+    margin: 0;
+}
+
+.phase-banner__content__tag {
+    display: inline-block;
+    padding: 2px 8px;
+    margin-right: 10px;
+    background-color: #1d70b8;
+    color: #ffffff;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 14px;
+}
+
+.phase-banner__text {
+    color: #0b0c0c;
+    line-height: 1.25;
+}
+
+.phase-banner__text a {
+    color: #1d70b8;
+    text-decoration: underline;
+}

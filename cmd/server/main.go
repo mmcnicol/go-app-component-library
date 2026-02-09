@@ -8,6 +8,7 @@ import (
     // Import your components so their init() functions run and register stories
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/hello"
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/phase_banner"
+	_ "github.com/mmcnicol/go-app-component-library/pkg/components/toggle_switch"
 
 	"log"
 	"net/http"
@@ -23,7 +24,9 @@ func main() {
 		Description: "A go-app UI library using Go and WebAssembly",
 		Author:      "mmcnicol",
 		Styles: []string{
-			"/web/style/main.css", // Link to your custom CSS
+			"/web/style/main.css",
+			"/web/style/phase_banner.css",
+			"/web/style/toggle_switch.css",
 		},
 		Icon: app.Icon{
 			//Default: "/web/images/logo.png",

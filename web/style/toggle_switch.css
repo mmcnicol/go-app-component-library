@@ -1,0 +1,36 @@
+/* web/styles/toggle_switch.css */
+.toggle-container {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.switch {
+    position: relative;
+    width: 50px;
+    height: 26px;
+    background-color: #ccc;
+    border-radius: 15px;
+    transition: background-color 0.2s;
+    margin-right: 10px;
+}
+
+.switch-inner {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.2s;
+}
+
+.toggle-container.active .switch {
+    background-color: #4cd964;
+}
+
+.toggle-container.active .switch-inner {
+    transform: translateX(24px);
+}
