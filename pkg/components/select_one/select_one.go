@@ -40,9 +40,9 @@ func (o *SelectOne) Render() app.UI {
 			Class(containerClass).
 			Disabled(o.Disabled).
 			//SelectedValue(o.SelectedValue). // Keeps the UI in sync with Go state
-			//OnChange(o.onSelectChange).
+			OnChange(o.onSelectChange).
 			//OnChange(o.ValueTo(&o.SelectedValue)).
-			OnSelect(o.ValueTo(&o.SelectedValue)).
+			//OnSelect(o.ValueTo(&o.SelectedValue)).
 			Body(
 				app.Option().
 					Disabled(true).
