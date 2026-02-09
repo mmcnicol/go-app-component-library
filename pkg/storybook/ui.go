@@ -11,7 +11,7 @@ type Shell struct {
 
 	activeComponent string
 	activeStory     string
-	searchQuery     string
+	SearchQuery     string
 }
 
 func (s *Shell) OnMount(ctx app.Context) {
@@ -28,7 +28,7 @@ func (s *Shell) Render() app.UI {
 		app.Log("Shell Render()")
 	}
 	allComponents := GetRegistry()
-	query := strings.ToLower(s.searchQuery)
+	query := strings.ToLower(s.SearchQuery)
 
 	// 1. Correctly filter components and close the loop/if blocks
 	filteredComponents := make([]ComponentContainer, 0)
@@ -47,10 +47,11 @@ func (s *Shell) Render() app.UI {
 					ID("sidebar-search-input").
 					Class("sidebar-search").
 					Placeholder("Filter components...").
-					Value(s.searchQuery).
+					Value(s.SearchQuery).
+					//AutoFocus(true).
 					OnInput(s.onSearch),
 
-				app.If(s.searchQuery != "", func() app.UI {
+				app.If(s.SearchQuery != "", func() app.UI {
 					return app.Span().
 						Class("search-clear").
 						Text("✕").
@@ -137,15 +138,15 @@ func (s *Shell) onSearch(ctx app.Context, e app.Event) {
 	if app.IsClient {
 		app.Log("Shell onSearch()")
 	}
-	s.searchQuery = ctx.JSSrc().Get("value").String()
+	s.SearchQuery = ctx.JSSrc().Get("value").String()
 }
 
 func (s *Shell) onClearSearch(ctx app.Context, e app.Event) {
 	if app.IsClient {
 		app.Log("Shell onClearSearch()")
 	}
-	s.searchQuery = ""
-	ctx.Update()
+	s.SearchQuery = ""
+	//ctx.Update()
 
 	// Optional: Put the cursor back in the search box after clearing
     app.Window().GetElementByID("sidebar-search-input").Call("focus")

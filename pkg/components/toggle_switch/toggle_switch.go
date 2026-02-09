@@ -26,7 +26,7 @@ func (t *ToggleSwitch) OnClick(ctx app.Context, e app.Event) {
 		app.Logf("ToggleSwitch state is now: %v", t.IsOn)
 	}
 
-	ctx.Update()
+	//ctx.Update()
 }
 
 func (t *ToggleSwitch) Render() app.UI {
