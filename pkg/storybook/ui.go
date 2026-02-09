@@ -117,6 +117,8 @@ func (s *Shell) selectStory(ctx app.Context, compName, storyName string) {
 	u.RawQuery = q.Encode()
 
 	ctx.Navigate(u.String())
+	s.shouldRender = true
+	ctx.Update()
 }
 
 func (s *Shell) renderActiveStory() app.UI {
