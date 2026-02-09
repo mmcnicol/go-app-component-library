@@ -41,19 +41,16 @@ func init() {
 
 	storybook.Register("Form", "Input Text", 
 		map[string]*storybook.Control{
-			"Label": {Label: "Label", Type: storybook.ControlText, Value: "Label Text."},
 			"Value": {Label: "Value", Type: storybook.ControlText, Value: ""}, 
 			"Disabled": {Label: "Disabled", Type: storybook.ControlBool, Value: false},
 			"Placeholder": {Label: "Placeholder", Type: storybook.ControlText, Value: "First Name"}, 
 		},
 		func(controls map[string]*storybook.Control) app.UI {
-			labelString := controls["Label"].Value.(string)
 			valueString := controls["Value"].Value.(string)
 			isDisabled := controls["Disabled"].Value.(bool)
 			placeholderString := controls["Placeholder"].Value.(string)
 
 			return &InputText{
-				Label: labelString,
 				Value: valueString,
 				Disabled: isDisabled,
 				Placeholder: placeholderString,

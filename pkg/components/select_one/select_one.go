@@ -9,7 +9,7 @@ import (
 type SelectOne struct {
 	app.Compo
 	Options       []string
-	selectedValue string
+	SelectedValue string
 	PromptText    string
 	Disabled      bool
     //shouldRender  bool
@@ -39,12 +39,13 @@ func (o *SelectOne) Render() app.UI {
 			Class("selectOne-container-select").
 			Class(containerClass).
 			Disabled(o.Disabled).
-			//SelectedValue(o.selectedValue). // Keeps the UI in sync with Go state
-			OnChange(o.onSelectChange).
+			//SelectedValue(o.SelectedValue). // Keeps the UI in sync with Go state
+			//OnChange(o.onSelectChange).
+			OnChange(o.ValueTo(&o.onSelectChange)).
 			Body(
 				app.Option().
 					Disabled(true).
-					Selected(o.selectedValue == "").
+					Selected(o.SelectedValue == "").
 					Text(o.PromptText),
 				app.Range(o.Options).Slice(func(i int) app.UI {
 					opt := o.Options[i]
@@ -52,7 +53,7 @@ func (o *SelectOne) Render() app.UI {
 						Value(opt).
 						Text(opt).
 						// Set the "selected" attribute explicitly if it matches
-						Selected(opt == o.selectedValue)
+						Selected(opt == o.SelectedValue)
 				}),
 			),
 	)
@@ -62,10 +63,10 @@ func (o *SelectOne) onSelectChange(ctx app.Context, e app.Event) {
 	if app.IsClient {
 		app.Log("SelectOne onSelectChange()")
 	}
-	o.selectedValue = ctx.JSSrc().Get("value").String()
+	o.SelectedValue = ctx.JSSrc().Get("value").String()
 	//o.shouldRender = true
 	if app.IsClient {
-		app.Logf("SelectOne state is now: %v", o.selectedValue)
+		app.Logf("SelectOne state is now: %v", o.SelectedValue)
 	}
 }
 

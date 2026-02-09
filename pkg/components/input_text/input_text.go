@@ -9,7 +9,6 @@ import (
 type InputText struct {
 	app.Compo
 	Value       string
-	Label       string
 	Placeholder string
 	Disabled    bool
 }
@@ -26,11 +25,13 @@ func (t *InputText) Render() app.UI {
 
 	return app.Div().Class("inputText-container").Body(
 
+		/*
 		app.If(t.Label != "", func() app.UI {
 			return app.Label().
 				Class("inputText-container-label").
 				Text(t.Label)
 		}),
+		*/
 
 		app.Input().
 			Class("inputText-container-input").
@@ -39,7 +40,6 @@ func (t *InputText) Render() app.UI {
 			Value(t.Value).
 			Disabled(t.Disabled).
 			Placeholder(t.Placeholder).
-			//Placeholder("What is your name?").
 			//AutoFocus(true).
 			OnChange(t.ValueTo(&t.Value)),
 	)
