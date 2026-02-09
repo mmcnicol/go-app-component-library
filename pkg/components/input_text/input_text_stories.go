@@ -10,6 +10,7 @@ import (
 // Use init() to auto-register when this package is imported
 func init() {
 
+	/*
 	inputTextDefault := &InputText{
 		Label: "Label text.",
 	}
@@ -36,5 +37,34 @@ func init() {
 	storybook.Register("Input Text", "ReadOnly", func() app.UI {
 		return inputTextReadOnly
 	})
+	*/
+
+	inputTextReadOnly := &InputText{
+		Label: "Label text.",
+		Value: "this is a test",
+		Disabled: true,
+	}
+
+	storybook.Register("Built In", "Input Text", 
+		map[string]*storybook.Control{
+			"Label": {Label: "Label Text", Type: storybook.ControlText, Value: "Label Text."},
+			"Disabled":   {Label: "Disabled", Type: storybook.ControlBool, Value: false},
+			"Value":    {Label: "Options", Type: storybook.ControlText, Value: ""}, 
+			"Placeholder":    {Label: "Placeholder", Type: storybook.ControlText, Value: "First Name"}, 
+		},
+		func(controls map[string]*storybook.Control) app.UI {
+			labelText := controls["Label Text"].Value.(string)
+			isDisabled := controls["Disabled"].Value.(bool)
+			valueString := controls["Value"].Value.(string)
+			placeholderString := controls["Placeholder"].Value.(string)
+
+			return &InputText{
+				Label: labelText,
+				Value: valueString,
+				Disabled: isDisabled,
+				Placeholder: placeholderString,
+			}
+		},
+	)
 
 }
