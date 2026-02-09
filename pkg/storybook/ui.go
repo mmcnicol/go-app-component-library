@@ -24,17 +24,16 @@ func (s *Shell) OnMount(ctx app.Context) {
 
 func (s *Shell) Render() app.UI {
 	allComponents := GetRegistry()
+	query := strings.ToLower(s.searchQuery)
 	
 	// Filter components based on search query
 	filteredComponents := make([]Component, 0)
 	for _, c := range allComponents {
+		
 		// Simple case-insensitive match
-		if s.searchQuery == "" || 
-		   app.ToLwr(c.Name) == app.ToLwr(s.searchQuery) || 
-		   contains(app.ToLwr(c.Name), app.ToLwr(s.searchQuery)) {
-			filteredComponents = append(filteredComponents, c)
-		}
-	}
+		if query == "" || strings.Contains(strings.ToLower(c.Name), query) {
+        filteredComponents = append(filteredComponents, c)
+    }
 
 	return app.Div().Class("storybook-layout").Body(
 		app.Aside().Class("storybook-sidebar").Body(
