@@ -156,51 +156,91 @@ func NewServer(port int, workDir string, enableDashboard, profile bool) (*Server
 }
 
 // buildWasm builds the WebAssembly binary
+// cmd/dev-server/main.go - Simplified buildWasm method
+
 func (s *Server) buildWasm() (string, error) {
-    // Use the real wasm main file from cmd/wasm/main.go
-    wasmMainFile := filepath.Join(s.workDir, "cmd/wasm/main.go")
-    
-    // Check if the file exists
-    if _, err := os.Stat(wasmMainFile); os.IsNotExist(err) {
-        return "", fmt.Errorf("wasm main file not found: %s", wasmMainFile)
-    }
-    
-    // Build to web/app.wasm (fixed name for simplicity)
     outputPath := filepath.Join(s.outputDir, "app.wasm")
     
-    // First, let's try to build with the existing BuildWasm method
-    wasmPath, err := s.compiler.BuildWasm(context.Background(), wasmMainFile, nil)
-    if err != nil {
-        // If that fails, try a direct build
-        log.Printf("Build failed, trying direct approach: %v", err)
-        wasmPath, err = s.buildDirect(wasmMainFile, outputPath)
-    }
+    // First, ensure we're building from the correct directory
+    cmd := exec.Command("go", "build",
+        "-o", outputPath,
+        "-tags", "dev",
+        "-ldflags", "-s -w",
+        "./cmd/wasm",  // Use ./ notation for local package
+    )
     
-    if err != nil {
-        return "", fmt.Errorf("build failed: %v", err)
-    }
+    cmd.Dir = s.workDir
     
-    // If we got a random filename, rename it to app.wasm
-    if filepath.Base(wasmPath) != "app.wasm" {
-        finalPath := outputPath
-        if err := os.Rename(wasmPath, finalPath); err != nil {
-            // If rename fails, copy it
-            data, err := os.ReadFile(wasmPath)
-            if err != nil {
-                return wasmPath, fmt.Errorf("failed to read wasm file: %v", err)
-            }
-            if err := os.WriteFile(finalPath, data, 0644); err != nil {
-                return wasmPath, fmt.Errorf("failed to write wasm file: %v", err)
-            }
-            os.Remove(wasmPath)
-            wasmPath = finalPath
-        } else {
-            wasmPath = finalPath
+    // Critical: Set GOPRIVATE to tell Go this is a private/local package
+    env := os.Environ()
+    
+    // Filter out any problematic env vars
+    var cleanEnv []string
+    for _, e := range env {
+        // Remove GOPROXY for local builds to avoid proxy issues
+        if !strings.HasPrefix(e, "GOPROXY=") {
+            cleanEnv = append(cleanEnv, e)
         }
     }
     
-    log.Printf("Built WebAssembly to: %s", wasmPath)
-    return wasmPath, nil
+    cleanEnv = append(cleanEnv,
+        "GOOS=js",
+        "GOARCH=wasm",
+        "GO111MODULE=on",
+        "GOPROXY=direct",  // Bypass proxy
+        "GOPRIVATE=github.com/mmcnicol/go-app-component-library",  // Mark as private
+    )
+    
+    cmd.Env = cleanEnv
+    
+    var stdout, stderr bytes.Buffer
+    cmd.Stdout = &stdout
+    cmd.Stderr = &stderr
+    
+    log.Printf("Building WebAssembly from %s", s.workDir)
+    
+    if err := cmd.Run(); err != nil {
+        // Try alternative approach
+        return s.buildWasmAlternative(outputPath)
+    }
+    
+    log.Printf("✅ Built: %s", outputPath)
+    return outputPath, nil
+}
+
+func (s *Server) buildWasmAlternative(outputPath string) (string, error) {
+    // Alternative: Use go list to verify the package exists
+    cmd := exec.Command("go", "list", "./...")
+    cmd.Dir = s.workDir
+    output, err := cmd.Output()
+    if err != nil {
+        return "", fmt.Errorf("failed to list packages: %v", err)
+    }
+    log.Printf("Available packages:\n%s", output)
+    
+    // Try building with module mode off (for local development)
+    cmd = exec.Command("go", "build",
+        "-o", outputPath,
+        "-tags", "dev",
+        "-ldflags", "-s -w",
+        "./cmd/wasm",
+    )
+    
+    cmd.Dir = s.workDir
+    cmd.Env = append(os.Environ(),
+        "GOOS=js",
+        "GOARCH=wasm",
+        "GO111MODULE=on",
+    )
+    
+    var stderr bytes.Buffer
+    cmd.Stderr = &stderr
+    
+    if err := cmd.Run(); err != nil {
+        return "", fmt.Errorf("alternative build failed: %v\n%s", err, stderr.String())
+    }
+    
+    return outputPath, nil
 }
 
 // monitorClients periodically updates the connected client count
