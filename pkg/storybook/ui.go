@@ -32,13 +32,12 @@ func (s *Shell) Render() app.UI {
 	allComponents := GetRegistry()
 	query := strings.ToLower(s.searchQuery)
 
-	// 1. Correctly filter components and close the loop/if blocks
 	filteredComponents := make([]ComponentContainer, 0)
 	for _, c := range allComponents {
 		if query == "" || strings.Contains(strings.ToLower(c.Name), query) {
 			filteredComponents = append(filteredComponents, c)
 		}
-	} // This closing brace was missing
+	}
 
 	return app.Div().Class("storybook-layout").Body(
 		app.Aside().Class("storybook-sidebar").Body(
@@ -63,7 +62,6 @@ func (s *Shell) Render() app.UI {
 			),
 
 			app.Ul().Body(
-				// 2. Use filteredComponents here instead of 'components'
 				app.Range(filteredComponents).Slice(func(i int) app.UI {
 					comp := filteredComponents[i]
 					return app.Li().Body(
@@ -94,11 +92,18 @@ func (s *Shell) Render() app.UI {
 		),
 
 		app.Main().Class("storybook-preview").Body(
+
 			app.If(s.activeComponent != "", func() app.UI {
-				return s.renderActiveStory()
+				story := s.getActiveStory()
+				//return s.renderActiveStory()
+				return app.Div().Body(
+                    app.Div().Class("canvas").Body(story.Render(story.Controls)),
+                    app.Div().Class("controls-panel").Body(s.renderControls()),
+                )
 			}).Else(func() app.UI {
 				return app.Div().Class("empty-state").Text("Select a component from the sidebar")
 			}),
+
 		),
 	)
 }
