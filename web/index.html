@@ -1,0 +1,125 @@
+<!-- web/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Go App Component Library - Development</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        #app {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="loading">
+            <div class="spinner"></div>
+            <h2>Loading Go WebAssembly...</h2>
+            <p>Hot reload development server is running.</p>
+            <p>Edit components and see changes instantly!</p>
+        </div>
+    </div>
+    
+    <script src="wasm_exec.js"></script>
+    <script>
+        // Live reload WebSocket
+        const ws = new WebSocket('ws://' + window.location.host + '/ws');
+        
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            if (data.type === 'reload') {
+                console.log('Reloading due to:', data.reason);
+                window.location.reload();
+            }
+        };
+        
+        ws.onopen = function() {
+            console.log('Live reload WebSocket connected');
+        };
+        
+        // Load WebAssembly
+        async function loadWasm() {
+            if (typeof Go === 'undefined') {
+                document.getElementById('app').innerHTML = 
+                    '<div style="color: red; padding: 20px; text-align: center;">' +
+                    '<h2>Error: wasm_exec.js not loaded</h2>' +
+                    '<p>Make sure web/wasm_exec.js exists in your project.</p>' +
+                    '</div>';
+                return;
+            }
+            
+            const go = new Go();
+            
+            try {
+                const response = await fetch('/app.wasm?t=' + Date.now());
+                if (!response.ok) {
+                    throw new Error('Failed to fetch WebAssembly');
+                }
+                
+                const bytes = await response.arrayBuffer();
+                const result = await WebAssembly.instantiate(bytes, go.importObject);
+                
+                go.run(result.instance);
+            } catch (err) {
+                console.error('Failed to load WebAssembly:', err);
+                document.getElementById('app').innerHTML = 
+                    '<div style="color: red; padding: 20px; text-align: center;">' +
+                    '<h2>Failed to load application</h2>' +
+                    '<p>Error: ' + err.message + '</p>' +
+                    '<p>Check console for details.</p>' +
+                    '<button onclick="window.location.reload()" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">Retry</button>' +
+                    '</div>';
+            }
+        }
+        
+        loadWasm();
+        
+        // Auto-refresh check
+        let lastCheck = Date.now();
+        setInterval(() => {
+            fetch('/app.wasm?check=' + lastCheck)
+                .then(res => {
+                    const lastModified = res.headers.get('last-modified');
+                    if (lastModified) {
+                        const serverTime = new Date(lastModified).getTime();
+                        if (serverTime > lastCheck) {
+                            console.log('WASM updated, reloading...');
+                            window.location.reload();
+                        }
+                    }
+                })
+                .catch(() => {});
+        }, 2000);
+    </script>
+</body>
+</html>

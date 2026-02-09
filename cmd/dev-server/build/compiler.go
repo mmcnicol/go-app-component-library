@@ -277,3 +277,57 @@ func (c *Compiler) GetGoVersion() (string, error) {
     }
     return strings.TrimSpace(string(output)), nil
 }
+
+// BuildWasmToPath builds WebAssembly to a specific output path
+func (c *Compiler) BuildWasmToPath(ctx context.Context, mainFile string, changedFiles []string, outputPath string) (string, error) {
+    // Check cache for unchanged files
+    if c.cache.IsValid(mainFile, changedFiles) {
+        if entry, exists := c.cache.Get(mainFile); exists {
+            return entry.OutputPath, nil
+        }
+    }
+    
+    // Build command
+    cmd := exec.CommandContext(ctx, c.goBinary, "build",
+        "-o", outputPath,
+        "-tags", joinTags(c.buildTags),
+        "-ldflags", c.ldflags,
+        mainFile,
+    )
+    
+    cmd.Dir = c.workDir
+    cmd.Env = append(os.Environ(),
+        "GOOS=js",
+        "GOARCH=wasm",
+        "GO111MODULE=on",
+    )
+    
+    var stdout, stderr bytes.Buffer
+    cmd.Stdout = &stdout
+    cmd.Stderr = &stderr
+    
+    start := time.Now()
+    err := cmd.Run()
+    buildTime := time.Since(start)
+    
+    if err != nil {
+        log.Printf("Build failed with error: %v", err)
+        log.Printf("Stderr output: %s", stderr.String())
+        return "", fmt.Errorf("build failed: %v\n%s", err, stderr.String())
+    }
+    
+    // Update cache
+    entry := CacheEntry{
+        OutputPath:   outputPath,
+        Hash:         c.cache.calculateHash(mainFile, changedFiles),
+        Dependencies: changedFiles,
+        Timestamp:    time.Now(),
+    }
+    
+    if err := c.cache.Set(mainFile, entry); err != nil {
+        log.Printf("Warning: Failed to update cache: %v", err)
+    }
+    
+    log.Printf("Built %s in %v", filepath.Base(outputPath), buildTime)
+    return outputPath, nil
+}

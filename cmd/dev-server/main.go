@@ -107,13 +107,11 @@ type Server struct {
 }
 
 // NewServer creates a new development server
-func NewServer(port int, workDir, outputDir string, enableDashboard, profile bool) (*Server, error) {
-    if outputDir == "" {
-        outputDir = filepath.Join(workDir, "tmp", "wasm")
-    }
-    
+func NewServer(port int, workDir string, enableDashboard, profile bool) (*Server, error) {
+    // Use web folder as output directory
+    outputDir := filepath.Join(workDir, "web")
     if err := os.MkdirAll(outputDir, 0755); err != nil {
-        return nil, fmt.Errorf("failed to create output directory: %v", err)
+        return nil, fmt.Errorf("failed to create web directory: %v", err)
     }
     
     // Create compiler with error handling
@@ -133,14 +131,14 @@ func NewServer(port int, workDir, outputDir string, enableDashboard, profile boo
         profile:         profile,
     }
     
-    // Initialize watcher
+    // Initialize watcher - also watch web folder for CSS/JS changes
     watcher, err := watch.NewWatcher(workDir, s.onFileChange)
     if err != nil {
         return nil, fmt.Errorf("failed to create watcher: %v", err)
     }
     s.watcher = watcher
     
-    // Initial build
+    // Initial build - output to web/app.wasm
     initialWasm, err := s.buildWasm()
     if err != nil {
         return nil, fmt.Errorf("initial build failed: %v", err)
@@ -155,12 +153,12 @@ func NewServer(port int, workDir, outputDir string, enableDashboard, profile boo
 
 // buildWasm builds the WebAssembly binary
 func (s *Server) buildWasm() (string, error) {
-    // Create a simple wasm file without the problematic import
+    // Create a simple wasm file for development
     tempDir, err := os.MkdirTemp("", "dev-wasm-*")
     if err != nil {
         return "", fmt.Errorf("failed to create temp dir: %v", err)
     }
-    defer os.RemoveAll(tempDir) // Clean up after building
+    defer os.RemoveAll(tempDir)
     
     mainFile := filepath.Join(tempDir, "main.go")
     
@@ -179,6 +177,7 @@ func (d *DevApp) Render() app.UI {
         app.H1().Text("Go App Component Library - Development"),
         app.P().Text("✅ Development server is running!"),
         app.P().Text("✨ Hot reload is active - edit your components and see changes instantly."),
+        app.P().Text("📁 Serving from web/ folder with wasm_exec.js"),
         app.Hr(),
         app.Div().Style("margin-top", "20px").Body(
             app.H3().Text("Getting Started:"),
@@ -189,11 +188,11 @@ func (d *DevApp) Render() app.UI {
             ),
         ),
         app.Div().Style("margin-top", "20px").Body(
-            app.H3().Text("Example Component Preview:"),
-            app.Div().Style("padding", "20px").Style("background", "#f5f5f5").Style("border-radius", "8px").Body(
-                app.H4().Text("Hello Component"),
-                app.P().Text("This would show your actual Hello component when imported."),
-                app.P().Text("For production builds, use: go run ./cmd/server"),
+            app.H3().Text("File Structure:"),
+            app.Ul().Body(
+                app.Li().Text("web/app.wasm - WebAssembly binary (auto-generated)"),
+                app.Li().Text("web/wasm_exec.js - WebAssembly runtime (from Go)"),
+                app.Li().Text("web/styles.css - Custom styles (optional)"),
             ),
         ),
     )
@@ -208,12 +207,15 @@ func main() {
         return "", fmt.Errorf("failed to write temp main file: %v", err)
     }
     
-    wasmPath, err := s.compiler.BuildWasm(context.Background(), mainFile, nil)
+    // Build to web/app.wasm (fixed name for simplicity)
+    outputPath := filepath.Join(s.outputDir, "app.wasm")
+    
+    wasmPath, err := s.compiler.BuildWasmToPath(context.Background(), mainFile, nil, outputPath)
     if err != nil {
         return "", fmt.Errorf("build failed: %v", err)
     }
     
-    log.Printf("Built development WebAssembly: %s", filepath.Base(wasmPath))
+    log.Printf("Built WebAssembly to: %s", wasmPath)
     return wasmPath, nil
 }
 
@@ -295,36 +297,27 @@ func (s *Server) clearCache() {
 func (s *Server) Start() error {
     mux := http.NewServeMux()
     
-    // Serve static files from embedded FS
-    mux.Handle("/web/", http.StripPrefix("/web/", http.FileServer(http.FS(staticFiles))))
+    // Serve static files from web folder
+    webDir := filepath.Join(s.workDir, "web")
+    mux.Handle("/", http.FileServer(http.Dir(webDir)))
     
-    // WASM file with cache busting
+    // Override specific routes
     mux.HandleFunc("/app.wasm", s.serveWasm)
-    
-    // Serve go-app's wasm_exec.js
-    mux.HandleFunc("/wasm_exec.js", s.serveWasmExec)
-    
-    // Live reload WebSocket
     mux.Handle("/ws", s.liveReload)
     
-    // Development dashboard API
-    mux.HandleFunc("/api/dashboard", s.serveDashboardData)
-    mux.HandleFunc("/api/rebuild", s.handleRebuild)
-    mux.HandleFunc("/api/clear-cache", s.handleClearCache)
-    
-    // Main application handler - this serves the HTML that loads the WebAssembly
-    mux.HandleFunc("/", s.serveApp)
+    // Development dashboard API (if enabled)
+    if s.enableDashboard {
+        mux.HandleFunc("/api/dashboard", s.serveDashboardData)
+        mux.HandleFunc("/api/rebuild", s.handleRebuild)
+        mux.HandleFunc("/api/clear-cache", s.handleClearCache)
+    }
     
     addr := fmt.Sprintf(":%d", s.port)
     log.Printf("Development server starting on http://localhost%s", addr)
+    log.Printf("Serving from: %s", webDir)
     
     if s.enableDashboard {
         log.Printf("Dashboard API: http://localhost%s/api/dashboard", addr)
-    }
-    
-    if s.profile {
-        log.Printf("Profiling enabled")
-        mux.HandleFunc("/debug/pprof/", http.DefaultServeMux.ServeHTTP)
     }
     
     return http.ListenAndServe(addr, mux)
@@ -349,21 +342,39 @@ func (s *Server) serveWasm(w http.ResponseWriter, r *http.Request) {
     http.ServeFile(w, r, wasmPath)
 }
 
-// serveWasmExec serves the go-app's wasm_exec.js file
+// serveWasmExec serves the wasm_exec.js file
 func (s *Server) serveWasmExec(w http.ResponseWriter, r *http.Request) {
-    // Try to read wasm_exec.js from go-app package
-    wasmExecPath := filepath.Join(s.workDir, "vendor", "github.com", "maxence-charriere", "go-app", "v10", "cmd", "wasm_exec.js")
-    
-    // If not found in vendor, try to get it from Go installation
-    if _, err := os.Stat(wasmExecPath); os.IsNotExist(err) {
-        // Alternative: copy from Go installation
+    // Try to serve from embedded static files first
+    data, err := staticFiles.ReadFile("static/wasm_exec.js")
+    if err == nil {
         w.Header().Set("Content-Type", "application/javascript")
-        w.Write([]byte(`// wasm_exec.js placeholder - install go-app to get the real file
-console.log("Please install go-app to get wasm_exec.js");`))
+        w.Write(data)
         return
     }
     
-    http.ServeFile(w, r, wasmExecPath)
+    // Fallback: try to read from go-app package
+    wasmExecPath := filepath.Join(s.workDir, "vendor", "github.com", "maxence-charriere", "go-app", "v10", "cmd", "wasm_exec.js")
+    
+    if _, err := os.Stat(wasmExecPath); err == nil {
+        http.ServeFile(w, r, wasmExecPath)
+        return
+    }
+    
+    // Last resort: try Go installation
+    goRoot := runtime.GOROOT()
+    if goRoot != "" {
+        wasmExecPath = filepath.Join(goRoot, "misc", "wasm", "wasm_exec.js")
+        if _, err := os.Stat(wasmExecPath); err == nil {
+            http.ServeFile(w, r, wasmExecPath)
+            return
+        }
+    }
+    
+    // Generate a minimal wasm_exec.js if nothing else works
+    w.Header().Set("Content-Type", "application/javascript")
+    w.Write([]byte(`// Minimal wasm_exec.js for development
+    const go = new Go();
+    `))
 }
 
 // serveApp serves the main application HTML page
