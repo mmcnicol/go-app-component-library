@@ -1,6 +1,6 @@
 //go:build dev
 // pkg/components/input_text/input_text_stories.go
-package input_textr
+package input_text
 
 import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
@@ -13,5 +13,5 @@ func init() {
 	storybook.Register("Input Text", "Default", func() app.UI {
 		return &InputText{}
 	})
-	
+
 }
