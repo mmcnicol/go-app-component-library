@@ -116,36 +116,6 @@ func (c *Compiler) BuildWasm(ctx context.Context, mainFile string, changedFiles 
     return outputPath, nil
 }
 
-// tryVendorBuild tries to build using vendor directory
-func (c *Compiler) tryVendorBuild(ctx context.Context, mainFile, outputPath string) (string, error) {
-    cmd := exec.CommandContext(ctx, c.goBinary, "build",
-        "-o", outputPath,
-        "-tags", joinTags(c.buildTags),
-        "-ldflags", c.ldflags,
-        "-mod=vendor",
-        mainFile,
-    )
-    
-    cmd.Dir = c.workDir
-    cmd.Env = append(os.Environ(),
-        "GOOS=js",
-        "GOARCH=wasm",
-        "GO111MODULE=on",
-    )
-    
-    var stdout, stderr bytes.Buffer
-    cmd.Stdout = &stdout
-    cmd.Stderr = &stderr
-    
-    log.Printf("Trying vendor build...")
-    
-    if err := cmd.Run(); err != nil {
-        return "", fmt.Errorf("vendor build also failed: %v\n%s", err, stderr.String())
-    }
-    
-    return outputPath, nil
-}
-
 // BuildOnlyChanged implements incremental compilation
 func (c *Compiler) BuildOnlyChanged(ctx context.Context, changedFiles []string) (string, error) {
     // Analyze which packages are affected
