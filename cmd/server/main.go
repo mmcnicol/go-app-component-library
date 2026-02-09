@@ -2,13 +2,10 @@
 package main
 
 import (
-	"encoding/json"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/mmcnicol/go-app-component-library/pkg/components/hello"
 	"log"
 	"net/http"
-	"strings"
-	"time"
 )
 
 func main() {
