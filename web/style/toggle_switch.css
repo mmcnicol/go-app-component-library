@@ -38,20 +38,20 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
-.toggleSwitch-container.active .toggleSwitch-container-switch {
+.toggleSwitch-container.toggleSwitch-container.active .toggleSwitch-container-switch {
     background-color: #4cd964;
 }
 
-.toggleSwitch-container-active .toggleSwitch-container-switch-inner {
+.toggleSwitch-container.toggleSwitch-container-active .toggleSwitch-container-switch-inner {
     transform: translateX(24px);
 }
 
-.toggleSwitch-container-disabled {
+.toggleSwitch-container.toggleSwitch-container-disabled {
     opacity: 0.5;                /* Visual cue for inactivity */
     cursor: not-allowed;         /* Shows the 'circle-slash' cursor */
     pointer-events: none;        /* Prevents the browser from even firing the click event */
 }
 
-.toggleSwitch-container-disabled .toggleSwitch-container-switch {
+.toggleSwitch-container.toggleSwitch-container-disabled .toggleSwitch-container-switch {
     background-color: #e0e0e0;   /* Desaturate the background */
 }
