@@ -14,6 +14,7 @@ import (
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/select_one"
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/input_text"
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/static_message"
+	_ "github.com/mmcnicol/go-app-component-library/pkg/components/icon"
 )
 
 func main() {
