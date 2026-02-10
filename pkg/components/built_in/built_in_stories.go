@@ -214,15 +214,18 @@ func init() {
 				Style("width", "100%").
 				Style("padding", "8px").
 				Rows(rows).
-				Value(valueString).
 				Placeholder(placeholderString).
 				Disabled(isDisabled).
 				OnInput(func(ctx app.Context, e app.Event) {
-					// Captures multi-line text including newlines
+					// Sync the change back to the registry
 					newVal := ctx.JSSrc().Get("value").String()
 					controls["Value"].Value = newVal
 					ctx.Update()
-				})
+				}).
+				Body(
+					// This sets the content of the textarea
+					app.Text(valueString),
+				)
 		},
 	)
 
