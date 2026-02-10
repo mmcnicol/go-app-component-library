@@ -21,7 +21,16 @@ func init() {
 			iconSize := controls["Size"].Value.(int)
 
 			// List of all available icon names in your GetIcon switch
-			allIcons := []string{"success", "info", "warn", "error"}
+			allIcons := []string{
+				"success", 
+				"info", 
+				"warn", 
+				"error", 
+				"chevron-right", 
+				"chevron-down", 
+				"folder", 
+				"file",
+			}
 			
 			// Create an instance of your icon component
 			i := &Icon{}

@@ -22,6 +22,14 @@ func (i *Icon) GetIcon(name string, size int) app.UI {
 		d = "M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"
 	case "error":
 		d = "M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"
+	case "chevron-right":
+		d = "M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+	case "chevron-down":
+		d = "M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"
+	case "folder":
+		d = "M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"
+	case "file":
+		d = "M13 11h-2v3H8v2h3v3h2v-3h3v-2h-3v-3zm1-9H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"
 	}
 
 	// Using app.Raw avoids the "undefined: app.Svg" compilation error
