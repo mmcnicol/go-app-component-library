@@ -30,14 +30,14 @@ func (o *SelectOne) Render() app.UI {
     //o.shouldRender = false
 
 	selectClass := "selectOne-container-select"
-    if s.Disabled {
+    if o.Disabled {
         selectClass += " selectOne-container-select-disabled"
     }
-	
+
 	return app.Div().Class("selectOne-container").Body(
         app.Select().
             Class(selectClass).
-            Disabled(s.Disabled).
+            Disabled(o.Disabled).
 			//SelectedValue(o.SelectedValue). // Keeps the UI in sync with Go state
 			//OnChange(o.onSelectChange).
 			//OnChange(o.ValueTo(&o.SelectedValue)).
