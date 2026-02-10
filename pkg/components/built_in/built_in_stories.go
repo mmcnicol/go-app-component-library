@@ -293,7 +293,7 @@ func init() {
 		},
 	)
 
-	storybook.Register("Built In", "TimeInput", 
+	storybook.Register("Built In", "Time", 
 		map[string]*storybook.Control{
 			"Value":    {Label: "Time", Type: storybook.ControlText, Value: "12:00"}, 
 			"Disabled": {Label: "Disabled", Type: storybook.ControlBool, Value: false},
