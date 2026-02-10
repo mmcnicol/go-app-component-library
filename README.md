@@ -38,7 +38,7 @@ Data
 - [ ] Table with column sorting
 - [ ] Table with column sorting and paging
 - [ ] Table with column sorting and server-side paging
-- [ ] Tree
+- [x] Tree
 - [ ] TreeTable
 
 Panel
