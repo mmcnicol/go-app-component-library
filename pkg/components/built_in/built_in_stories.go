@@ -160,7 +160,7 @@ func init() {
 			footerCaption := controls["Footer"].Value.(string)
 
 			// Process CSV headers into a slice
-			headers := {"Name", "Role", "Location"}
+			headers := []string{"Name", "Role", "Location"}
 
 			// Dummy data for the table body
 			rows := [][]string{
