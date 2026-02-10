@@ -251,7 +251,7 @@ func (d *DataGrid) renderPaginationInfo(totalPages int) app.UI {
     
     return app.Div().
         Class("data-grid__pagination-info").
-        Textf("Showing %d-%d of %d items", start, end, d.props.TotalItems))
+        Textf("Showing %d-%d of %d items", start, end, d.props.TotalItems)
 }
 
 func (d *DataGrid) renderPageNavigation(totalPages int) app.UI {
