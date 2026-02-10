@@ -22,7 +22,6 @@ func init() {
 
 			// List of all available icon names in your GetIcon switch
 			allIcons := []string{
-				"gopher",
 				"success", 
 				"info", 
 				"warn", 

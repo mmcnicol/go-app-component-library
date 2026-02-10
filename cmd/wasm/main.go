@@ -19,6 +19,7 @@ import (
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/tree"
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/progress"
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/button"
+	_ "github.com/mmcnicol/go-app-component-library/pkg/components/label"
 )
 
 func main() {

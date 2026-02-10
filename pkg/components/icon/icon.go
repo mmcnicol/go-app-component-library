@@ -16,9 +16,6 @@ func (i *Icon) GetIcon(name string, size int) app.UI {
 	isSpinner := name == "spinner"
 
 	switch name {
-	case "gopher":
-    	// A simplified, friendly Gopher silhouette
-    	d = "M12 2C9.24 2 7 4.24 7 7v1h10V7c0-2.76-2.24-5-5-5zm-5 7c-1.1 0-2 .9-2 2v7c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-7c0-1.1-.9-2-2-2H7zm3 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm4 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 4.5c-1.38 0-2.5-1.12-2.5-2.5h5c0 1.38-1.12 2.5-2.5 2.5z"
 	case "success":
 		d = "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
 	case "info":

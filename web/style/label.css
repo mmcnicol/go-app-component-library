@@ -1,0 +1,20 @@
+/* web/styles/label.css */
+
+.label-component {
+    display: inline-block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--theme-text-main);
+    transition: color 0.3s ease;
+}
+
+.label-component-required {
+    color: #d32f2f; /* Standard red for required */
+    margin-left: 4px;
+}
+
+/* Optional: Slight dimming for disabled context if needed */
+.label-component-disabled {
+    opacity: 0.5;
+}

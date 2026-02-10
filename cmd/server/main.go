@@ -18,6 +18,7 @@ import (
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/tree"
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/progress"
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/button"
+	_ "github.com/mmcnicol/go-app-component-library/pkg/components/label"
 
 	"log"
 	"net/http"
@@ -45,6 +46,7 @@ func main() {
 			"/web/style/progress.css",
 			"/web/style/button.css",
 			"/web/style/icon.css",
+			"/web/style/label.css",
 		},
 		Icon: app.Icon{
 			//Default: "/web/images/logo.png",

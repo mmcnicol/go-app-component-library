@@ -17,11 +17,12 @@ Built In
 - [ ] Form
 
 Form
-- [x] SelectOne
-- [x] ToggleSwitch
+- [x] Label
 - [x] InputText
 - [x] InputTextArea
 - [x] Button
+- [x] ToggleSwitch
+- [x] SelectOne
 - [ ] DatePicker
 - [ ] Time
 - [ ] AutoComplete
