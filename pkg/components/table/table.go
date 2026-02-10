@@ -160,12 +160,30 @@ func (t *Table) renderHeader() app.UI {
             headerContent = app.Text(col.Header)
         }
         
+        /*
         headers = append(headers, app.Th().
             ID(col.ID).
             Class(headerClass).
             Style(t.getColumnStyle(col)...). // Use spread operator
             Scope("col").
             Body(headerContent))
+        */
+
+        styleArgs := t.getColumnStyle(col)
+        if len(styleArgs) > 0 {
+            headers = append(headers, app.Th().
+                ID(col.ID).
+                Class(headerClass).
+                Style(styleArgs...). // Use spread operator
+                Scope("col").
+                Body(headerContent))
+        } else {
+            headers = append(headers, app.Th().
+                ID(col.ID).
+                Class(headerClass).
+                Scope("col").
+                Body(headerContent))
+        }
     }
     
     return app.THead().
@@ -215,10 +233,24 @@ func (t *Table) renderBody() app.UI {
                 cellContent = t.formatCellValue(cellData)
             }
             
+            /*
             cells = append(cells, app.Td().
                 Class(cellClass).
                 Style(t.getColumnStyle(col)...). // Use spread operator
                 Body(cellContent))
+            */
+
+            styleArgs := t.getColumnStyle(col)
+            if len(styleArgs) > 0 {
+                cells = append(cells, app.Td().
+                    Class(cellClass).
+                    Style(styleArgs...). // Use spread operator
+                    Body(cellContent))
+            } else {
+                cells = append(cells, app.Td().
+                    Class(cellClass).
+                    Body(cellContent))
+            }
         }
         
         rows = append(rows, row.Body(cells...))
@@ -257,10 +289,24 @@ func (t *Table) renderFooter() app.UI {
             footerContent = col.FooterRenderer(col, i)
         }
         
+        /*
         footers = append(footers, app.Td().
             Class(footerClass).
             Style(t.getColumnStyle(col)...). // Use spread operator
             Body(footerContent))
+        */
+
+        styleArgs := t.getColumnStyle(col)
+        if len(styleArgs) > 0 {
+            footers = append(footers, app.Td().
+                Class(footerClass).
+                Style(styleArgs...). // Use spread operator
+                Body(footerContent))
+        } else {
+            footers = append(footers, app.Td().
+                Class(footerClass).
+                Body(footerContent))
+        }
     }
     
     return app.TFoot().
@@ -279,8 +325,9 @@ func (t *Table) getRowKey(rowData map[string]interface{}, index int) string {
     return "row-" + string(index)
 }
 
-func (t *Table) getColumnStyle(col Column) []string {
-    var styles []string
+// Update getColumnStyle to properly handle Style() method
+func (t *Table) getColumnStyle(col Column) []any {
+    var styles []any
     
     if col.Width != "" {
         styles = append(styles, "width", col.Width)
