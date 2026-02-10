@@ -2,12 +2,6 @@
 package icon
 
 import (
-	"github.com/maxence-charriere/go-app/v10/pkg/app"
-)
-
-package icon
-
-import (
 	"fmt"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
