@@ -331,4 +331,45 @@ func init() {
 		},
 	)
 
+	storybook.Register("Built In", "Dialog", 
+		map[string]*storybook.Control{
+			"Open":    {Label: "Open", Type: storybook.ControlBool, Value: true}, 
+			"Title":   {Label: "Dialog Title", Type: storybook.ControlText, Value: "Confirmation"}, 
+			"Message": {Label: "Message Body", Type: storybook.ControlText, Value: "Are you sure you want to proceed?"}, 
+		},
+		func(controls map[string]*storybook.Control) app.UI {
+			isOpen := controls["Open"].Value.(bool)
+			title := controls["Title"].Value.(string)
+			message := controls["Message"].Value.(string)
+
+			return app.Div().Body(
+				app.Dialog().
+					// The 'open' attribute determines visibility in go-app
+					Open(isOpen).
+					Style("border", "1px solid #ccc").
+					Style("border-radius", "8px").
+					Style("padding", "20px").
+					Style("box-shadow", "0 4px 6px rgba(0,0,0,0.1)").
+					Body(
+						app.H3().Text(title),
+						app.P().Text(message),
+						app.Div().Style("text-align", "right").Body(
+							app.Button().Text("Cancel").OnClick(func(ctx app.Context, e app.Event) {
+								controls["Open"].Value = false
+								ctx.Update()
+							}),
+							app.Button().
+								Style("margin-left", "10px").
+								Text("Confirm").
+								OnClick(func(ctx app.Context, e app.Event) {
+									app.Log("Dialog Confirmed")
+									controls["Open"].Value = false
+									ctx.Update()
+								}),
+						),
+					),
+			)
+		},
+	)
+
 }
