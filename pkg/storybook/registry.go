@@ -39,16 +39,6 @@ type ComponentContainer struct {
 // registry stores all registered components
 var registry = make(map[string][]Story)
 
-/*
-// Register adds a story to the registry
-func Register(componentName string, storyName string, render func() app.UI) {
-	registry[componentName] = append(registry[componentName], Story{
-		Name:   storyName,
-		Render: render,
-	})
-}
-*/
-
 // Register adds a story to the registry
 func Register(componentName string, storyName string, controls map[string]*Control, render func(map[string]*Control) app.UI) {
     // Ensure map isn't nil if none provided

@@ -96,22 +96,6 @@ func (s *Shell) Render() app.UI {
 		),
 
 		// MAIN CONTENT AREA
-		/*
-		app.Main().Class("storybook-preview").Body(
-
-			app.If(s.activeComponent != "", func() app.UI {
-				story := s.getActiveStory()
-				//return s.renderActiveStory()
-				return app.Div().Body(
-                    app.Div().Class("canvas").Body(story.Render(story.Controls)),
-                    app.Div().Class("controls-panel").Body(s.renderControls()),
-                )
-			}).Else(func() app.UI {
-				return app.Div().Class("empty-state").Text("Select a component from the sidebar")
-			}),
-
-		),
-		*/
 		app.Main().Class("storybook-main").Body(
             app.Div().Class("canvas-header").Body(
                 app.Button().
@@ -176,26 +160,6 @@ func (s *Shell) getActiveStory() *Story {
     }
     return nil
 }
-
-/*
-func (s *Shell) renderActiveStory() app.UI {
-	if app.IsClient {
-		app.Log("Shell renderActiveStory()")
-	}
-	for _, comp := range GetRegistry() {
-		if comp.Name == s.activeComponent {
-			for _, story := range comp.Stories {
-				if story.Name == s.activeStory {
-					return app.Div().Class("story-container").Body(
-						story.Render(),
-					)
-				}
-			}
-		}
-	}
-	return app.Div().Text("Story not found")
-}
-*/
 
 func (s *Shell) renderActiveStory() app.UI {
     story := s.getActiveStory()
@@ -266,7 +230,7 @@ func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
         return app.Input().
 			Type("checkbox").
 			Checked(ctrl.Value.(bool)).
-			Disabled(ctrl.ReadOnly.(bool)).
+			Disabled(ctrl.ReadOnly).
             OnChange(func(ctx app.Context, e app.Event) {
                 ctrl.Value = ctx.JSSrc().Get("checked").Bool()
                 s.shouldRender = true // Trigger Shell update
@@ -275,7 +239,7 @@ func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
         return app.Input().
 			Type("text").
 			Value(ctrl.Value).
-			Disabled(ctrl.ReadOnly.(bool)).
+			Disabled(ctrl.ReadOnly).
             OnInput(func(ctx app.Context, e app.Event) {
                 val := ctx.JSSrc().Get("value").String()
                 
