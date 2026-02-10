@@ -44,10 +44,11 @@
     --theme-border: #333333;
 
     --theme-primary: #90caf9;
-    --theme-bg-active: #1a237e;
     --theme-text-active: #ffffff;
-    --theme-border-active: #90caf9;
+    --theme-bg-active: #1e293b;     /* Deeper blue-gray */
+    --theme-border-active: #38bdf8; /* Brighter "Electric" blue */
+    --theme-text-active: #f1f5f9;   /* Off-white for better readability */
 
     /* Override Global Tokens for dark context */
-    --color-gray-100: #2c2c2c; /* Darker hover for tree nodes */
+    --color-gray-100: #1e1e1e;      /* Subtle hover effect */
 }
