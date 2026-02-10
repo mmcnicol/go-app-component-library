@@ -231,4 +231,28 @@ func init() {
 		},
 	)
 
+	storybook.Register("Built In", "Button", 
+		map[string]*storybook.Control{
+			"Label":    {Label: "Button Text", Type: storybook.ControlText, Value: "Click Me"}, 
+			"Disabled": {Label: "Disabled", Type: storybook.ControlBool, Value: false},
+			"Title":    {Label: "Tooltip (Title)", Type: storybook.ControlText, Value: "Submit Form"}, 
+		},
+		func(controls map[string]*storybook.Control) app.UI {
+			label := controls["Label"].Value.(string)
+			isDisabled := controls["Disabled"].Value.(bool)
+			title := controls["Title"].Value.(string)
+
+			return app.Button().
+				Text(label).
+				Title(title).
+				Disabled(isDisabled).
+				Style("padding", "10px 20px").
+				Style("cursor", "pointer").
+				OnClick(func(ctx app.Context, e app.Event) {
+					// For a storybook, you might want to log the click
+					app.Log("Button clicked: " + label)
+				})
+		},
+	)
+
 }
