@@ -33,9 +33,9 @@ func (s *Shell) Render() app.UI {
 
 	// Dynamically apply the dark-theme class
 	layoutClass := "storybook-layout"
-	if s.IsDark {
-		layoutClass += " dark-theme"
-	}
+    if s.IsDark {
+        layoutClass += " dark-theme"
+    }
 
 	allComponents := GetRegistry()
 	query := strings.ToLower(s.searchQuery)
@@ -47,7 +47,9 @@ func (s *Shell) Render() app.UI {
 		}
 	}
 
-	return app.Div().Class("storybook-layout").Body(
+	//return app.Div().Class("storybook-layout").Body(
+	return app.Div().Class(layoutClass).Body(
+	
 		// LEFT SIDEBAR
 		app.Aside().Class("storybook-sidebar").Body(
 			app.H2().Text("Components"),
