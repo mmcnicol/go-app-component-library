@@ -9,6 +9,9 @@ import (
 
 // Use init() to auto-register when this package is imported
 func init() {
+	if app.IsClient {
+		app.Log("Tree init()")
+	}
 
 	storybook.Register("Data", "Tree", 
 		map[string]*storybook.Control{

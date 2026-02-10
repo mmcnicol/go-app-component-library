@@ -19,6 +19,9 @@ type Tree struct {
 }
 
 func (t *Tree) Render() app.UI {
+	if app.IsClient {
+		app.Log("Tree Render()")
+	}
 	return app.Div().Class("ui-tree").Body(
 		app.Range(t.Data).Slice(func(i int) app.UI {
 			return t.renderNode(t.Data[i], 0)
@@ -38,6 +41,9 @@ func (t *Tree) renderNode(node *TreeNode, level int) app.UI {
 			Style("padding-left", app.FormatString("%dpx", level*20)).
 			Style("cursor", "pointer").
 			OnClick(func(ctx app.Context, e app.Event) {
+				if app.IsClient {
+					app.Log("Tree OnClick()")
+				}
 				node.Expanded = !node.Expanded
 				ctx.Update()
 			}).
