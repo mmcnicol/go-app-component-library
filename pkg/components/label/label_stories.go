@@ -1,6 +1,6 @@
 //go:build dev
 // pkg/components/label/label_stories.go
-package input_text
+package label
 
 import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
