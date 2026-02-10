@@ -113,13 +113,22 @@ func (s *SortableTable) handleSortClick(accessor string) func(ctx app.Context, e
             s.sortOrder = "asc"
         }
         
+        // Re-sort the data
         s.sortData()
-        ctx.Update()
+        
+        // Force the component to update
+        s.Update()
         
         if s.props.OnSortChange != nil {
             s.props.OnSortChange(s.sortBy, s.sortOrder)
         }
     }
+}
+
+// Update method tells go-app when to re-render
+func (s *SortableTable) Update(ctx app.Context) bool {
+    // Always re-render when sort changes
+    return true
 }
 
 func (s *SortableTable) sortData() {
@@ -130,6 +139,14 @@ func (s *SortableTable) sortData() {
     sort.Slice(s.sortedData, func(i, j int) bool {
         valI := s.sortedData[i][s.sortBy]
         valJ := s.sortedData[j][s.sortBy]
+        
+        // Handle nil values
+        if valI == nil {
+            return false
+        }
+        if valJ == nil {
+            return true
+        }
         
         // Handle different data types
         switch vI := valI.(type) {
@@ -173,4 +190,7 @@ func (s *SortableTable) sortData() {
             return strI > strJ
         }
     })
+    
+    // Log for debugging
+    app.Logf("Sorted by %s (%s): %d rows", s.sortBy, s.sortOrder, len(s.sortedData))
 }
