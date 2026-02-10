@@ -293,31 +293,39 @@ func init() {
 		},
 	)
 
-	storybook.Register("Built In", "Time", 
+	storybook.Register("Built In", "TimeInput", 
 		map[string]*storybook.Control{
-			"Value":    {Label: "Time (HH:MM)", Type: storybook.ControlText, Value: "12:00"}, 
+			"Value":    {Label: "Time", Type: storybook.ControlText, Value: "12:00"}, 
 			"Disabled": {Label: "Disabled", Type: storybook.ControlBool, Value: false},
-			"Min":      {Label: "Min Time", Type: storybook.ControlText, Value: "08:00"},
-			"Max":      {Label: "Max Time", Type: storybook.ControlText, Value: "18:00"},
+			"Min":      {Label: "Min (08:00)", Type: storybook.ControlText, Value: "08:00"},
+			"Max":      {Label: "Max (18:00)", Type: storybook.ControlText, Value: "18:00"},
 		},
 		func(controls map[string]*storybook.Control) app.UI {
-			valueString := controls["Value"].Value.(string)
-			isDisabled := controls["Disabled"].Value.(bool)
-			minTime := controls["Min"].Value.(string)
-			maxTime := controls["Max"].Value.(string)
+			val := controls["Value"].Value.(string)
+			dis := controls["Disabled"].Value.(bool)
+			min := controls["Min"].Value.(string)
+			max := controls["Max"].Value.(string)
 
 			return app.Input().
 				Type("time").
-				Value(valueString).
-				Disabled(isDisabled).
-				Attr("min", minTime). // Restricts the picker range
-				Attr("max", maxTime).
-				Style("padding", "8px").
-				Style("font-family", "sans-serif").
+				Value(val).
+				// Use the built-in methods for go-app v10
+				Disabled(dis).
+				Min(min). 
+				Max(max).
+				// Add a style to visualize invalid states
+				Style("border", "2px solid").
+				Style("border-color", "initial"). 
 				OnInput(func(ctx app.Context, e app.Event) {
-					// Captures the time string from the native picker
 					newVal := ctx.JSSrc().Get("value").String()
 					controls["Value"].Value = newVal
+					
+					// Trigger a browser check for min/max validity
+					isInvalid := ctx.JSSrc().Get("validity").Get("valid").Bool()
+					if !isInvalid {
+						app.Log("Time is outside restricted range!")
+					}
+					
 					ctx.Update()
 				})
 		},
