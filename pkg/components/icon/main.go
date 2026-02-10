@@ -6,7 +6,8 @@ import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
-func Icon(name string, size int) app.UI {
+// GetIcon returns an SVG icon
+func GetIcon(name string, size int) app.UI {
 	var d string
 	switch name {
 	case "success":
