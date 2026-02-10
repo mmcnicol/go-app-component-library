@@ -1,6 +1,45 @@
 /* web/styles/tree.css */
 
 .tree-component-node {
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    margin: 2px 0;
+    cursor: pointer;
+    border-radius: 4px;
+    color: inherit;
+    /* Smoothly transition background and color changes */
+    transition: background-color 0.2s ease, color 0.2s ease;
+    
+    /* Ensure the node doesn't grow taller than the icons */
+    min-height: 32px; 
+    
+    /* Critical for truncation: ensure the container handles overflow */
+    overflow: hidden; 
+}
+
+/* 1. HOVER STATE: Light up slightly on mouse over */
+.tree-component-node:hover:not(.tree-component-node-active) {
+    background-color: #F3F4F6; /* Very light gray */
+}
+
+/* 2. TRUNCATION: Handle long labels using CSS only */
+.tree-component-node span {
+    white-space: nowrap;      /* Prevent text from wrapping to a new line */
+    overflow: hidden;         /* Hide the text that spills out */
+    text-overflow: ellipsis;  /* Add the "..." */
+    display: block;           /* Necessary for ellipsis to calculate correctly */
+    flex: 1;                  /* Take up remaining width in the flex row */
+}
+
+.tree-component-node-active {
+    background-color: #E3F2FD;
+    border-left: 4px solid #1976D2;
+    color: #0D47A1;
+}
+
+/*
+.tree-component-node {
     color: inherit;
     transition: background-color 0.2s ease, color 0.2s ease;
 }
@@ -10,3 +49,4 @@
     border-left: 4px solid #1976D2;
     color: #0D47A1; /* This adds the dark blue text back in */
 }
+*/
