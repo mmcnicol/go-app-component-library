@@ -25,7 +25,9 @@
     --theme-text-active: var(--color-blue-900);
     --theme-border-active: var(--color-blue-500);
     --theme-input-focus-glow: rgba(25, 118, 210, 0.25); /* Light blue glow */
-    
+    --theme-banner-bg: #1d70b8; /* Standard GDS Blue */
+    --theme-banner-text: #ffffff;
+
     /* Spacing Scale */
     --spacing-xs: 4px;
     --spacing-sm: 8px;
@@ -52,6 +54,8 @@
     --theme-border-active: #38bdf8; /* Brighter "Electric" blue */
     --theme-text-active: #f1f5f9;   /* Off-white for better readability */
     --theme-input-focus-glow: rgba(144, 202, 249, 0.35); /* Brighter glow for dark mode */
+    --theme-banner-bg: #38bdf8; /* Brighter blue for Dark Mode */
+    --theme-banner-text: #0b0c0c; /* Darker text for contrast against bright blue */
 
     /* Override Global Tokens for dark context */
     --color-gray-100: #1e1e1e;      /* Subtle hover effect */

@@ -1,10 +1,13 @@
 /* web/styles/phase_banner.css */
+
 .phase-banner {
     padding-top: 10px;
     padding-bottom: 10px;
-    border-bottom: 1px solid #b1b4b6;
+    border-bottom: 1px solid var(--theme-border); /* Swapped from hardcoded gray */
     font-family: sans-serif;
     font-size: 16px;
+    background-color: var(--theme-bg-canvas); /* Ensures it matches the main content */
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .phase-banner__content {
@@ -17,9 +20,8 @@
     display: inline-block;
     padding: 2px 8px;
     margin-right: 10px;
-    /* background-color: #1d70b8; */
-    background-color: var(--theme-primary); /* Use variable */
-    color: #ffffff;
+    background-color: var(--theme-banner-bg); /* Use variable */
+    color: var(--theme-banner-text);           /* Use variable */
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -27,11 +29,11 @@
 }
 
 .phase-banner__text {
-    color: #0b0c0c;
+    color: var(--theme-text-main); /* Swapped from hardcoded #0b0c0c */
     line-height: 1.25;
 }
 
 .phase-banner__text a {
-    color: #1d70b8;
+    color: var(--theme-primary); /* Use our primary blue variable */
     text-decoration: underline;
 }
