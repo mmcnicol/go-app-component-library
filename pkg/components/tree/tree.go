@@ -39,7 +39,7 @@ func (t *Tree) renderNode(node *TreeNode, level int) app.UI {
 			Style("cursor", "pointer").
 			OnClick(func(ctx app.Context, e app.Event) {
 				node.Expanded = !node.Expanded
-				t.Update()
+				app.Update()
 			}).
 			Body(
 				// Toggle Icon
