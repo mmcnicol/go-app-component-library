@@ -46,6 +46,7 @@
     --theme-bg-canvas: #121212;
     --theme-bg-sidebar: #1e1e1e;
     --theme-text-main: #e0e0e0;
+    /* Ensure the border is visible but not overwhelming */
     --theme-border: #333333;
 
     --theme-success: #22c55e; /* A slightly softer green for dark backgrounds */
@@ -58,5 +59,6 @@
     --theme-banner-text: #0b0c0c; /* Darker text for contrast against bright blue */
 
     /* Override Global Tokens for dark context */
+    /* A deep gray/charcoal for "secondary" backgrounds like message boxes */
     --color-gray-100: #1e1e1e;      /* Subtle hover effect */
 }

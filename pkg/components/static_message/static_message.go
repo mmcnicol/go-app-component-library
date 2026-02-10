@@ -14,6 +14,17 @@ type StaticMessage struct {
 }
 
 func (m *StaticMessage) Render() app.UI {
+    i := &icon.Icon{}
+    return app.Div().Class("staticMessage-container").Body(
+        app.Div().Class("staticMessage-icon").Body(
+            i.GetIcon(m.IconName, 20),
+        ),
+        app.Div().Class("staticMessage-content").Text(m.Message),
+    )
+}
+
+/*
+func (m *StaticMessage) Render() app.UI {
 
 	i := icon.Icon{}
 
@@ -57,3 +68,4 @@ func (m *StaticMessage) Render() app.UI {
 			app.Span().Text(m.Detail),
 		)
 }
+*/
