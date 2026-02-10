@@ -35,14 +35,15 @@ var treeData = []*TreeNode{
 func init() {
     storybook.Register("Data", "Tree", 
         map[string]*storybook.Control{
-            "Expanded": {Label: "Expand All", Type: storybook.ControlBool, Value: false},
+            //"Expanded": {Label: "Expand All", Type: storybook.ControlBool, Value: false},
         },
         func(controls map[string]*storybook.Control) app.UI {
-            expandAll := controls["Expanded"].Value.(bool)
+            //expandAll := controls["Expanded"].Value.(bool)
 
-            // Always sync the persistent data with the control state
-            // so the checkbox can force the tree to open OR close.
-            setAllExpanded(treeData, expandAll)
+            // If "Expand All" is toggled in the sidebar, update the persistent data
+            //if expandAll {
+            //    setAllExpanded(treeData, true)
+            //}
 
             return app.Div().Style("padding", "20px").Body(
                 &Tree{Data: treeData},
@@ -51,6 +52,8 @@ func init() {
     )
 }
 
+/*
+// Helper to handle the "Expand All" control logic
 func setAllExpanded(nodes []*TreeNode, state bool) {
     for _, n := range nodes {
         n.Expanded = state
@@ -59,6 +62,7 @@ func setAllExpanded(nodes []*TreeNode, state bool) {
         }
     }
 }
+*/
 
 /*
 // Use init() to auto-register when this package is imported
