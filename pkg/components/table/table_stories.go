@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-    storybook.Register("Table", "Basic Table",
+    storybook.Register("Data", "Basic Table",
         map[string]*storybook.Control{
             "Striped":      {Label: "Striped", Type: storybook.ControlBool, Value: true},
             "Bordered":     {Label: "Bordered", Type: storybook.ControlBool, Value: false},
@@ -166,7 +166,7 @@ func init() {
         },
     )
 
-    storybook.Register("Table", "Sortable Table",
+    storybook.Register("Data", "Sortable Table",
         map[string]*storybook.Control{
             "InitialSort":  {Label: "Initial Sort", Type: storybook.ControlSelect, Value: "name", Options: []string{"id", "name", "email", "role", "status"}},
             "SortOrder":    {Label: "Sort Order", Type: storybook.ControlSelect, Value: "asc", Options: []string{"asc", "desc"}},
@@ -266,7 +266,7 @@ func init() {
         },
     )
 
-    storybook.Register("Table", "Data Grid",
+    storybook.Register("Data", "Data Grid",
         map[string]*storybook.Control{
             "Selectable":   {Label: "Selectable", Type: storybook.ControlBool, Value: true},
             "MultiSelect":  {Label: "Multi Select", Type: storybook.ControlBool, Value: true},
