@@ -17,6 +17,7 @@ import (
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/input_text_area"
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/tree"
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/progress"
+	_ "github.com/mmcnicol/go-app-component-library/pkg/components/button"
 
 	"log"
 	"net/http"
@@ -42,6 +43,7 @@ func main() {
 			"/web/style/tree.css",
 			"/web/style/static_message.css",
 			"/web/style/progress.css",
+			"/web/style/button.css",
 		},
 		Icon: app.Icon{
 			//Default: "/web/images/logo.png",

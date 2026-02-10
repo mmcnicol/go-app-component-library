@@ -28,6 +28,15 @@
     --theme-banner-bg: #1d70b8; /* Standard GDS Blue */
     --theme-banner-text: #ffffff;
 
+    --theme-button-primary-bg: var(--color-blue-500);
+    --theme-button-primary-text: var(--color-white);
+    
+    --theme-button-danger-bg: #d32f2f;
+    --theme-button-danger-text: var(--color-white);
+
+    --theme-button-secondary-bg: var(--color-gray-100);
+    --theme-button-secondary-text: var(--theme-text-main);
+
     /* Spacing Scale */
     --spacing-xs: 4px;
     --spacing-sm: 8px;
@@ -57,6 +66,12 @@
     --theme-input-focus-glow: rgba(144, 202, 249, 0.35); /* Brighter glow for dark mode */
     --theme-banner-bg: #38bdf8; /* Brighter blue for Dark Mode */
     --theme-banner-text: #0b0c0c; /* Darker text for contrast against bright blue */
+
+    --theme-button-primary-bg: #38bdf8; /* Lighter blue for dark mode */
+    --theme-button-primary-text: #0b0c0c;
+    
+    --theme-button-danger-bg: #ef5350; /* Softer red for dark mode */
+    --theme-button-secondary-bg: #333333;
 
     /* Override Global Tokens for dark context */
     /* A deep gray/charcoal for "secondary" backgrounds like message boxes */

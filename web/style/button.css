@@ -1,0 +1,37 @@
+/* web/styles/button.css */
+
+.button-component {
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.1s, opacity 0.2s, background-color 0.2s;
+    font-size: 14px;
+}
+
+.button-component:active {
+    transform: scale(0.98);
+}
+
+.button-component-primary {
+    background-color: var(--theme-button-primary-bg);
+    color: var(--theme-button-primary-text);
+}
+
+.button-component-secondary {
+    background-color: var(--theme-button-secondary-bg);
+    color: var(--theme-button-secondary-text);
+    border: 1px solid var(--theme-border);
+}
+
+.button-component-danger {
+    background-color: var(--theme-button-danger-bg);
+    color: var(--theme-button-danger-text);
+}
+
+.button-component-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(0.5);
+}

@@ -28,13 +28,6 @@ Form
 - [ ] Form
 - [ ] Form Validation
 
-Messages
-- [x] PhaseBanner
-- [x] StaticMessage
-- [ ] Growl
-- [ ] Tooltip
-- [ ] NotificationBar / CookieConsent
-
 Data
 - [x] Tree
 - [ ] TreeTable
@@ -56,12 +49,21 @@ Navigation
 - [ ] Sidebar
 - [ ] Sidenav?
 
+Messages
+- [x] PhaseBanner
+- [x] StaticMessage
+- [ ] Growl
+- [ ] Tooltip
+- [ ] NotificationBar / CookieConsent
+
+Feedback
+- [x] Progress
+- [ ] Meter
+
 Misc
 - [x] Icons
 - [x] Themes
 - [ ] Skeleton
-- [ ] Meter
-- [x] Progress
 - [ ] Canvas
 - [ ] Chart
 
