@@ -263,13 +263,19 @@ func (s *Shell) renderControls() app.UI {
 func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
     switch ctrl.Type {
     case ControlBool:
-        return app.Input().Type("checkbox").Checked(ctrl.Value.(bool)).
+        return app.Input().
+			Type("checkbox").
+			Checked(ctrl.Value.(bool)).
+			Disabled(ctrl.ReadOnly.(bool)).
             OnChange(func(ctx app.Context, e app.Event) {
                 ctrl.Value = ctx.JSSrc().Get("checked").Bool()
                 s.shouldRender = true // Trigger Shell update
             })
     case ControlText, ControlNumber:
-        return app.Input().Type("text").Value(ctrl.Value).
+        return app.Input().
+			Type("text").
+			Value(ctrl.Value).
+			Disabled(ctrl.ReadOnly.(bool)).
             OnInput(func(ctx app.Context, e app.Event) {
                 val := ctx.JSSrc().Get("value").String()
                 

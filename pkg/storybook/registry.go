@@ -15,10 +15,11 @@ const (
 )
 
 type Control struct {
-    Label   string
-    Type    ControlType
-    Value   any
-    Options []string // For select inputs
+    Label    string
+    Type     ControlType
+    Value    any
+    Options  []string // For select inputs
+	ReadOnly bool
 }
 
 // Story represents a single view of a component (e.g., "Primary", "Disabled")
