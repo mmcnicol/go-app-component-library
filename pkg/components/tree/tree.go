@@ -63,7 +63,7 @@ func (t *Tree) renderNode(node *TreeNode, level int) app.UI {
                     node.Selected = true
                     app.Log("Document selected: " + node.Label)
                 }
-                t.Update()
+                ctx.Update()
             }).
             Body(
                 // Toggle Icon (Chevron)
