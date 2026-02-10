@@ -1,6 +1,6 @@
 //go:build dev
 // pkg/components/icon/icon_stories.go
-package static_message
+package icon
 
 import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"

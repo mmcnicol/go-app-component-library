@@ -55,9 +55,9 @@ Navigation
 - [ ] Sidenav?
 
 Misc
-- [ ] Skeleton
+- [x] Icons
 - [ ] Themes
-- [ ] Icons
+- [ ] Skeleton
 
 Chart
 - [ ] Chart
