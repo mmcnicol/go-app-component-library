@@ -1,0 +1,7 @@
+/* web/styles/tree.css */
+
+.tree-component-node-active {
+    background-color: #E3F2FD;
+    border-left: 4px solid #1976D2; /* Stronger visual indicator */
+    transition: background-color 0.2s ease;
+}

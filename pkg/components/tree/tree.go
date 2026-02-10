@@ -17,6 +17,7 @@ type TreeNode struct {
 type Tree struct {
 	app.Compo
 	Data []*TreeNode
+	OnSelect func(ctx app.Context, nodeName string) // Callback for parent sync
 }
 
 func (t *Tree) Render() app.UI {
@@ -29,6 +30,28 @@ func (t *Tree) Render() app.UI {
 		}),
 	)
 }
+
+
+
+            OnClick(func(ctx app.Context, e app.Event) {
+                if hasChildren {
+                    node.Expanded = !node.Expanded
+                } else {
+                    t.deselectAll(t.Data)
+                    node.Selected = true
+                    
+                    // Trigger the callback to update Storybook controls
+                    if t.OnSelect != nil {
+                        t.OnSelect(ctx, node.Label)
+                    }
+                }
+                ctx.Update()
+            }).
+
+
+
+
+
 
 func (t *Tree) renderNode(node *TreeNode, level int) app.UI {
     i := &icon.Icon{}
@@ -53,6 +76,21 @@ func (t *Tree) renderNode(node *TreeNode, level int) app.UI {
             Style("background-color", bg).
             Style("color", textColor).
             Style("border-radius", "4px").
+			OnClick(func(ctx app.Context, e app.Event) {
+                if hasChildren {
+                    node.Expanded = !node.Expanded
+                } else {
+                    t.deselectAll(t.Data)
+                    node.Selected = true
+                    
+                    // Trigger the callback to update Storybook controls
+                    if t.OnSelect != nil {
+                        t.OnSelect(ctx, node.Label)
+                    }
+                }
+                ctx.Update()
+            }).
+			/*
             OnClick(func(ctx app.Context, e app.Event) {
                 if hasChildren {
                     // Folders toggle expansion
@@ -65,6 +103,7 @@ func (t *Tree) renderNode(node *TreeNode, level int) app.UI {
                 }
                 ctx.Update()
             }).
+			*/
             Body(
                 // Toggle Icon (Chevron)
                 app.If(hasChildren, func() app.UI {

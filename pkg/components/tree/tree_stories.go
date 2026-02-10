@@ -35,6 +35,27 @@ var treeData = []*TreeNode{
 func init() {
     storybook.Register("Data", "Tree", 
         map[string]*storybook.Control{
+            "Selected": {Label: "Active Document", Type: storybook.ControlText, Value: "None", ReadOnly: true},
+        },
+        func(controls map[string]*storybook.Control) app.UI {
+            return app.Div().Style("padding", "20px").Body(
+                &Tree{
+                    Data: treeData,
+                    // Pass the controls so the component can update the sidebar
+                    OnSelect: func(ctx app.Context, nodeName string) {
+                        controls["Selected"].Value = nodeName
+                        ctx.Update()
+                    },
+                },
+            )
+        },
+    )
+}
+
+/*
+func init() {
+    storybook.Register("Data", "Tree", 
+        map[string]*storybook.Control{
             //"Expanded": {Label: "Expand All", Type: storybook.ControlBool, Value: false},
         },
         func(controls map[string]*storybook.Control) app.UI {
@@ -51,6 +72,7 @@ func init() {
         },
     )
 }
+*/
 
 /*
 // Helper to handle the "Expand All" control logic
