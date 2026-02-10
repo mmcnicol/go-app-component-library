@@ -1,6 +1,10 @@
 // pkg/components/static_message/static_message.go
 package static_message
 
+import (
+	"github.com/maxence-charriere/go-app/v10/pkg/app"
+)
+
 type StaticMessage struct {
 	app.Compo
 	Severity string // info, warn, error, success
