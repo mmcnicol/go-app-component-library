@@ -117,7 +117,7 @@ func (s *SortableTable) handleSortClick(accessor string) func(ctx app.Context, e
         s.sortData()
         
         // Force the component to update
-        s.Update()
+        ctx.Update()
         
         if s.props.OnSortChange != nil {
             s.props.OnSortChange(s.sortBy, s.sortOrder)
