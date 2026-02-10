@@ -1,0 +1,29 @@
+/* web/style/variables.css */
+:root {
+    /* --- Global Tokens (The Raw Palette) --- */
+    --color-blue-50: #E3F2FD;
+    --color-blue-500: #1976D2;
+    --color-blue-900: #0D47A1;
+    --color-gray-100: #F3F4F6;
+    --color-gray-300: #ced4da;
+    
+    /* --- Semantic Tokens (The Meaning) --- */
+    /* Use these in your components so you can change the "theme" later */
+    --theme-primary: var(--color-blue-500);
+    --theme-primary-hover: var(--color-blue-900);
+    --theme-bg-active: var(--color-blue-50);
+    --theme-text-active: var(--color-blue-900);
+    --theme-border-active: var(--color-blue-500);
+    
+    /* Spacing Scale */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+
+    /* Typography */
+    --font-main: system-ui, -apple-system, sans-serif;
+    --font-size-base: 16px;
+    --font-size-sm: 14px;
+}

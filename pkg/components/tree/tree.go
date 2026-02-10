@@ -4,6 +4,7 @@ package tree
 import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/mmcnicol/go-app-component-library/pkg/components/icon"
+	"github.com/mmcnicol/go-app-component-library/pkg/theme"
 )
 
 type TreeNode struct {
@@ -46,9 +47,11 @@ func (t *Tree) renderNode(node *TreeNode, level int) app.UI {
 			Class(nodeClass). // Apply the CSS class here
 			Style("display", "flex").
 			Style("align-items", "center").
-			Style("padding", "6px 8px").
+			//Style("padding", "6px 8px").
+			Style("padding", theme.SpacingSM + " 0"). // Use spacing tokens
 			Style("margin", "2px 0").
-			Style("padding-left", app.FormatString("%dpx", level*32)).
+			//Style("padding-left", app.FormatString("%dpx", level*32)).
+			Style("padding-left", app.FormatString("calc(%d * %s)", level, theme.SpacingXL)).
 			Style("cursor", "pointer").
 			Style("border-radius", "4px").
 			OnClick(func(ctx app.Context, e app.Event) {

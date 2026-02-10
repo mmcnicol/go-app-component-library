@@ -31,6 +31,7 @@ func main() {
 		Description: "A go-app UI library using Go and WebAssembly",
 		Author:      "mmcnicol",
 		Styles: []string{
+			"/web/style/variables.css", // Load this FIRST
 			"/web/style/main.css",
 			"/web/style/phase_banner.css",
 			"/web/style/toggle_switch.css",
