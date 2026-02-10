@@ -245,22 +245,45 @@ func (s *Shell) renderControls() app.UI {
     )
 }
 
+// In pkg/storybook/ui.go, update the renderControlInput function:
 func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
     switch ctrl.Type {
     case ControlBool:
         return app.Input().
-			Type("checkbox").
-			Checked(ctrl.Value.(bool)).
-			Disabled(ctrl.ReadOnly).
+            Type("checkbox").
+            Checked(ctrl.Value.(bool)).
+            Disabled(ctrl.ReadOnly).
             OnChange(func(ctx app.Context, e app.Event) {
                 ctrl.Value = ctx.JSSrc().Get("checked").Bool()
                 s.shouldRender = true // Trigger Shell update
             })
+    case ControlSelect:
+        // Create options for select
+        var options []app.UI
+        for _, opt := range ctrl.Options {
+            isSelected := opt == ctrl.Value.(string)
+            options = append(options, 
+                app.Option().
+                    Value(opt).
+                    Text(opt).
+                    Selected(isSelected),
+            )
+        }
+        
+        return app.Select().
+            Value(ctrl.Value).
+            Disabled(ctrl.ReadOnly).
+            OnChange(func(ctx app.Context, e app.Event) {
+                ctrl.Value = ctx.JSSrc().Get("value").String()
+                s.shouldRender = true
+                ctx.Update()
+            }).
+            Body(options...)
     case ControlText, ControlNumber:
         return app.Input().
-			Type("text").
-			Value(ctrl.Value).
-			Disabled(ctrl.ReadOnly).
+            Type("text").
+            Value(ctrl.Value).
+            Disabled(ctrl.ReadOnly).
             OnInput(func(ctx app.Context, e app.Event) {
                 val := ctx.JSSrc().Get("value").String()
                 

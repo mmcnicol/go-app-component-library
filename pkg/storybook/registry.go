@@ -9,16 +9,17 @@ import (
 type ControlType string
 
 const (
-    ControlText   ControlType = "text"
-    ControlBool   ControlType = "bool"
-    ControlNumber ControlType = "number"
+	ControlText   ControlType = "text"
+	ControlBool   ControlType = "bool"
+	ControlNumber ControlType = "number"
+	ControlSelect ControlType = "select"
 )
 
 type Control struct {
-    Label    string
-    Type     ControlType
-    Value    any
-    Options  []string // For select inputs
+	Label    string
+	Type     ControlType
+	Value    any
+	Options  []string // For select inputs
 	ReadOnly bool
 }
 
@@ -26,8 +27,8 @@ type Control struct {
 type Story struct {
 	Name   string
 	Controls map[string]*Control
-    // Render now accepts the current state of controls
-    Render   func(controls map[string]*Control) app.UI
+	// Render now accepts the current state of controls
+	Render   func(controls map[string]*Control) app.UI
 }
 
 // ComponentContainer holds all stories for a specific component
