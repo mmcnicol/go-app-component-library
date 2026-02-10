@@ -247,7 +247,7 @@ func (t *Table) renderFooter() app.UI {
             Body(footerContent))
     }
     
-    return app.Tfoot().
+    return app.TFoot().
         Class("table__foot").
         Body(
             app.Tr().Class("table__row").Body(footers...),
