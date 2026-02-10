@@ -36,6 +36,7 @@ func main() {
 			"/web/style/toggle_switch.css",
 			"/web/style/select_one.css",
 			"/web/style/input_text.css",
+			"/web/style/tree.css",
 		},
 		Icon: app.Icon{
 			//Default: "/web/images/logo.png",
