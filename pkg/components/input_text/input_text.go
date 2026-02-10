@@ -23,7 +23,7 @@ func (t *InputText) Render() app.UI {
 
     return app.Div().Class("inputText-container").Body(
         app.Input().
-            Class(inputClass). // Applied to the input
+            Class(inputClass).
             Type("text").
             Value(t.Value).
             Disabled(t.Disabled).

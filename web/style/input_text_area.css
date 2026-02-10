@@ -1,0 +1,43 @@
+/* web/styles/input_text_area.css */
+
+.inputTextArea-container {
+    margin-bottom: 1rem;
+}
+
+.inputTextArea-container-input {
+    padding: 8px 12px;
+    border: 1px solid var(--theme-border);
+    border-radius: 4px;
+    font-size: 1rem;
+    
+    /* Dynamic Theme Colors */
+    background-color: var(--theme-bg-canvas);
+    color: var(--theme-text-main);
+    
+    /* Smooth transition for theme switching and focus */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+    width: 100%;
+    box-sizing: border-box; /* Ensures padding doesn't break width */
+}
+
+/* The "Blue Ring" Focus State */
+.inputTextArea-container-input:focus {
+    outline: 0;
+    border-color: var(--theme-primary);
+    box-shadow: 0 0 0 0.2rem var(--theme-input-focus-glow);
+}
+
+.inputTextArea-container-input::placeholder {
+    /* Use a slightly faded version of main text */
+    color: var(--theme-text-main);
+    opacity: 0.5;
+}
+
+/* Disabled State */
+.inputTextArea-container-input-disabled {
+    background-color: var(--color-gray-100);
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+    border-color: var(--color-gray-300);
+}

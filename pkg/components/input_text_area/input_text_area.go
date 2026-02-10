@@ -17,8 +17,14 @@ type InputTextArea struct {
 }
 
 func (t *InputTextArea) Render() app.UI {
+	// Determine the class for the input element itself
+    inputClass := "inputTextArea-container-input"
+    if t.Disabled {
+        inputClass += " inputTextArea-container-input-disabled"
+    }
+
 	return app.Textarea().
-		Class("input-textarea").
+		Class(inputClass).
 		// Removed .Value(t.Value) as it is undefined for HTMLTextarea
 		Placeholder(t.Placeholder).
 		Rows(t.Rows).

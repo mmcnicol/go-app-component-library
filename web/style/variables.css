@@ -45,7 +45,7 @@
 .dark-theme {
     --theme-bg-canvas: #121212;
     --theme-bg-sidebar: #1e1e1e;
-    --theme-text-main: #e0e0e0;
+    --theme-text-main: #f0f0f0; /* Off-white text */
     /* Ensure the border is visible but not overwhelming */
     --theme-border: #333333;
 

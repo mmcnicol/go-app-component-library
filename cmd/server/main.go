@@ -37,6 +37,7 @@ func main() {
 			"/web/style/toggle_switch.css",
 			"/web/style/select_one.css",
 			"/web/style/input_text.css",
+			"/web/style/input_text_area.css",
 			"/web/style/tree.css",
 			"/web/style/static_message.css",
 		},
