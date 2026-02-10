@@ -30,8 +30,10 @@ inputText-container {
 
 /* The blue ring effect on focus */
 .inputText-container-input:focus {
-    color: #495057;
+    /* color: #495057; */
+    color: var(--theme-primary); /* Use variable */
     background-color: #fff;
+    background-color: var(--theme-bg-canvas); /* Use variable */
     border-color: #80bdff;
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);

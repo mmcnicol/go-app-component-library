@@ -21,7 +21,8 @@
     position: relative;
     width: 50px;
     height: 26px;
-    background-color: #ccc;
+    /* background-color: #ccc; */
+    background-color: var(--color-gray-300); /* Use variable */
     border-radius: 15px;
     /* Smooth background color fade */
     transition: background-color 0.25s ease-in-out; 
@@ -34,7 +35,8 @@
     left: 3px;
     width: 20px;
     height: 20px;
-    background-color: white;
+    /* background-color: white; */
+    background-color: var(--color-white); /* Use variable */
     border-radius: 50%;
     /* Smooth sliding movement */
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -42,7 +44,8 @@
 }
 
 .toggleSwitch-container.toggleSwitch-container-active .toggleSwitch-container-switch {
-    background-color: #4cd964;
+    /* background-color: #4cd964; */
+    background-color: var(--theme-success); /* Use variable */
 }
 
 .toggleSwitch-container.toggleSwitch-container-active .toggleSwitch-container-switch-inner {
