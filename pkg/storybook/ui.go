@@ -245,7 +245,6 @@ func (s *Shell) renderControls() app.UI {
     )
 }
 
-// In pkg/storybook/ui.go, update the renderControlInput function:
 func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
     switch ctrl.Type {
     case ControlBool:
@@ -271,7 +270,7 @@ func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
         }
         
         return app.Select().
-            Value(ctrl.Value).
+            Attr("value", ctrl.Value). // Fixed: Use Attr instead of Value()
             Disabled(ctrl.ReadOnly).
             OnChange(func(ctx app.Context, e app.Event) {
                 ctrl.Value = ctx.JSSrc().Get("value").String()
@@ -282,7 +281,7 @@ func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
     case ControlText, ControlNumber:
         return app.Input().
             Type("text").
-            Value(ctrl.Value).
+            Attr("value", ctrl.Value). // Fixed: Use Attr instead of Value()
             Disabled(ctrl.ReadOnly).
             OnInput(func(ctx app.Context, e app.Event) {
                 val := ctx.JSSrc().Get("value").String()
