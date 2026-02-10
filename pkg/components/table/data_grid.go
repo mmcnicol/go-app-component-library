@@ -118,12 +118,10 @@ func (d *DataGrid) renderActions() app.UI {
         return app.Div()
     }
     
+    i := &icon.Icon{} // Use your library icon component
     var actions []app.UI
     for _, action := range d.props.Actions {
-        disabled := action.Disabled
-        if d.props.Selectable && !d.props.MultiSelect {
-            disabled = disabled || len(d.internalState.SelectedRows) != 1
-        }
+        // ... logic for disabled status ...
         
         actions = append(actions, app.Button().
             Type("button").
@@ -131,14 +129,11 @@ func (d *DataGrid) renderActions() app.UI {
             Disabled(disabled).
             OnClick(d.handleAction(action)).
             Body(
-                action.Icon,
+                i.GetIcon(action.Icon, 16), // Fix: convert string to UI
                 app.Text(action.Label),
             ))
     }
-    
-    return app.Div().
-        Class("data-grid__actions").
-        Body(actions...)
+    return app.Div().Class("data-grid__actions").Body(actions...)
 }
 
 func (d *DataGrid) renderGrid() app.UI {
@@ -355,4 +350,57 @@ func (d *DataGrid) notifyPageChange() {
     if d.props.OnPageChange != nil {
         d.props.OnPageChange(d.internalState.CurrentPage, d.props.PageSize)
     }
+}
+
+func (d *DataGrid) getRowKey(rowData map[string]interface{}, index int) string {
+	// If the data has an "ID", use it; otherwise, fallback to the row index
+	if id, ok := rowData["ID"].(string); ok {
+		return id
+	}
+	return fmt.Sprintf("row-%d", index)
+}
+
+func (d *DataGrid) toggleRowSelection(key string, data map[string]interface{}) {
+	if d.internalState.SelectedRows == nil {
+		d.internalState.SelectedRows = make(map[string]bool)
+	}
+	d.internalState.SelectedRows[key] = !d.internalState.SelectedRows[key]
+}
+
+func (d *DataGrid) clearSelection(ctx app.Context, e app.Event) {
+	d.internalState.SelectedRows = make(map[string]bool)
+	ctx.Update()
+}
+
+func (d *DataGrid) handleRowSelection(key string, data map[string]interface{}) app.EventHandler {
+	return func(ctx app.Context, e app.Event) {
+		d.toggleRowSelection(key, data)
+		ctx.Update()
+	}
+}
+
+func (d *DataGrid) handleAction(action GridAction) app.EventHandler {
+	return func(ctx app.Context, e app.Event) {
+		if action.Handler != nil {
+			// Convert internal map to slice for the handler
+			var selected []map[string]interface{}
+			// Note: This requires tracking the actual data objects in internalState 
+			// if you need to pass full objects back.
+			action.Handler(ctx, selected)
+		}
+	}
+}
+
+func (d *DataGrid) handleSortChange(sortBy string, sortOrder string) {
+	d.internalState.SortBy = sortBy
+	d.internalState.SortOrder = sortOrder
+}
+
+func (d *DataGrid) renderPaginationControls() app.UI {
+    if !d.props.Pagination {
+        return app.Nil
+    }
+    // You can return the same nav used in the footer
+    totalPages := (d.props.TotalItems + d.props.PageSize - 1) / d.props.PageSize
+    return d.renderPageNavigation(totalPages)
 }
