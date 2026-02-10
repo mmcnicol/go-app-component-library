@@ -3,6 +3,7 @@
 package icon
 
 import (
+	"strings"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/mmcnicol/go-app-component-library/pkg/storybook"
 )
@@ -23,7 +24,7 @@ func init() {
 			allIcons := []string{"success", "info", "warn", "error"}
 			
 			// Create an instance of your icon component
-			i := &icon.Icon{}
+			i := &Icon{}
 
 			return app.Div().Style("padding", "20px").Body(
 				app.H2().Text("Icon Gallery"),
