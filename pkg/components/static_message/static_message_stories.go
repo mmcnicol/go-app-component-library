@@ -7,14 +7,26 @@ import (
 	"github.com/mmcnicol/go-app-component-library/pkg/storybook"
 )
 
-// Use init() to auto-register when this package is imported
 func init() {
 
 	storybook.Register("Messages", "StaticMessage", 
 		map[string]*storybook.Control{
-			"Severity": {Label: "Severity", Type: storybook.ControlText, Value: "info"}, 
-			"Summary":  {Label: "Summary", Type: storybook.ControlText, Value: "Info Message"}, 
-			"Detail":   {Label: "Detail", Type: storybook.ControlText, Value: "This is a detailed description of the alert."}, 
+			"Severity": {
+				Label: "Severity", 
+				Type: storybook.ControlSelect, 
+				Value: "info",
+				Options: []string{"info", "success", "warn", "error"},
+			}, 
+			"Summary": {
+				Label: "Summary", 
+				Type: storybook.ControlText, 
+				Value: "Information Message",
+			}, 
+			"Detail": {
+				Label: "Detail", 
+				Type: storybook.ControlText, 
+				Value: "This is a detailed description of the alert.",
+			}, 
 		},
 		func(controls map[string]*storybook.Control) app.UI {
 			severity := controls["Severity"].Value.(string)
@@ -29,5 +41,49 @@ func init() {
 		},
 	)
 
-}
+	// Optional: Add individual stories for each severity type as examples
+	storybook.Register("Messages", "Info Message", 
+		map[string]*storybook.Control{},
+		func(controls map[string]*storybook.Control) app.UI {
+			return &StaticMessage{
+				Severity: "info",
+				Summary:  "Information",
+				Detail:   "Your request has been processed successfully.",
+			}
+		},
+	)
+	
+	storybook.Register("Messages", "Success Message", 
+		map[string]*storybook.Control{},
+		func(controls map[string]*storybook.Control) app.UI {
+			return &StaticMessage{
+				Severity: "success",
+				Summary:  "Success!",
+				Detail:   "Your changes have been saved successfully.",
+			}
+		},
+	)
+	
+	storybook.Register("Messages", "Warning Message", 
+		map[string]*storybook.Control{},
+		func(controls map[string]*storybook.Control) app.UI {
+			return &StaticMessage{
+				Severity: "warn",
+				Summary:  "Warning",
+				Detail:   "Please review your information before submitting.",
+			}
+		},
+	)
+	
+	storybook.Register("Messages", "Error Message", 
+		map[string]*storybook.Control{},
+		func(controls map[string]*storybook.Control) app.UI {
+			return &StaticMessage{
+				Severity: "error",
+				Summary:  "Error",
+				Detail:   "An error occurred while processing your request.",
+			}
+		},
+	)
 
+}
