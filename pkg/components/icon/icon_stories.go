@@ -30,6 +30,7 @@ func init() {
 				"chevron-down", 
 				"chevron-left",
 				"chevron-up", 
+				"sort",
 				"settings",
 				"logout",  
 				"folder", 

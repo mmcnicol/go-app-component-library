@@ -1,0 +1,44 @@
+/* web/styles/sortable_table.css */
+
+.table__sort-button {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    text-align: left;
+    color: inherit;
+    transition: color 0.2s ease;
+}
+
+.table__sort-button:hover {
+    color: var(--theme-primary, #007bff);
+}
+
+.table__sort-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.6;
+    transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.table__sort-button:hover .table__sort-indicator {
+    opacity: 1;
+}
+
+/* Style for active sort indicator */
+.table__sort-button .icon-chevron-up,
+.table__sort-button .icon-chevron-down {
+    opacity: 1;
+    color: var(--theme-primary, #007bff);
+}
+
+/* Style for sort icon (indeterminate state) */
+.table__sort-button .icon-sort {
+    opacity: 0.4;
+}

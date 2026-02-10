@@ -5,6 +5,7 @@ import (
     "fmt"
     "sort"
     "github.com/maxence-charriere/go-app/v10/pkg/app"
+    "github.com/mmcnicol/go-app-component-library/pkg/components/icon"
 )
 
 // SortableTableProps extends TableProps with sorting capabilities
@@ -75,19 +76,23 @@ func (s *SortableTable) createSortableHeader(col Column, colIndex int, originalR
     }
     
     // Add sorting indicator
+    iconName := "sort" // Default icon (indeterminate state)
     if s.sortBy == col.Accessor {
-        icon := "↑"
-        if s.sortOrder == "desc" {
-            icon = "↓"
+        if s.sortOrder == "asc" {
+            iconName = "chevron-up"
+        } else {
+            iconName = "chevron-down"
         }
-        content = append(content, app.Span().
-            Class("table__sort-indicator").
-            Text(icon))
-    } else {
-        content = append(content, app.Span().
-            Class("table__sort-indicator table__sort-indicator--inactive").
-            Text("↕"))
     }
+    
+    // Create icon instance
+    icon := &icon.Icon{}
+    iconElement := icon.GetIcon(iconName, 16) // Use 16px size for headers
+    
+    content = append(content, 
+        app.Span().
+            Class("table__sort-indicator").
+            Body(iconElement))
     
     return app.Button().
         Type("button").

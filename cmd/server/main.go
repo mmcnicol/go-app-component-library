@@ -49,7 +49,7 @@ func main() {
 			"/web/style/icon.css",
 			"/web/style/label.css",
 			"/web/style/table.css",
-			"/web/style/table_sortable.css",
+			"/web/style/sortable_table.css",
 			"/web/style/data_grid.css",
 		},
 		Icon: app.Icon{
