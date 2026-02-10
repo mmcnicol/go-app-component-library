@@ -13,7 +13,7 @@ func init() {
 
 	storybook.Register("Misc", "Icon", 
 		map[string]*storybook.Control{
-			"Search": {Label: "Search Icons", Type: storybook.ControlText, Value: ""},
+			"Search": {Label: "Search Icons", Type: storybook.ControlText, Value: "error"},
 			"Size":   {Label: "Icon Size", Type: storybook.ControlNumber, Value: 48},
 		},
 		func(controls map[string]*storybook.Control) app.UI {
