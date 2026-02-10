@@ -238,6 +238,7 @@ func (t *Table) applyColumnStyles(elem app.HTMLTag, col Column) app.HTMLTag {
     return elem
 }
 
+/*
 func (t *Table) renderHeader() app.UI {
     var headers []app.UI
     
@@ -371,6 +372,7 @@ func (t *Table) renderFooter() app.UI {
             app.Tr().Class("table__row").Body(footers...),
         )
 }
+*/
 
 func (t *Table) getRowKey(rowData map[string]interface{}, index int) string {
     if t.props.RowKey != "" {
