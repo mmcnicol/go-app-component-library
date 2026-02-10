@@ -193,4 +193,9 @@ func (s *SortableTable) sortData() {
     
     // Log for debugging
     app.Logf("Sorted by %s (%s): %d rows", s.sortBy, s.sortOrder, len(s.sortedData))
+
+    // Log first few rows after sorting
+    for i := 0; i < min(3, len(s.sortedData)); i++ {
+        app.Logf("Row %d: %v = %v", i, s.sortBy, s.sortedData[i][s.sortBy])
+    }
 }
