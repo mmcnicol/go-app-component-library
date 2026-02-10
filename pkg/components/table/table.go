@@ -2,6 +2,7 @@
 package table
 
 import (
+    "fmt"
     "github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
@@ -151,7 +152,7 @@ func (t *Table) renderHeader() app.UI {
             Body(headerContent))
     }
     
-    return app.Thead().
+    return app.THead().
         Class("table__head").
         Body(
             app.Tr().Class("table__row").Body(headers...),
@@ -207,7 +208,7 @@ func (t *Table) renderBody() app.UI {
         rows = append(rows, row.Body(cells...))
     }
     
-    return app.Tbody().
+    return app.TBody().
         Class("table__body").
         Body(rows...)
 }
@@ -223,7 +224,7 @@ func (t *Table) renderFooter() app.UI {
     }
     
     if !hasFooter {
-        return app.Tfoot()
+        return app.TFoot()
     }
     
     var footers []app.UI
