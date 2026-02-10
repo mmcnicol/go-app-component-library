@@ -267,8 +267,7 @@ func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
                 ctrl.Value = ctx.JSSrc().Get("checked").Bool()
                 s.shouldRender = true // Trigger Shell update
             })
-    case ControlText:
-	case ControlNumber:
+    case ControlText, ControlNumber:
         return app.Input().Type("text").Value(ctrl.Value).
             OnInput(func(ctx app.Context, e app.Event) {
                 ctrl.Value = ctx.JSSrc().Get("value").String()
