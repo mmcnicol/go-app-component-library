@@ -9,7 +9,7 @@ Built In
 - [x] Select
 - [x] Button
 - [x] Table
-- [ ] Meter
+- [x] Meter
 - [ ] Progress
 - [ ] Dialog
 - [ ] Form

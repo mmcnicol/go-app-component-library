@@ -255,4 +255,41 @@ func init() {
 		},
 	)
 
+	storybook.Register("Built In", "Meter", 
+		map[string]*storybook.Control{
+			"Value":   {Label: "Current Value", Type: storybook.ControlNumber, Value: 60}, 
+			"Min":     {Label: "Min Value", Type: storybook.ControlNumber, Value: 0}, 
+			"Max":     {Label: "Max Value", Type: storybook.ControlNumber, Value: 100}, 
+			"Low":     {Label: "Low Threshold", Type: storybook.ControlNumber, Value: 30}, 
+			"High":    {Label: "High Threshold", Type: storybook.ControlNumber, Value: 80}, 
+			"Optimum": {Label: "Optimum Value", Type: storybook.ControlNumber, Value: 90}, 
+		},
+		func(controls map[string]*storybook.Control) app.UI {
+			// Asserting as int, then converting to float64 as required by meter methods
+			val := float64(controls["Value"].Value.(int))
+			min := float64(controls["Min"].Value.(int))
+			max := float64(controls["Max"].Value.(int))
+			low := float64(controls["Low"].Value.(int))
+			high := float64(controls["High"].Value.(int))
+			optimum := float64(controls["Optimum"].Value.(int))
+
+			return app.Div().Body(
+				app.P().Text(fmt.Sprintf("Status: %.0f%%", val)),
+				app.Meter().
+					Style("width", "100%").
+					Style("height", "25px").
+					Min(min).
+					Max(max).
+					Value(val).
+					Low(low).
+					High(high).
+					Optimum(optimum).
+					Body(
+						// Fallback text for older browsers
+						app.Text(fmt.Sprintf("%.0f", val)),
+					),
+			)
+		},
+	)
+
 }
