@@ -23,7 +23,7 @@ func init() {
 				app.Input().
 					Style("display", "block").
 					Style("width", "200px").
-					Style("padding", "8px").
+					Style("padding", "8px"),
 					//Placeholder("Type here..."),
 			)
 		},
