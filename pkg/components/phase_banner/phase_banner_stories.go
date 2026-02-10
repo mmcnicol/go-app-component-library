@@ -33,6 +33,7 @@ func init() {
 		},
 	)
 	
+	/*
 	// Optional: Keep the individual stories as examples if needed
 	storybook.Register("Messages", "Phase Banner - Alpha", 
 		map[string]*storybook.Control{}, // Empty controls map
@@ -61,4 +62,5 @@ func init() {
 			}
 		},
 	)
+	*/
 }

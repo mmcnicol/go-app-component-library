@@ -41,6 +41,7 @@ func init() {
 		},
 	)
 
+	/*
 	// Optional: Add individual stories for each severity type as examples
 	storybook.Register("Messages", "Info Message", 
 		map[string]*storybook.Control{},
@@ -85,5 +86,6 @@ func init() {
 			}
 		},
 	)
+	*/
 
 }
