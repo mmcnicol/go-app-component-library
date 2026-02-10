@@ -7,35 +7,20 @@ import (
 	"github.com/mmcnicol/go-app-component-library/pkg/storybook"
 )
 
-// Use init() to auto-register when this package is imported
 func init() {
-
-	/*
-	storybook.Register("Phase Banner", "Beta", func() app.UI {
-		return &PhaseBanner{
-			Phase: "Beta",
-			//Message: app.Text("This is a new service – your "),
-			// You can nest elements inside the message
-			Message: app.Span().Body(
-				app.Text("This is a new service – your "),
-				app.A().Href("/feedback").Text("feedback"),
-				app.Text(" will help us to improve it."),
-			),
-		}
-	})
-	
-	storybook.Register("Phase Banner", "Alpha", func() app.UI {
-		return &PhaseBanner{
-			Phase: "Alpha",
-			Message: app.Text("This is a brand new service in development."),
-		}
-	})
-	*/
-
 	storybook.Register("Messages", "Phase Banner", 
 		map[string]*storybook.Control{
-			"Phase": {Label: "Phase", Type: storybook.ControlText, Value: "Alpha"},
-			"Message": {Label: "Message", Type: storybook.ControlText, Value: "This is a brand new service in development."},
+			"Phase": {
+				Label: "Phase", 
+				Type: storybook.ControlSelect, 
+				Value: "Alpha",
+				Options: []string{"Alpha", "Beta", "Gamma", "Stable", "Deprecated"},
+			},
+			"Message": {
+				Label: "Message", 
+				Type: storybook.ControlText, 
+				Value: "This is a brand new service in development.",
+			},
 		},
 		func(controls map[string]*storybook.Control) app.UI {
 			phaseString := controls["Phase"].Value.(string)
@@ -48,4 +33,26 @@ func init() {
 		},
 	)
 	
+	// Optional: Keep the individual stories as examples if needed
+	storybook.Register("Messages", "Phase Banner - Alpha", func() app.UI {
+		return &PhaseBanner{
+			Phase: "Alpha",
+			Message: app.Span().Body(
+				app.Text("This is a new service in development – your "),
+				app.A().Href("/feedback").Text("feedback"),
+				app.Text(" will help us to improve it."),
+			),
+		}
+	})
+	
+	storybook.Register("Messages", "Phase Banner - Beta", func() app.UI {
+		return &PhaseBanner{
+			Phase: "Beta",
+			Message: app.Span().Body(
+				app.Text("This service is currently in beta testing. "),
+				app.A().Href("/report-issue").Text("Report any issues"),
+				app.Text(" you encounter."),
+			),
+		}
+	})
 }
