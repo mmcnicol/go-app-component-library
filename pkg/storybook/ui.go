@@ -15,6 +15,12 @@ type Shell struct {
 	searchQuery     string
 	shouldRender    bool
 	showControls    bool
+	IsDark          bool
+}
+
+func (s *Shell) OnInit() {
+    // Load the preference from local storage
+	app.Window().GetState("storybook-theme-dark", &s.IsDark)
 }
 
 func (s *Shell) OnMount(ctx app.Context) {
@@ -31,7 +37,15 @@ func (s *Shell) Render() app.UI {
 	if app.IsClient {
 		app.Log("Shell Render()")
 	}
+
 	s.shouldRender = false
+
+	// Dynamically apply the dark-theme class
+	layoutClass := "storybook-layout"
+	if s.IsDark {
+		layoutClass += " dark-theme"
+	}
+
 	allComponents := GetRegistry()
 	query := strings.ToLower(s.searchQuery)
 
@@ -46,6 +60,16 @@ func (s *Shell) Render() app.UI {
 		// LEFT SIDEBAR
 		app.Aside().Class("storybook-sidebar").Body(
 			app.H2().Text("Components"),
+
+			&ThemeSwitcher{
+				IsDark: s.IsDark,
+				OnChange: func(isDark bool) {
+					s.IsDark = isDark
+					// Persist the choice
+					app.Window().SetState("storybook-theme-dark", isDark)
+					//s.Update()
+				},
+			},
 
 			app.Div().Class("search-container").Body(
 				app.Input().
@@ -95,7 +119,7 @@ func (s *Shell) Render() app.UI {
 			),
 		),
 
-		// MAIN CONTENT AREA
+		// MAIN CONTENT AREA / MAIN PREVIEW
 		app.Main().Class("storybook-main").Body(
             app.Div().Class("canvas-header").Body(
                 app.Button().

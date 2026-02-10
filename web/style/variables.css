@@ -1,14 +1,22 @@
 /* web/style/variables.css */
+
 :root {
-    /* --- Global Tokens (The Raw Palette) --- */
+    /* --- Global Tokens --- */
     --color-blue-50: #E3F2FD;
     --color-blue-500: #1976D2;
     --color-blue-900: #0D47A1;
     --color-gray-100: #F3F4F6;
     --color-gray-300: #ced4da;
+    --color-white: #ffffff;
+    --color-black: #1a1a1a;
     
-    /* --- Semantic Tokens (The Meaning) --- */
-    /* Use these in your components so you can change the "theme" later */
+    /* --- Layout Tokens (Default Light Mode) --- */
+    --theme-bg-canvas: var(--color-white);
+    --theme-bg-sidebar: #f8f9fa;
+    --theme-text-main: var(--color-black);
+    --theme-border: #e0e0e0;
+
+    /* --- Semantic Tokens --- */
     --theme-primary: var(--color-blue-500);
     --theme-primary-hover: var(--color-blue-900);
     --theme-bg-active: var(--color-blue-50);
@@ -26,4 +34,20 @@
     --font-main: system-ui, -apple-system, sans-serif;
     --font-size-base: 16px;
     --font-size-sm: 14px;
+}
+
+/* --- Dark Theme Overrides --- */
+.dark-theme {
+    --theme-bg-canvas: #121212;
+    --theme-bg-sidebar: #1e1e1e;
+    --theme-text-main: #e0e0e0;
+    --theme-border: #333333;
+
+    --theme-primary: #90caf9;
+    --theme-bg-active: #1a237e;
+    --theme-text-active: #ffffff;
+    --theme-border-active: #90caf9;
+
+    /* Override Global Tokens for dark context */
+    --color-gray-100: #2c2c2c; /* Darker hover for tree nodes */
 }

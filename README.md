@@ -9,10 +9,10 @@ Built In
 - [x] Select
 - [x] Button
 - [x] Table
+- [x] Dialog
 - [X] Time
 - [x] Meter
 - [ ] Progress
-- [x] Dialog
 - [ ] Form
 - [ ] Canvas
 
@@ -34,12 +34,12 @@ Messages
 - [ ] NotificationBar / CookieConsent
 
 Data
+- [x] Tree
+- [ ] TreeTable
 - [ ] Table
 - [ ] Table with column sorting
 - [ ] Table with column sorting and paging
 - [ ] Table with column sorting and server-side paging
-- [x] Tree
-- [ ] TreeTable
 
 Panel
 - [ ] Panel
