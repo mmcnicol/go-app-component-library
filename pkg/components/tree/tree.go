@@ -31,28 +31,6 @@ func (t *Tree) Render() app.UI {
 	)
 }
 
-
-
-            OnClick(func(ctx app.Context, e app.Event) {
-                if hasChildren {
-                    node.Expanded = !node.Expanded
-                } else {
-                    t.deselectAll(t.Data)
-                    node.Selected = true
-                    
-                    // Trigger the callback to update Storybook controls
-                    if t.OnSelect != nil {
-                        t.OnSelect(ctx, node.Label)
-                    }
-                }
-                ctx.Update()
-            }).
-
-
-
-
-
-
 func (t *Tree) renderNode(node *TreeNode, level int) app.UI {
     i := &icon.Icon{}
     hasChildren := len(node.Children) > 0
