@@ -25,10 +25,11 @@ func (i *Icon) GetIcon(name string, size int) app.UI {
 	}
 
 	// Using app.Raw avoids the "undefined: app.Svg" compilation error
-	return app.Raw(fmt.Sprintf(
-		`<svg class="icon icon-%s" viewBox="0 0 %d %d" width="%d" height="%d"><path d="%s" /></svg>`,
-		name, size, size, size, size, d,
-	))
+	// ViewBox stays 0 0 24 24. Width/Height handles the zoom.
+    return app.Raw(fmt.Sprintf(
+        `<svg class="icon icon-%s" viewBox="0 0 24 24" width="%d" height="%d"><path d="%s" /></svg>`,
+        name, size, size, d,
+    ))
 }
 
 /*
