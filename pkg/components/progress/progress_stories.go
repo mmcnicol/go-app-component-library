@@ -19,7 +19,7 @@ func init() {
             
             return app.Div().Style("padding", "20px").Body(
                 &Progress{
-                    Label: lbl,
+                    Value: val,
                 },
             )
         },
