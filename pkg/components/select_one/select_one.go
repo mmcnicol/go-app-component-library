@@ -29,17 +29,15 @@ func (o *SelectOne) Render() app.UI {
 
     //o.shouldRender = false
 
-	containerClass := ""
-	if o.Disabled {
-        containerClass += "selectOne-container-select-disabled"
+	selectClass := "selectOne-container-select"
+    if s.Disabled {
+        selectClass += " selectOne-container-select-disabled"
     }
-
+	
 	return app.Div().Class("selectOne-container").Body(
-		
-		app.Select().
-			Class("selectOne-container-select").
-			Class(containerClass).
-			Disabled(o.Disabled).
+        app.Select().
+            Class(selectClass).
+            Disabled(s.Disabled).
 			//SelectedValue(o.SelectedValue). // Keeps the UI in sync with Go state
 			//OnChange(o.onSelectChange).
 			//OnChange(o.ValueTo(&o.SelectedValue)).
@@ -68,26 +66,3 @@ func (o *SelectOne) Render() app.UI {
 			),
 	)
 }
-
-/*
-func (o *SelectOne) onSelectChange(ctx app.Context, e app.Event) {
-	if app.IsClient {
-		app.Log("SelectOne onSelectChange()")
-	}
-	o.SelectedValue = ctx.JSSrc().Get("value").String()
-	//o.shouldRender = true
-	if app.IsClient {
-		app.Logf("SelectOne state is now: %v", o.SelectedValue)
-	}
-	ctx.Update()
-}
-*/
-
-/*
-func (o *SelectOne) Update(ctx app.Context) bool {
-	if app.IsClient {
-		app.Log("SelectOne Update()")
-	}
-	return o.shouldRender
-}
-*/
