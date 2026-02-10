@@ -197,4 +197,33 @@ func init() {
 		},
 	)
 
+	storybook.Register("Built In", "InputTextArea", 
+		map[string]*storybook.Control{
+			"Value":       {Label: "Value", Type: storybook.ControlText, Value: "Hello\nWorld!"}, 
+			"Disabled":    {Label: "Disabled", Type: storybook.ControlBool, Value: false},
+			"Placeholder": {Label: "Placeholder", Type: storybook.ControlText, Value: "Enter your message..."},
+			"Rows":        {Label: "Rows", Type: storybook.ControlNumber, Value: 5},
+		},
+		func(controls map[string]*storybook.Control) app.UI {
+			valueString := controls["Value"].Value.(string)
+			isDisabled := controls["Disabled"].Value.(bool)
+			placeholderString := controls["Placeholder"].Value.(string)
+			rows := controls["Rows"].Value.(int)
+
+			return app.Textarea().
+				Style("width", "100%").
+				Style("padding", "8px").
+				Rows(rows).
+				Value(valueString).
+				Placeholder(placeholderString).
+				Disabled(isDisabled).
+				OnInput(func(ctx app.Context, e app.Event) {
+					// Captures multi-line text including newlines
+					newVal := ctx.JSSrc().Get("value").String()
+					controls["Value"].Value = newVal
+					ctx.Update()
+				})
+		},
+	)
+
 }

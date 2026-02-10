@@ -5,7 +5,7 @@ TODO List:
 Built In
 - [x] Div
 - [x] InputText
-- [ ] InputTextArea
+- [x] InputTextArea
 - [x] Select
 - [ ] Button
 - [x] Table
