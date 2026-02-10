@@ -24,6 +24,7 @@
     --theme-bg-active: var(--color-blue-50);
     --theme-text-active: var(--color-blue-900);
     --theme-border-active: var(--color-blue-500);
+    --theme-input-focus-glow: rgba(25, 118, 210, 0.25); /* Light blue glow */
     
     /* Spacing Scale */
     --spacing-xs: 4px;
@@ -47,10 +48,10 @@
 
     --theme-success: #22c55e; /* A slightly softer green for dark backgrounds */
     --theme-primary: #90caf9;
-    --theme-text-active: #ffffff;
     --theme-bg-active: #1e293b;     /* Deeper blue-gray */
     --theme-border-active: #38bdf8; /* Brighter "Electric" blue */
     --theme-text-active: #f1f5f9;   /* Off-white for better readability */
+    --theme-input-focus-glow: rgba(144, 202, 249, 0.35); /* Brighter glow for dark mode */
 
     /* Override Global Tokens for dark context */
     --color-gray-100: #1e1e1e;      /* Subtle hover effect */

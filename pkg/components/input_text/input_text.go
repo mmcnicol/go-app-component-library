@@ -15,42 +15,26 @@ type InputText struct {
 }
 
 func (t *InputText) Render() app.UI {
-	if app.IsClient {
-		app.Log("InputText Render()")
-	}
-
-	containerClass := ""
-	if t.Disabled {
-        containerClass += "inputText-container-input-disabled"
+    // Determine the class for the input element itself
+    inputClass := "inputText-container-input"
+    if t.Disabled {
+        inputClass += " inputText-container-input-disabled"
     }
 
-	return app.Div().Class("inputText-container").Body(
-
-		/*
-		app.If(t.Label != "", func() app.UI {
-			return app.Label().
-				Class("inputText-container-label").
-				Text(t.Label)
-		}),
-		*/
-
-		app.Input().
-			Class("inputText-container-input").
-			Class(containerClass).
-			Type("text").
-			Value(t.Value).
-			Disabled(t.Disabled).
-			Placeholder(t.Placeholder).
-			//AutoFocus(true).
-			//OnChange(t.ValueTo(&t.Value)),
-			OnInput(func(ctx app.Context, e app.Event) {
-				val := ctx.JSSrc().Get("value").String()
-				t.Value = val
-				if t.OnInput != nil {
-					t.OnInput(ctx, val)
-				}
-				//ctx.Update()
-			},
-		),
-	)
+    return app.Div().Class("inputText-container").Body(
+        app.Input().
+            Class(inputClass). // Applied to the input
+            Type("text").
+            Value(t.Value).
+            Disabled(t.Disabled).
+            Placeholder(t.Placeholder).
+            OnInput(func(ctx app.Context, e app.Event) {
+                val := ctx.JSSrc().Get("value").String()
+                t.Value = val
+                if t.OnInput != nil {
+                    t.OnInput(ctx, val)
+                }
+                ctx.Update() // Important for real-time feedback
+            }),
+    )
 }

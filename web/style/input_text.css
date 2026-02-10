@@ -1,44 +1,43 @@
 /* web/styles/input_text.css */
 
-inputText-container {
+.inputText-container {
     margin-bottom: 1rem;
 }
 
-/*
-.inputText-container-label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-bottom: 4px;
-    color: #333;
-}
-*/
-
 .inputText-container-input {
     padding: 8px 12px;
-    border: 1px solid #ced4da;
+    border: 1px solid var(--theme-border);
     border-radius: 4px;
     font-size: 1rem;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    
+    /* Dynamic Theme Colors */
+    background-color: var(--theme-bg-canvas);
+    color: var(--theme-text-main);
+    
+    /* Smooth transition for theme switching and focus */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+    width: 100%;
+    box-sizing: border-box; /* Ensures padding doesn't break width */
 }
 
-.inputText-container-input-disabled {
-    background-color: #e0e0e0;   /* Desaturate the background */
-    opacity: 0.5;                /* Visual cue for inactivity */
-    cursor: not-allowed;         /* Shows the 'circle-slash' cursor */
-    pointer-events: none;        /* Prevents the browser from even firing the click event */
-}
-
-/* The blue ring effect on focus */
+/* The "Blue Ring" Focus State */
 .inputText-container-input:focus {
-    /* color: #495057; */
-    color: var(--theme-primary); /* Use variable */
-    background-color: #fff;
-    background-color: var(--theme-bg-canvas); /* Use variable */
-    border-color: #80bdff;
     outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    border-color: var(--theme-primary);
+    box-shadow: 0 0 0 0.2rem var(--theme-input-focus-glow);
 }
 
 .inputText-container-input::placeholder {
-    color: #adb5bd;
+    /* Use a slightly faded version of main text */
+    color: var(--theme-text-main);
+    opacity: 0.5;
+}
+
+/* Disabled State */
+.inputText-container-input-disabled {
+    background-color: var(--color-gray-100);
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+    border-color: var(--color-gray-300);
 }
