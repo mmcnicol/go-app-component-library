@@ -21,6 +21,7 @@ type Shell struct {
 func (s *Shell) OnMount(ctx app.Context) {
 	ctx.LocalStorage().Get("storybook-theme-dark", &s.IsDark)
 	ctx.Update()
+	s.shouldRender = true
 }
 
 func (s *Shell) Render() app.UI {
@@ -61,6 +62,7 @@ func (s *Shell) Render() app.UI {
 					
 					// Trigger the re-render
 					ctx.Update()
+					s.shouldRender = true
 				},
 			},
 
