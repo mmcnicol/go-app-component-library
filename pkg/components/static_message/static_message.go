@@ -14,22 +14,25 @@ type StaticMessage struct {
 }
 
 func (m *StaticMessage) Render() app.UI {
-	// Map severity to PrimeFaces-style colors
-	icon := "pi-info-circle"
+
+	i := icon.Icon{}
+
+	// Map severity to style colors
+	//icon := "pi-info-circle"
 	color := "#3B82F6"      // info blue
 	bgColor := "#EFF6FF"
 	
 	switch m.Severity {
 	case "success":
-		icon = "pi-check"
+		//icon = "pi-check"
 		color = "#22C55E"
 		bgColor = "#F0FDF4"
 	case "warn":
-		icon = "pi-exclamation-triangle"
+		//icon = "pi-exclamation-triangle"
 		color = "#F59E0B"
 		bgColor = "#FFFBEB"
 	case "error":
-		icon = "pi-times-circle"
+		//icon = "pi-times-circle"
 		color = "#EF4444"
 		bgColor = "#FEF2F2"
 	}
@@ -45,7 +48,7 @@ func (m *StaticMessage) Render() app.UI {
 			// Icon placeholder (assuming FontAwesome or PrimeIcons CSS is loaded)
 			//app.I().Class("pi " + icon).Style("color", color).Style("margin-right", "0.5rem"),
 			//icon.GetSVGIcon(m.Severity, 24, color), // Injected SVG
-			icon.GetIcon(m.Severity, 24), // Injected SVG
+			i.GetIcon(m.Severity, 24), // Injected SVG
 			app.Span().Style("font-weight", "bold").Style("margin-right", "0.5rem").Text(m.Summary),
 			app.Span().Text(m.Detail),
 		)
