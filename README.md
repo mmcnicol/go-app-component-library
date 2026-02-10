@@ -8,7 +8,7 @@ Built In
 - [ ] InputTextArea
 - [x] Select
 - [ ] Button
-- [ ] Table
+- [x] Table
 - [ ] Meter
 - [ ] Progress
 - [ ] Dialog

@@ -5,6 +5,7 @@ package built_in
 import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/mmcnicol/go-app-component-library/pkg/storybook"
+	"strings"
 )
 
 // Use init() to auto-register when this package is imported
