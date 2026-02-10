@@ -17,7 +17,7 @@ func (m *StaticMessage) Render() app.UI {
     i := &icon.Icon{}
     return app.Div().Class("staticMessage-container").Body(
         app.Div().Class("staticMessage-icon").Body(
-            i.GetIcon(m.IconName, 20),
+            i.GetIcon(m.Severity, 20),
         ),
         app.Div().Class("staticMessage-content").Text(m.Message),
     )

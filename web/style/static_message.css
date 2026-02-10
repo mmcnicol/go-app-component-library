@@ -1,7 +1,5 @@
 /* web/styles/static_message.css */
 
-/* web/styles/static_message.css */
-
 .staticMessage-container {
     padding: 16px;
     margin-bottom: 1rem;
@@ -9,7 +7,7 @@
     display: flex;
     align-items: flex-start;
     
-    /* THEME AWARE: Use a subtle background and the theme's border color */
+    /* THEME AWARE: Uses the charcoal gray from variables in Dark Mode */
     background-color: var(--color-gray-100); 
     border: 1px solid var(--theme-border);
     transition: background-color 0.3s ease, border-color 0.3s ease;
@@ -17,22 +15,21 @@
 
 .staticMessage-content {
     flex: 1;
-    /* THEME AWARE: Ensures text flips to white/light-gray in dark mode */
+    /* This ensures text turns white/light-gray in Dark Mode */
     color: var(--theme-text-main);
     font-size: 0.95rem;
     line-height: 1.5;
 }
 
-/* Icon styling inside the message */
 .staticMessage-icon {
     margin-right: 12px;
     margin-top: 2px;
     flex-shrink: 0;
-    /* Inherits color from text-main automatically */
-    color: var(--theme-text-main); 
+    /* Uses the theme's primary color (e.g., Blue) for the icon */
+    color: var(--theme-primary); 
 }
 
-/* If you want the icon to stay a specific color (like Blue) in both modes: */
-.staticMessage-icon-info {
-    color: var(--theme-primary);
+/* Ensure SVG icons inside use the parent's color */
+.staticMessage-icon svg {
+    fill: currentColor;
 }

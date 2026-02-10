@@ -38,6 +38,7 @@ func main() {
 			"/web/style/select_one.css",
 			"/web/style/input_text.css",
 			"/web/style/tree.css",
+			"/web/style/static_message.css",
 		},
 		Icon: app.Icon{
 			//Default: "/web/images/logo.png",
