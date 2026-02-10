@@ -1,6 +1,10 @@
 // pkg/components/input_text_area/input_text_area.go
 package input_text_area
 
+import (
+	"github.com/maxence-charriere/go-app/v10/pkg/app"
+)
+
 type InputTextArea struct {
 	app.Compo
 	Value       string
