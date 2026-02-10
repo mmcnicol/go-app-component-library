@@ -38,7 +38,7 @@ func (t *Tree) renderNode(node *TreeNode, level int) app.UI {
 			Style("display", "flex").
 			Style("align-items", "center").
 			Style("padding", "4px 0").
-			Style("padding-left", app.FormatString("%dpx", level*20)).
+			Style("padding-left", app.FormatString("%dpx", level*32)).
 			Style("cursor", "pointer").
 			OnClick(func(ctx app.Context, e app.Event) {
 				if app.IsClient {
