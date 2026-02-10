@@ -34,25 +34,31 @@ func init() {
 	)
 	
 	// Optional: Keep the individual stories as examples if needed
-	storybook.Register("Messages", "Phase Banner - Alpha", func() app.UI {
-		return &PhaseBanner{
-			Phase: "Alpha",
-			Message: app.Span().Body(
-				app.Text("This is a new service in development – your "),
-				app.A().Href("/feedback").Text("feedback"),
-				app.Text(" will help us to improve it."),
-			),
-		}
-	})
+	storybook.Register("Messages", "Phase Banner - Alpha", 
+		map[string]*storybook.Control{}, // Empty controls map
+		func(controls map[string]*storybook.Control) app.UI {
+			return &PhaseBanner{
+				Phase: "Alpha",
+				Message: app.Span().Body(
+					app.Text("This is a new service in development – your "),
+					app.A().Href("/feedback").Text("feedback"),
+					app.Text(" will help us to improve it."),
+				),
+			}
+		},
+	)
 	
-	storybook.Register("Messages", "Phase Banner - Beta", func() app.UI {
-		return &PhaseBanner{
-			Phase: "Beta",
-			Message: app.Span().Body(
-				app.Text("This service is currently in beta testing. "),
-				app.A().Href("/report-issue").Text("Report any issues"),
-				app.Text(" you encounter."),
-			),
-		}
-	})
+	storybook.Register("Messages", "Phase Banner - Beta", 
+		map[string]*storybook.Control{}, // Empty controls map
+		func(controls map[string]*storybook.Control) app.UI {
+			return &PhaseBanner{
+				Phase: "Beta",
+				Message: app.Span().Body(
+					app.Text("This service is currently in beta testing. "),
+					app.A().Href("/report-issue").Text("Report any issues"),
+					app.Text(" you encounter."),
+				),
+			}
+		},
+	)
 }
