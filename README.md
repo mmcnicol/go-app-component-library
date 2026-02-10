@@ -21,7 +21,7 @@ Form
 - [x] ToggleSwitch
 - [x] InputText
 - [x] InputTextArea
-- [ ] Button
+- [x] Button
 - [ ] DatePicker
 - [ ] Time
 - [ ] AutoComplete
@@ -63,9 +63,9 @@ Feedback
 Misc
 - [x] Icons
 - [x] Themes
-- [ ] Skeleton
 - [ ] Canvas
 - [ ] Chart
+- [ ] Skeleton
 
 
 This go-app component library creates a development environment that rivals the best JavaScript tooling, with instant visual feedback and minimal context switching.
