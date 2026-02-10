@@ -2,7 +2,9 @@
 package table
 
 import (
+    "fmt"
     "github.com/maxence-charriere/go-app/v10/pkg/app"
+    "github.com/mmcnicol/go-app-component-library/pkg/components/icon"
 )
 
 // DataGridProps defines properties for the advanced data grid
@@ -118,22 +120,32 @@ func (d *DataGrid) renderActions() app.UI {
         return app.Div()
     }
     
-    i := &icon.Icon{} // Use your library icon component
+    // Initialize the icon component
+    i := &icon.Icon{} 
     var actions []app.UI
+    
     for _, action := range d.props.Actions {
-        // ... logic for disabled status ...
+        // Fix: Declare the 'disabled' variable properly
+        disabled := action.Disabled
+        if d.props.Selectable && !d.props.MultiSelect {
+            // Disable actions if not exactly one row is selected (if required)
+            disabled = disabled || len(d.internalState.SelectedRows) != 1
+        }
         
         actions = append(actions, app.Button().
             Type("button").
-            Class("btn btn--secondary btn--small").
+            Class("ui-button ui-button-secondary ui-button-small"). // Using library classes
             Disabled(disabled).
             OnClick(d.handleAction(action)).
             Body(
-                i.GetIcon(action.Icon, 16), // Fix: convert string to UI
-                app.Text(action.Label),
+                i.GetIcon(action.Icon, 16),
+                app.Span().Style("margin-left", "8px").Text(action.Label),
             ))
     }
-    return app.Div().Class("data-grid__actions").Body(actions...)
+    
+    return app.Div().
+        Class("data-grid__actions").
+        Body(actions...)
 }
 
 func (d *DataGrid) renderGrid() app.UI {
@@ -403,4 +415,21 @@ func (d *DataGrid) renderPaginationControls() app.UI {
     // You can return the same nav used in the footer
     totalPages := (d.props.TotalItems + d.props.PageSize - 1) / d.props.PageSize
     return d.renderPageNavigation(totalPages)
+}
+
+func (d *DataGrid) handleSelectAll(ctx app.Context, e app.Event) {
+    val := ctx.JSSrc().Get("target").Get("checked").Bool()
+    if d.internalState.SelectedRows == nil {
+        d.internalState.SelectedRows = make(map[string]bool)
+    }
+
+    if val {
+        for i, rowData := range d.props.Data {
+            key := d.getRowKey(rowData, i)
+            d.internalState.SelectedRows[key] = true
+        }
+    } else {
+        d.internalState.SelectedRows = make(map[string]bool)
+    }
+    ctx.Update()
 }
