@@ -1,15 +1,20 @@
 /* web/styles/toggle_switch.css */
 .toggleSwitch-container {
-    margin-bottom: 1rem;
+    display: inline-flex; /* Keeps the whole component inline */
+    flex-direction: row;  /* Forces children to be side-by-side */
+    align-items: center;  /* Centers the label vertically relative to the switch */
     cursor: pointer;
     user-select: none;
+    margin-bottom: 1rem;
 }
 
 .toggleSwitch-container-label {
+    /* Remove any margin-bottom that might have been left over */
+    margin-bottom: 0; 
+    margin-left: 8px;
     font-size: 0.9rem;
     font-weight: 600;
-    margin-bottom: 4px;
-    color: #333;
+    white-space: nowrap; /* Prevents the label from wrapping to a new line */
 }
 
 .toggleSwitch-container-switch {
