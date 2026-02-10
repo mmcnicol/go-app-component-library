@@ -8,7 +8,7 @@
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--spacing-xs);
     width: 100%;
     text-align: left;
     color: inherit;
@@ -16,7 +16,7 @@
 }
 
 .table__sort-button:hover {
-    color: var(--theme-primary, #007bff);
+    color: var(--theme-primary);
 }
 
 .table__sort-indicator {
@@ -35,7 +35,7 @@
 .table__sort-button .icon-chevron-up,
 .table__sort-button .icon-chevron-down {
     opacity: 1;
-    color: var(--theme-primary, #007bff);
+    color: var(--theme-primary);
 }
 
 /* Style for sort icon (indeterminate state) */

@@ -2,9 +2,9 @@
 
 .data-grid {
     /* Base data grid styling */
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--theme-border);
     border-radius: 4px;
-    background-color: white;
+    background-color: var(--theme-bg-canvas);
     overflow: hidden;
 }
 
@@ -12,24 +12,24 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.75rem 1rem;
-    background-color: var(--color-bg-secondary);
-    border-bottom: 1px solid var(--color-border);
-    gap: 1rem;
+    padding: var(--spacing-lg) var(--spacing-md);
+    background-color: var(--theme-bg-sidebar);
+    border-bottom: 1px solid var(--theme-border);
+    gap: var(--spacing-md);
 }
 
 .data-grid__selection-info {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    color: var(--color-text-secondary);
+    gap: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary, #6c757d);
 }
 
 .data-grid__actions {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--spacing-sm);
     margin-left: auto;
 }
 
@@ -37,36 +37,39 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.75rem 1rem;
-    background-color: var(--color-bg-secondary);
-    border-top: 1px solid var(--color-border);
-    gap: 1rem;
+    padding: var(--spacing-lg) var(--spacing-md);
+    background-color: var(--theme-bg-sidebar);
+    border-top: 1px solid var(--theme-border);
+    gap: var(--spacing-md);
 }
 
 .data-grid__pagination-info {
-    font-size: 0.875rem;
-    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary, #6c757d);
 }
 
 .data-grid__page-navigation {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: var(--spacing-xs);
 }
 
 .data-grid__page-input {
     width: 3rem;
     text-align: center;
-    padding: 0.25rem;
-    border: 1px solid var(--color-border);
+    padding: var(--spacing-xs);
+    border: 1px solid var(--theme-border);
     border-radius: 2px;
+    background-color: var(--theme-bg-canvas);
+    color: var(--theme-text-main);
 }
 
 .data-grid__page-size {
-    padding: 0.25rem 0.5rem;
-    border: 1px solid var(--color-border);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: 1px solid var(--theme-border);
     border-radius: 2px;
-    background-color: white;
+    background-color: var(--theme-bg-canvas);
+    color: var(--theme-text-main);
 }
 
 /* Selection checkbox */
