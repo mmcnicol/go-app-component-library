@@ -18,19 +18,13 @@ type Shell struct {
 	IsDark          bool
 }
 
-func (s *Shell) OnInit() {
-    // Load the preference from local storage
-	app.Window().GetState("storybook-theme-dark", &s.IsDark)
-}
-
 func (s *Shell) OnMount(ctx app.Context) {
-	if app.IsClient {
-		app.Log("Shell OnMount()")
-	}
-	s.showControls = true // Default to open
-	url := ctx.Page().URL()
-	s.activeComponent = url.Query().Get("component")
-	s.activeStory = url.Query().Get("story")
+    // Load state using ctx.GetState (v10 way)
+    ctx.GetState("storybook-theme-dark", &s.IsDark)
+    
+    // In v10, we usually need to trigger one update after mounting 
+    // if we changed fields in OnMount
+    ctx.Update()
 }
 
 func (s *Shell) Render() app.UI {
@@ -61,15 +55,19 @@ func (s *Shell) Render() app.UI {
 		app.Aside().Class("storybook-sidebar").Body(
 			app.H2().Text("Components"),
 
-			&ThemeSwitcher{
-				IsDark: s.IsDark,
-				OnChange: func(isDark bool) {
-					s.IsDark = isDark
-					// Persist the choice
-					app.Window().SetState("storybook-theme-dark", isDark)
-					//s.Update()
-				},
-			},
+			// Refactored ThemeSwitcher integration
+            &ThemeSwitcher{
+                IsDark: s.IsDark,
+                OnChange: func(ctx app.Context, isDark bool) {
+                    s.IsDark = isDark
+                    
+                    // Save state using ctx.SetState (v10 way)
+                    ctx.SetState("storybook-theme-dark", isDark, app.Persist)
+                    
+                    // This is how you trigger the re-render in v10
+                    ctx.Update() 
+                },
+            },
 
 			app.Div().Class("search-container").Body(
 				app.Input().

@@ -9,6 +9,29 @@ type ThemeSwitcher struct {
 	OnChange func(isDark bool)
 }
 
+// pkg/storybook/theme_switcher.go
+
+func (s *ThemeSwitcher) Render() app.UI {
+    icon := "☀️"
+    if s.IsDark {
+        icon = "🌙"
+    }
+
+    return app.Div().
+        Class("theme-switcher-btn"). // Use a class for styling
+        OnClick(func(ctx app.Context, e app.Event) {
+            s.IsDark = !s.IsDark
+            if s.OnChange != nil {
+                // Pass the context up so the Shell can call ctx.Update()
+                s.OnChange(ctx, s.IsDark) 
+            }
+        }).
+        Body(
+            app.Span().Text(icon),
+        )
+}
+
+/*
 func (s *ThemeSwitcher) Render() app.UI {
 	icon := "☀️"
 	label := "Light Mode"
@@ -38,3 +61,4 @@ func (s *ThemeSwitcher) Render() app.UI {
 			app.Span().Style("font-size", "18px").Text(icon),
 		)
 }
+*/
