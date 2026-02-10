@@ -19,7 +19,8 @@ func (m *StaticMessage) Render() app.UI {
         app.Div().Class("staticMessage-icon").Body(
             i.GetIcon(m.Severity, 20),
         ),
-        app.Div().Class("staticMessage-content").Text(m.Message),
+        app.Div().Class("staticMessage-content-summary").Text(m.Summary),
+		app.Div().Class("staticMessage-content-detail").Text(m.Detail),
     )
 }
 

@@ -13,7 +13,15 @@
     transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.staticMessage-content {
+.staticMessage-content-summary {
+    flex: 1;
+    /* This ensures text turns white/light-gray in Dark Mode */
+    color: var(--theme-text-main);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.staticMessage-content-detail {
     flex: 1;
     /* This ensures text turns white/light-gray in Dark Mode */
     color: var(--theme-text-main);
