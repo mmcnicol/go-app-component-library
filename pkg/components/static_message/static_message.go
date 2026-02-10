@@ -48,7 +48,7 @@ func (m *StaticMessage) Render() app.UI {
 			// Icon placeholder (assuming FontAwesome or PrimeIcons CSS is loaded)
 			//app.I().Class("pi " + icon).Style("color", color).Style("margin-right", "0.5rem"),
 			//icon.GetSVGIcon(m.Severity, 24, color), // Injected SVG
-			i.GetIcon(m.Severity, 24), // Injected SVG
+			i.GetIcon(m.Severity, 48),
 			app.Span().Style("font-weight", "bold").Style("margin-right", "0.5rem").Text(m.Summary),
 			app.Span().Text(m.Detail),
 		)
