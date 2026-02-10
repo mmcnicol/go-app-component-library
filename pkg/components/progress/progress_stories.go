@@ -1,6 +1,6 @@
 //go:build dev
 // pkg/components/progress/progress_stories.go
-package input_text
+package progress
 
 import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
