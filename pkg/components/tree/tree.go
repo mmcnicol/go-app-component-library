@@ -73,11 +73,17 @@ func (t *Tree) renderNode(node *TreeNode, level int) app.UI {
 					return app.Div().Style("width", "16px")
 				}),
 				
+				// Icon
 				app.If(node.Icon != "", func() app.UI {
 					return app.Div().Style("margin", "0 6px").Body(i.GetIcon(node.Icon, 18))
 				}),
 				
-				app.Span().Style("font-weight", "500").Text(node.Label),
+				//app.Span().Style("font-weight", "500").Text(node.Label),
+				// Label with Weight - CSS handles the truncation now
+                app.Span().
+                    Style("font-weight", "500").
+                    Text(node.Label).
+                    Title(node.Label), // Browser tooltip shows the full name on hover
 			),
 		
 		app.If(node.Expanded && hasChildren, func() app.UI {
