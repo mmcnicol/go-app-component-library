@@ -201,7 +201,7 @@ func init() {
 							)
 						}),
 					),
-					app.TBody().Body(
+					app.TFoot().Body(
 						app.Text("table footer text.")
 					),
 				)
