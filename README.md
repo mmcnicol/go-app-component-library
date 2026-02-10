@@ -32,10 +32,9 @@ Form
 Data
 - [x] Tree
 - [ ] TreeTable
-- [ ] Table
-- [ ] Table with column sorting
-- [ ] Table with column sorting and paging
-- [ ] Table with column sorting and server-side paging
+- [x] Table (Base)
+- [x] Sortable Table
+- [x] Data Grid
 
 Panel
 - [ ] Panel

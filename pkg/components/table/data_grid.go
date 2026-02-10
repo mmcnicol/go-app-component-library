@@ -231,7 +231,7 @@ func (d *DataGrid) renderSelectionHeader() app.UI {
     return app.Input().
         Type("checkbox").
         Checked(allSelected).
-        Indeterminate(indeterminate).
+        Attr("indeterminate", indeterminate). 
         OnChange(d.handleSelectAll).
         Class("data-grid__checkbox data-grid__checkbox--header")
 }
@@ -313,7 +313,7 @@ func (d *DataGrid) renderPageSizeSelector() app.UI {
     }
     
     return app.Select().
-        Value(d.props.PageSize).
+        Attr("value", d.props.PageSize). 
         OnChange(d.handlePageSizeChange).
         Class("data-grid__page-size").
         Body(options...)
@@ -410,7 +410,7 @@ func (d *DataGrid) handleSortChange(sortBy string, sortOrder string) {
 
 func (d *DataGrid) renderPaginationControls() app.UI {
     if !d.props.Pagination {
-        return app.Nil
+        return nil
     }
     // You can return the same nav used in the footer
     totalPages := (d.props.TotalItems + d.props.PageSize - 1) / d.props.PageSize
