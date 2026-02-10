@@ -2,6 +2,7 @@
 package table
 
 import (
+    "fmt"
     "sort"
     "github.com/maxence-charriere/go-app/v10/pkg/app"
 )
