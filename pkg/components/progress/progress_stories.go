@@ -13,15 +13,12 @@ func init() {
     storybook.Register("Misc", "Progress", 
         map[string]*storybook.Control{
             "Value": {Label: "Value", Type: storybook.ControlNumber, Value: 75},
-            "Label": {Label: "Label", Type: storybook.ControlText, Value: "Uploading..."},
         },
         func(controls map[string]*storybook.Control) app.UI {
             val := float64(controls["Value"].Value.(int))
-            lbl := controls["Label"].Value.(string)
             
             return app.Div().Style("padding", "20px").Body(
                 &Progress{
-                    Value: val,
                     Label: lbl,
                 },
             )

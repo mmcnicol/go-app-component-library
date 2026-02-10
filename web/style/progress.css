@@ -14,8 +14,3 @@
     transition: width 0.3s ease;
 }
 
-.progress-component-label {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--theme-text-main);
-}
