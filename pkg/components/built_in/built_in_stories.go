@@ -149,4 +149,63 @@ func init() {
 		},
 	)
 
+	storybook.Register("Built In", "Table", 
+		map[string]*storybook.Control{
+			"Caption":  {Label: "Caption", Type: storybook.ControlText, Value: "Employee Directory"},
+			"Headers":  {Label: "Headers (CSV)", Type: storybook.ControlText, Value: "Name, Role, Location"},
+			"Striped":  {Label: "Striped Rows", Type: storybook.ControlBool, Value: true},
+			"Bordered": {Label: "Show Borders", Type: storybook.ControlBool, Value: true},
+		},
+		func(controls map[string]*storybook.Control) app.UI {
+			caption := controls["Caption"].Value.(string)
+			headersRaw := controls["Headers"].Value.(string)
+			isStriped := controls["Striped"].Value.(bool)
+			isBordered := controls["Bordered"].Value.(bool)
+
+			// Process CSV headers into a slice
+			headers := strings.Split(headersRaw, ",")
+
+			// Dummy data for the table body
+			rows := [][]string{
+				{"Alice", "Engineer", "New York"},
+				{"Bob", "Designer", "London"},
+				{"Charlie", "Manager", "Tokyo"},
+			}
+
+			// Apply dynamic styling based on controls
+			tableClass := "storybook-table"
+			if isStriped {
+				tableClass += " striped"
+			}
+			if isBordered {
+				tableClass += " bordered"
+			}
+
+			return app.Table().
+				Class(tableClass).
+				Body(
+					app.Caption().Text(caption),
+					app.THead().Body(
+						app.Tr().Body(
+							app.Range(headers).Slice(func(i int) app.UI {
+								return app.Th().Text(strings.TrimSpace(headers[i]))
+							}),
+						),
+					),
+					app.TBody().Body(
+						app.Range(rows).Slice(func(i int) app.UI {
+							return app.Tr().Body(
+								app.Range(rows[i]).Slice(func(j int) app.UI {
+									return app.Td().Text(rows[i][j])
+								}),
+							)
+						}),
+					),
+					app.TBody().Body(
+						app.Text("table footer text.")
+					),
+				)
+		},
+	)
+
 }

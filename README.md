@@ -56,6 +56,7 @@ Navigation
 Misc
 - [ ] Skeleton
 - [ ] Themes
+- [ ] Icons
 
 Chart
 - [ ] Chart
