@@ -52,40 +52,8 @@ type Table struct {
 
 // Render returns the UI representation of the table
 func (t *Table) Render() app.UI {
-    // Build table classes
-    class := "table"
-    
-    if t.props.Striped {
-        class += " table--striped"
-    }
-    
-    if t.props.Bordered {
-        class += " table--bordered"
-    }
-    
-    if t.props.Hoverable {
-        class += " table--hoverable"
-    }
-    
-    if t.props.Compact {
-        class += " table--compact"
-    }
-    
-    if t.props.Class != "" {
-        class += " " + t.props.Class
-    }
-    
-    // Create table element
-    table := app.Table().
-        ID(t.props.ID).
-        Class(class)
-    
-    // Apply styles if provided
-    if len(t.props.Style) > 0 {
-        table = t.applyTableStyles(table)
-    }
-
-    table = table.DataSet("testid", t.props.DataTestID)
+    // Create table element with styles
+    table := t.createTableElement()
 
     // Add caption if provided
     if t.props.Caption != "" {
@@ -130,6 +98,122 @@ func (t *Table) Render() app.UI {
     }
     
     return content
+}
+
+func (t *Table) renderHeader() app.UI {
+    var headers []app.UI
+    
+    for i, col := range t.props.Columns {
+        headerClass := "table__header"
+        
+        if col.Align != "" {
+            headerClass += " table__header--align-" + col.Align
+        }
+        
+        var headerContent app.UI
+        if col.HeaderRenderer != nil {
+            headerContent = col.HeaderRenderer(col, i)
+        } else {
+            headerContent = app.Text(col.Header)
+        }
+        
+        headers = append(headers, t.createHeaderCell(col, headerClass, headerContent))
+    }
+    
+    return app.THead().
+        Class("table__head").
+        Body(
+            app.Tr().Class("table__row").Body(headers...),
+        )
+}
+
+func (t *Table) renderBody() app.UI {
+    var rows []app.UI
+    
+    for rowIdx, rowData := range t.props.Data {
+        rowKey := t.getRowKey(rowData, rowIdx)
+        rowClass := "table__row"
+        
+        if t.props.Hoverable {
+            rowClass += " table__row--hoverable"
+        }
+        
+        if t.props.OnRowClick != nil {
+            rowClass += " table__row--clickable"
+        }
+        
+        row := app.Tr().
+            ID(rowKey).
+            Class(rowClass).
+            DataSet("row-index", rowIdx).
+            OnClick(t.handleRowClick(rowData, rowIdx)).
+            OnMouseOver(t.handleRowHover(rowData, rowIdx))
+        
+        var cells []app.UI
+        
+        for colIdx, col := range t.props.Columns {
+            cellClass := "table__cell"
+            
+            if col.Align != "" {
+                cellClass += " table__cell--align-" + col.Align
+            }
+            
+            var cellContent app.UI
+            if col.CellRenderer != nil {
+                cellData := rowData[col.Accessor]
+                cellContent = col.CellRenderer(cellData, rowIdx, colIdx)
+            } else {
+                cellData := rowData[col.Accessor]
+                cellContent = t.formatCellValue(cellData)
+            }
+            
+            cells = append(cells, t.createBodyCell(col, cellClass, cellContent))
+        }
+        
+        rows = append(rows, row.Body(cells...))
+    }
+    
+    return app.TBody().
+        Class("table__body").
+        Body(rows...)
+}
+
+func (t *Table) renderFooter() app.UI {
+    // Only render footer if at least one column has a footer renderer
+    hasFooter := false
+    for _, col := range t.props.Columns {
+        if col.FooterRenderer != nil {
+            hasFooter = true
+            break
+        }
+    }
+    
+    if !hasFooter {
+        return app.TFoot()
+    }
+    
+    var footers []app.UI
+    
+    for i, col := range t.props.Columns {
+        footerClass := "table__footer"
+        
+        if col.Align != "" {
+            footerClass += " table__footer--align-" + col.Align
+        }
+        
+        var footerContent app.UI
+        if col.FooterRenderer != nil {
+            footerContent = col.FooterRenderer(col, i)
+        }
+        
+        footers = append(footers, t.createFooterCell(col, footerClass, footerContent))
+    }
+    
+    return app.TFoot().
+        Class("table__foot").
+        Body(
+            app.Tr().Class("table__row").Body(footers...),
+        )
 }
 
 // Helper function to apply table styles
@@ -348,4 +432,104 @@ func (t *Table) renderEmptyState() app.UI {
             app.H3().Text("No data available"),
             app.P().Text("There is no data to display at the moment."),
         )
+}
+
+// Helper function to apply table styles during creation
+func (t *Table) createTableElement() app.UI {
+    table := app.Table().
+        ID(t.props.ID).
+        Class(t.getTableClasses())
+    
+    // Apply styles if provided
+    if len(t.props.Style) > 0 {
+        for k, v := range t.props.Style {
+            table = table.Style(k, v)
+        }
+    }
+    
+    return table.DataSet("testid", t.props.DataTestID)
+}
+
+// Helper function to get table classes
+func (t *Table) getTableClasses() string {
+    class := "table"
+    
+    if t.props.Striped {
+        class += " table--striped"
+    }
+    
+    if t.props.Bordered {
+        class += " table--bordered"
+    }
+    
+    if t.props.Hoverable {
+        class += " table--hoverable"
+    }
+    
+    if t.props.Compact {
+        class += " table--compact"
+    }
+    
+    if t.props.Class != "" {
+        class += " " + t.props.Class
+    }
+    
+    return class
+}
+
+// Helper function to create header cell with styles
+func (t *Table) createHeaderCell(col Column, headerClass string, headerContent app.UI) app.UI {
+    headerElem := app.Th().
+        ID(col.ID).
+        Class(headerClass).
+        Scope("col")
+    
+    // Apply column styles
+    if col.Width != "" {
+        headerElem = headerElem.Style("width", col.Width)
+    }
+    if col.MinWidth != "" {
+        headerElem = headerElem.Style("min-width", col.MinWidth)
+    }
+    if col.MaxWidth != "" {
+        headerElem = headerElem.Style("max-width", col.MaxWidth)
+    }
+    
+    return headerElem.Body(headerContent)
+}
+
+// Helper function to create body cell with styles
+func (t *Table) createBodyCell(col Column, cellClass string, cellContent app.UI) app.UI {
+    cellElem := app.Td().Class(cellClass)
+    
+    // Apply column styles
+    if col.Width != "" {
+        cellElem = cellElem.Style("width", col.Width)
+    }
+    if col.MinWidth != "" {
+        cellElem = cellElem.Style("min-width", col.MinWidth)
+    }
+    if col.MaxWidth != "" {
+        cellElem = cellElem.Style("max-width", col.MaxWidth)
+    }
+    
+    return cellElem.Body(cellContent)
+}
+
+// Helper function to create footer cell with styles
+func (t *Table) createFooterCell(col Column, footerClass string, footerContent app.UI) app.UI {
+    footerElem := app.Td().Class(footerClass)
+    
+    // Apply column styles
+    if col.Width != "" {
+        footerElem = footerElem.Style("width", col.Width)
+    }
+    if col.MinWidth != "" {
+        footerElem = footerElem.Style("min-width", col.MinWidth)
+    }
+    if col.MaxWidth != "" {
+        footerElem = footerElem.Style("max-width", col.MaxWidth)
+    }
+    
+    return footerElem.Body(footerContent)
 }
