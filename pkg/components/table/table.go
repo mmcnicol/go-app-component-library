@@ -76,12 +76,28 @@ func (t *Table) Render() app.UI {
     }
     
     // Create table element
+    /*
     table := app.Table().
         ID(t.props.ID).
         Class(class).
         Style(t.props.Style).
         DataSet("testid", t.props.DataTestID)
+    */
+    table := app.Table().
+        ID(t.props.ID).
+        Class(class)
     
+    // Apply styles if provided
+    if len(t.props.Style) > 0 {
+        var styleArgs []string
+        for k, v := range t.props.Style {
+            styleArgs = append(styleArgs, k, v)
+        }
+        table = table.Style(styleArgs...)
+    }
+
+    table = table.DataSet("testid", t.props.DataTestID)
+
     // Add caption if provided
     if t.props.Caption != "" {
         table = table.Body(
@@ -147,7 +163,7 @@ func (t *Table) renderHeader() app.UI {
         headers = append(headers, app.Th().
             ID(col.ID).
             Class(headerClass).
-            Style(t.getColumnStyle(col)).
+            Style(t.getColumnStyle(col)...). // Use spread operator
             Scope("col").
             Body(headerContent))
     }
@@ -201,7 +217,7 @@ func (t *Table) renderBody() app.UI {
             
             cells = append(cells, app.Td().
                 Class(cellClass).
-                Style(t.getColumnStyle(col)).
+                Style(t.getColumnStyle(col)...). // Use spread operator
                 Body(cellContent))
         }
         
@@ -243,7 +259,7 @@ func (t *Table) renderFooter() app.UI {
         
         footers = append(footers, app.Td().
             Class(footerClass).
-            Style(t.getColumnStyle(col)).
+            Style(t.getColumnStyle(col)...). // Use spread operator
             Body(footerContent))
     }
     
@@ -263,22 +279,22 @@ func (t *Table) getRowKey(rowData map[string]interface{}, index int) string {
     return "row-" + string(index)
 }
 
-func (t *Table) getColumnStyle(col Column) map[string]string {
-    style := make(map[string]string)
+func (t *Table) getColumnStyle(col Column) []string {
+    var styles []string
     
     if col.Width != "" {
-        style["width"] = col.Width
+        styles = append(styles, "width", col.Width)
     }
     
     if col.MinWidth != "" {
-        style["min-width"] = col.MinWidth
+        styles = append(styles, "min-width", col.MinWidth)
     }
     
     if col.MaxWidth != "" {
-        style["max-width"] = col.MaxWidth
+        styles = append(styles, "max-width", col.MaxWidth)
     }
     
-    return style
+    return styles
 }
 
 func (t *Table) formatCellValue(value interface{}) app.UI {

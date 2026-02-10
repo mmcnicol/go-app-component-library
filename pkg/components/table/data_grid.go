@@ -165,7 +165,8 @@ func (d *DataGrid) renderGrid() app.UI {
         // Add selection column as first column
         selectionColumn := Column{
             ID:       "selection",
-            Header:   d.renderSelectionHeader(),
+            //Header:   d.renderSelectionHeader(),
+            Header: "Select", // Use a string, not app.UI
             Width:    "40px",
             Align:    "center",
             CellRenderer: func(data interface{}, rowIndex int, colIndex int) app.UI {
@@ -178,6 +179,22 @@ func (d *DataGrid) renderGrid() app.UI {
                     Checked(isSelected).
                     OnChange(d.handleRowSelection(rowKey, rowData)).
                     Class("data-grid__checkbox")
+            },
+            // Add a custom header renderer for the selection checkbox
+            HeaderRenderer: func(col Column, colIndex int) app.UI {
+                if !d.props.MultiSelect {
+                    return app.Text("Select")
+                }
+                
+                allSelected := len(d.internalState.SelectedRows) == len(d.props.Data)
+                indeterminate := len(d.internalState.SelectedRows) > 0 && !allSelected
+                
+                return app.Input().
+                    Type("checkbox").
+                    Checked(allSelected).
+                    Attr("indeterminate", indeterminate).
+                    OnChange(d.handleSelectAll).
+                    Class("data-grid__checkbox data-grid__checkbox--header")
             },
         }
         tableProps.Columns = append([]Column{selectionColumn}, tableProps.Columns...)
