@@ -385,4 +385,15 @@ func init() {
         },
     )
 
+	storybook.Register("Built In", "Canvas", 
+		nil, // No controls needed for this basic demo
+		func(controls map[string]*storybook.Control) app.UI {
+			return app.Div().Style("padding", "40px").Body(
+				app.H3().Text("Raw HTML5 Canvas"),
+				&BuiltInCanvas{},
+				app.P().Text("This is a native canvas element drawn using JS interop."),
+			)
+		},
+	)
+
 }

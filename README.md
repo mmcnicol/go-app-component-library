@@ -13,8 +13,8 @@ Built In
 - [X] Time
 - [x] Meter
 - [x] Progress
+- [x] Canvas
 - [ ] Form
-- [ ] Canvas
 
 Form
 - [x] SelectOne
