@@ -2,11 +2,37 @@
 package icon
 
 import (
-	"fmt"
-
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
+package icon
+
+import (
+	"fmt"
+	"github.com/maxence-charriere/go-app/v10/pkg/app"
+)
+
+func Icon(name string, size int) app.UI {
+	var d string
+	switch name {
+	case "success":
+		d = "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+	case "info":
+		d = "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+	case "warn":
+		d = "M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"
+	case "error":
+		d = "M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"
+	}
+
+	// Using app.Raw avoids the "undefined: app.Svg" compilation error
+	return app.Raw(fmt.Sprintf(
+		`<svg class="icon icon-%s" viewBox="0 0 24 24" width="%d" height="%d"><path d="%s" /></svg>`,
+		name, size, size, d,
+	))
+}
+
+/*
 // Icon returns an SVG icon based on the provided name and size.
 func Icon(name string, size int) app.UI {
 	var pathData string
@@ -32,6 +58,7 @@ func Icon(name string, size int) app.UI {
 			app.Path().D(pathData),
 		)
 }
+*/
 
 /*
 // Icon returns an SVG icon based on the provided name and size.
