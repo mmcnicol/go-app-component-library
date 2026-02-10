@@ -17,6 +17,7 @@ import (
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/icon"
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/input_text_area"
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/tree"
+	_ "github.com/mmcnicol/go-app-component-library/pkg/components/progress"
 )
 
 func main() {

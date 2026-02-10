@@ -21,7 +21,9 @@ Form
 - [x] ToggleSwitch
 - [x] InputText
 - [x] InputTextArea
+- [ ] Button
 - [ ] DatePicker
+- [ ] Time
 - [ ] AutoComplete
 - [ ] Form
 - [ ] Form Validation
@@ -58,8 +60,9 @@ Misc
 - [x] Icons
 - [x] Themes
 - [ ] Skeleton
-
-Chart
+- [ ] Meter
+- [x] Progress
+- [ ] Canvas
 - [ ] Chart
 
 

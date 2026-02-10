@@ -1,0 +1,21 @@
+/* web/styles/progress.css */
+
+.progress-component-bar {
+    width: 100%;
+    height: 10px;
+    appearance: none;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--color-gray-100); /* Dark in dark mode, light in light mode */
+}
+
+.progress-component-bar::-webkit-progress-value {
+    background-color: var(--theme-primary); /* Your Indigo/Blue */
+    transition: width 0.3s ease;
+}
+
+.progress-component-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--theme-text-main);
+}
