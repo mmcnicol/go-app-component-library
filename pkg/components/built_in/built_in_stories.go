@@ -153,11 +153,11 @@ func init() {
 	storybook.Register("Built In", "Table", 
 		map[string]*storybook.Control{
 			"Caption": {Label: "Caption", Type: storybook.ControlText, Value: "Employee Directory"},
-			"Footer": {Label: "Footer", Type: storybook.ControlText, Value: "table footer text."},
+			//"Footer": {Label: "Footer", Type: storybook.ControlText, Value: "table footer text."},
 		},
 		func(controls map[string]*storybook.Control) app.UI {
 			caption := controls["Caption"].Value.(string)
-			footerCaption := controls["Footer"].Value.(string)
+			//footerCaption := controls["Footer"].Value.(string)
 
 			// Process CSV headers into a slice
 			headers := []string{"Name", "Role", "Location"}
@@ -188,11 +188,13 @@ func init() {
 							)
 						}),
 					),
+					/*
 					app.TFoot().Body(
 						app.Tr().Body(
 							app.Td().ColSpan(3).Text(footerCaption),
 						),
 					),
+					*/
 				)
 		},
 	)
