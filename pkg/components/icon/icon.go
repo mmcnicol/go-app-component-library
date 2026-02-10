@@ -1,4 +1,4 @@
-// pkg/components/icon/main.go
+// pkg/components/icon/icon.go
 package icon
 
 import (

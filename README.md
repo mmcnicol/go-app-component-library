@@ -20,7 +20,7 @@ Form
 - [x] SelectOne
 - [x] ToggleSwitch
 - [x] InputText
-- [ ] InputTextArea
+- [x] InputTextArea
 - [ ] DatePicker
 - [ ] AutoComplete
 - [ ] Form
