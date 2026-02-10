@@ -202,11 +202,7 @@ func init() {
 							)
 						}),
 					),
-					app.TFoot().Body(
-						app.Tr().Body(
-							app.Text("table footer text."),
-						),
-					),
+					app.TFoot().Text("table footer text."),
 				)
 		},
 	)
