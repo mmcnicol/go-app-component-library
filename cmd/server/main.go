@@ -44,6 +44,7 @@ func main() {
 			"/web/style/static_message.css",
 			"/web/style/progress.css",
 			"/web/style/button.css",
+			"/web/style/icon.css",
 		},
 		Icon: app.Icon{
 			//Default: "/web/images/logo.png",

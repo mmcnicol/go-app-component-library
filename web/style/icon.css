@@ -1,0 +1,23 @@
+/* web/styles/icon.css */
+
+/* web/styles/icon.css */
+
+.icon-spin {
+    animation: icon-spin-animation 0.8s linear infinite;
+}
+
+@keyframes icon-spin-animation {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Ensure icons inherit text color for dark mode support */
+.icon {
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
