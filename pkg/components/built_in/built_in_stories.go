@@ -275,7 +275,7 @@ func init() {
 			optimum := float64(controls["Optimum"].Value.(int))
 
 			return app.Div().Body(
-				app.P().Text(fmt.Sprintf("Status: %.0f%%", val)),
+				//app.P().Text(fmt.Sprintf("Status: %.0f%%", val)),
 				app.Meter().
 					Style("width", "100%").
 					Style("height", "25px").

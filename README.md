@@ -13,6 +13,7 @@ Built In
 - [ ] Progress
 - [ ] Dialog
 - [ ] Form
+- [ ] Time
 - [ ] Canvas
 
 Form
