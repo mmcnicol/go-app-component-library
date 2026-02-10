@@ -1,0 +1,36 @@
+/* web/styles/table_sortable.css */
+
+.table__sort-button {
+    /* Reset button styles */
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    width: 100%;
+    text-align: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.table__sort-button:hover {
+    color: var(--color-primary);
+}
+
+.table__sort-indicator {
+    font-size: 0.75em;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+}
+
+.table__sort-indicator--inactive {
+    opacity: 0.3;
+}
+
+.table__sort-button:hover .table__sort-indicator--inactive {
+    opacity: 0.6;
+}

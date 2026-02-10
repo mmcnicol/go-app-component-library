@@ -20,6 +20,7 @@ import (
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/progress"
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/button"
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/label"
+	_ "github.com/mmcnicol/go-app-component-library/pkg/components/table"
 )
 
 func main() {
