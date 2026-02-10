@@ -19,7 +19,7 @@ type InputTextArea struct {
 func (t *InputTextArea) Render() app.UI {
 	return app.Textarea().
 		Class("input-textarea").
-		Value(t.Value).
+		// Removed .Value(t.Value) as it is undefined for HTMLTextarea
 		Placeholder(t.Placeholder).
 		Rows(t.Rows).
 		Cols(t.Cols).
@@ -28,6 +28,8 @@ func (t *InputTextArea) Render() app.UI {
 		OnInput(t.OnInput).
 		Style("width", "100%").
 		Style("padding", "8px").
-		Style("border-radius", "4px").
-		Style("border", "1px solid #ccc")
+		Body(
+			// This is how you set the internal content of a textarea
+			app.Text(t.Value),
+		)
 }
