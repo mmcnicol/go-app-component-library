@@ -28,8 +28,16 @@ func init() {
 				"error", 
 				"chevron-right", 
 				"chevron-down", 
+				"chevron-left",
+				"chevron-up", 
+				"settings",
+				"logout",  
 				"folder", 
 				"file",
+				"hospital-inpatient", 
+				"hospital-outpatient",
+				"hospital-alert-covid", 
+				"spinner",  
 			}
 			
 			// Create an instance of your icon component
