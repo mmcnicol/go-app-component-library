@@ -6,8 +6,12 @@ import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
+type Icon struct {
+	app.Compo
+}
+
 // GetIcon returns an SVG icon
-func GetIcon(name string, size int) app.UI {
+func (i *Icon) func GetIcon(name string, size int) app.UI {
 	var d string
 	switch name {
 	case "success":
