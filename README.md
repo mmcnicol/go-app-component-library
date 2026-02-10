@@ -12,7 +12,7 @@ Built In
 - [x] Dialog
 - [X] Time
 - [x] Meter
-- [ ] Progress
+- [x] Progress
 - [ ] Form
 - [ ] Canvas
 

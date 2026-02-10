@@ -373,4 +373,16 @@ func init() {
 		},
 	)
 
+	storybook.Register("Built In", "Progress", 
+        map[string]*storybook.Control{
+            "Value": {Label: "Value", Type: storybook.ControlNumber, Value: 50},
+        },
+        func(controls map[string]*storybook.Control) app.UI {
+            val := float64(controls["Value"].Value.(int))
+            return app.Div().Style("padding", "20px").Body(
+                app.Progress().Value(val).Max(100),
+            )
+        },
+    )
+
 }
