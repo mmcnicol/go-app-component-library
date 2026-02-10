@@ -270,8 +270,18 @@ func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
     case ControlText, ControlNumber:
         return app.Input().Type("text").Value(ctrl.Value).
             OnInput(func(ctx app.Context, e app.Event) {
-                ctrl.Value = ctx.JSSrc().Get("value").String()
+                val := ctx.JSSrc().Get("value").String()
+                
+                // If it's a number, you might want to convert it back to int/float
+                if ctrl.Type == ControlNumber {
+                    i, _ := strconv.Atoi(val)
+                    ctrl.Value = i
+                } else {
+                    ctrl.Value = val
+                }
+                
                 s.shouldRender = true
+                ctx.Update() // Essential to notify go-app to diff the DOM
             })
     default:
         return app.Text("Unsupported control")
