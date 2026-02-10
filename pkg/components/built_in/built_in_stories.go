@@ -152,19 +152,15 @@ func init() {
 
 	storybook.Register("Built In", "Table", 
 		map[string]*storybook.Control{
-			"Caption":  {Label: "Caption", Type: storybook.ControlText, Value: "Employee Directory"},
-			"Headers":  {Label: "Headers (CSV)", Type: storybook.ControlText, Value: "Name, Role, Location"},
-			"Striped":  {Label: "Striped Rows", Type: storybook.ControlBool, Value: true},
-			"Bordered": {Label: "Show Borders", Type: storybook.ControlBool, Value: true},
+			"Caption": {Label: "Caption", Type: storybook.ControlText, Value: "Employee Directory"},
+			"Footer": {Label: "Footer", Type: storybook.ControlText, Value: "table footer text."},
 		},
 		func(controls map[string]*storybook.Control) app.UI {
 			caption := controls["Caption"].Value.(string)
-			headersRaw := controls["Headers"].Value.(string)
-			isStriped := controls["Striped"].Value.(bool)
-			isBordered := controls["Bordered"].Value.(bool)
+			footerCaption := controls["Footer"].Value.(string)
 
 			// Process CSV headers into a slice
-			headers := strings.Split(headersRaw, ",")
+			headers := {"Name", "Role", "Location"}
 
 			// Dummy data for the table body
 			rows := [][]string{
@@ -173,17 +169,7 @@ func init() {
 				{"Charlie", "Manager", "Tokyo"},
 			}
 
-			// Apply dynamic styling based on controls
-			tableClass := "storybook-table"
-			if isStriped {
-				tableClass += " striped"
-			}
-			if isBordered {
-				tableClass += " bordered"
-			}
-
 			return app.Table().
-				Class(tableClass).
 				Body(
 					app.Caption().Text(caption),
 					app.THead().Body(
@@ -202,7 +188,11 @@ func init() {
 							)
 						}),
 					),
-					app.TFoot().Text("table footer text."),
+					app.TFoot().Body(
+						app.Tr().Body(
+							app.Td().ColSpan(3).Text(footerCaption),
+						),
+					),
 				)
 		},
 	)
