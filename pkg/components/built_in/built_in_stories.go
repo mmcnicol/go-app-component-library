@@ -246,8 +246,8 @@ func init() {
 				Text(label).
 				Title(title).
 				Disabled(isDisabled).
-				Style("padding", "10px 20px").
-				Style("cursor", "pointer").
+				//Style("padding", "10px 20px").
+				//Style("cursor", "pointer").
 				OnClick(func(ctx app.Context, e app.Event) {
 					// For a storybook, you might want to log the click
 					app.Log("Button clicked: " + label)
