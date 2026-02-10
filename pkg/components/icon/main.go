@@ -11,7 +11,7 @@ type Icon struct {
 }
 
 // GetIcon returns an SVG icon
-func (i *Icon) func GetIcon(name string, size int) app.UI {
+func (i *Icon) GetIcon(name string, size int) app.UI {
 	var d string
 	switch name {
 	case "success":
