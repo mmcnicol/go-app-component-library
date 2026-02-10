@@ -7,6 +7,62 @@ import (
 	"github.com/mmcnicol/go-app-component-library/pkg/storybook"
 )
 
+// Create a persistent variable for the story data
+var treeData = []*TreeNode{
+    {
+        Label: "Patient Records",
+        Icon:  "folder",
+        Children: []*TreeNode{
+            {
+                Label: "Lab Results",
+                Icon:  "folder",
+                Children: []*TreeNode{
+                    {Label: "Biochemistry_2024.pdf", Icon: "file"},
+                    {Label: "Hematology_FullCount.xml", Icon: "file"},
+                },
+            },
+            {
+                Label: "Discharge Summaries",
+                Icon:  "folder",
+                Children: []*TreeNode{
+                    {Label: "Final_Discharge_JohnDoe.pdf", Icon: "file"},
+                },
+            },
+        },
+    },
+}
+
+func init() {
+    storybook.Register("Data", "Tree", 
+        map[string]*storybook.Control{
+            "Expanded": {Label: "Expand All", Type: storybook.ControlBool, Value: false},
+        },
+        func(controls map[string]*storybook.Control) app.UI {
+            expandAll := controls["Expanded"].Value.(bool)
+
+            // If "Expand All" is toggled in the sidebar, update the persistent data
+            if expandAll {
+                setAllExpanded(treeData, true)
+            }
+
+            return app.Div().Style("padding", "20px").Body(
+                &Tree{Data: treeData},
+            )
+        },
+    )
+}
+
+// Helper to handle the "Expand All" control logic
+func setAllExpanded(nodes []*TreeNode, state bool) {
+    for _, n := range nodes {
+        n.Expanded = state
+        if len(n.Children) > 0 {
+            setAllExpanded(n.Children, state)
+        }
+    }
+}
+
+/*
 // Use init() to auto-register when this package is imported
 func init() {
 	if app.IsClient {
@@ -53,3 +109,4 @@ func init() {
 	)
 
 }
+*/
