@@ -76,26 +76,13 @@ func (t *Table) Render() app.UI {
     }
     
     // Create table element
-    /*
-    table := app.Table().
-        ID(t.props.ID).
-        Class(class).
-        Style(t.props.Style).
-        DataSet("testid", t.props.DataTestID)
-    */
     table := app.Table().
         ID(t.props.ID).
         Class(class)
     
     // Apply styles if provided
     if len(t.props.Style) > 0 {
-        // Create a slice to hold style arguments
-        var styleArgs []any
-        for k, v := range t.props.Style {
-            styleArgs = append(styleArgs, k, v)
-        }
-        // Convert to individual arguments
-        table = table.Style(styleArgs...)
+        table = t.applyTableStyles(table)
     }
 
     table = table.DataSet("testid", t.props.DataTestID)
@@ -145,6 +132,28 @@ func (t *Table) Render() app.UI {
     return content
 }
 
+// Helper function to apply table styles
+func (t *Table) applyTableStyles(elem app.HTMLTag) app.HTMLTag {
+    for k, v := range t.props.Style {
+        elem = elem.Style(k, v)
+    }
+    return elem
+}
+
+// Helper function to apply column styles
+func (t *Table) applyColumnStyles(elem app.HTMLTag, col Column) app.HTMLTag {
+    if col.Width != "" {
+        elem = elem.Style("width", col.Width)
+    }
+    if col.MinWidth != "" {
+        elem = elem.Style("min-width", col.MinWidth)
+    }
+    if col.MaxWidth != "" {
+        elem = elem.Style("max-width", col.MaxWidth)
+    }
+    return elem
+}
+
 func (t *Table) renderHeader() app.UI {
     var headers []app.UI
     
@@ -162,23 +171,14 @@ func (t *Table) renderHeader() app.UI {
             headerContent = app.Text(col.Header)
         }
         
-        /*
-        headers = append(headers, app.Th().
-            ID(col.ID).
-            Class(headerClass).
-            Style(t.getColumnStyle(col)...). // Use spread operator
-            Scope("col").
-            Body(headerContent))
-        */
-
         headerElem := app.Th().
             ID(col.ID).
             Class(headerClass).
             Scope("col")
-            
+        
         // Apply column styles
         headerElem = t.applyColumnStyles(headerElem, col)
-
+        
         headers = append(headers, headerElem.Body(headerContent))
     }
     
@@ -229,17 +229,11 @@ func (t *Table) renderBody() app.UI {
                 cellContent = t.formatCellValue(cellData)
             }
             
-            /*
-            cells = append(cells, app.Td().
-                Class(cellClass).
-                Style(t.getColumnStyle(col)...). // Use spread operator
-                Body(cellContent))
-            */
-
             cellElem := app.Td().Class(cellClass)
+            
             // Apply column styles
             cellElem = t.applyColumnStyles(cellElem, col)
-
+            
             cells = append(cells, cellElem.Body(cellContent))
         }
         
@@ -279,17 +273,11 @@ func (t *Table) renderFooter() app.UI {
             footerContent = col.FooterRenderer(col, i)
         }
         
-        /*
-        footers = append(footers, app.Td().
-            Class(footerClass).
-            Style(t.getColumnStyle(col)...). // Use spread operator
-            Body(footerContent))
-        */
-
         footerElem := app.Td().Class(footerClass)
+        
         // Apply column styles
         footerElem = t.applyColumnStyles(footerElem, col)
-
+        
         footers = append(footers, footerElem.Body(footerContent))
     }
     
@@ -307,25 +295,6 @@ func (t *Table) getRowKey(rowData map[string]interface{}, index int) string {
         }
     }
     return "row-" + string(index)
-}
-
-// Update getColumnStyle to properly handle Style() method
-func (t *Table) getColumnStyle(col Column) []any {
-    var styles []any
-    
-    if col.Width != "" {
-        styles = append(styles, "width", col.Width)
-    }
-    
-    if col.MinWidth != "" {
-        styles = append(styles, "min-width", col.MinWidth)
-    }
-    
-    if col.MaxWidth != "" {
-        styles = append(styles, "max-width", col.MaxWidth)
-    }
-    
-    return styles
 }
 
 func (t *Table) formatCellValue(value interface{}) app.UI {
@@ -379,18 +348,4 @@ func (t *Table) renderEmptyState() app.UI {
             app.H3().Text("No data available"),
             app.P().Text("There is no data to display at the moment."),
         )
-}
-
-// Helper function to apply column styles
-func (t *Table) applyColumnStyles(elem app.HTMLTag, col Column) app.HTMLTag {
-    if col.Width != "" {
-        elem = elem.Style("width", col.Width)
-    }
-    if col.MinWidth != "" {
-        elem = elem.Style("min-width", col.MinWidth)
-    }
-    if col.MaxWidth != "" {
-        elem = elem.Style("max-width", col.MaxWidth)
-    }
-    return elem
 }
