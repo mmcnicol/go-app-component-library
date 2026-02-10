@@ -293,4 +293,34 @@ func init() {
 		},
 	)
 
+	storybook.Register("Built In", "Time", 
+		map[string]*storybook.Control{
+			"Value":    {Label: "Time (HH:MM)", Type: storybook.ControlText, Value: "12:00"}, 
+			"Disabled": {Label: "Disabled", Type: storybook.ControlBool, Value: false},
+			"Min":      {Label: "Min Time", Type: storybook.ControlText, Value: "08:00"},
+			"Max":      {Label: "Max Time", Type: storybook.ControlText, Value: "18:00"},
+		},
+		func(controls map[string]*storybook.Control) app.UI {
+			valueString := controls["Value"].Value.(string)
+			isDisabled := controls["Disabled"].Value.(bool)
+			minTime := controls["Min"].Value.(string)
+			maxTime := controls["Max"].Value.(string)
+
+			return app.Input().
+				Type("time").
+				Value(valueString).
+				Disabled(isDisabled).
+				Attr("min", minTime). // Restricts the picker range
+				Attr("max", maxTime).
+				Style("padding", "8px").
+				Style("font-family", "sans-serif").
+				OnInput(func(ctx app.Context, e app.Event) {
+					// Captures the time string from the native picker
+					newVal := ctx.JSSrc().Get("value").String()
+					controls["Value"].Value = newVal
+					ctx.Update()
+				})
+		},
+	)
+
 }

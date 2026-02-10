@@ -9,11 +9,11 @@ Built In
 - [x] Select
 - [x] Button
 - [x] Table
+- [X] Time
 - [x] Meter
 - [ ] Progress
 - [ ] Dialog
 - [ ] Form
-- [ ] Time
 - [ ] Canvas
 
 Form
@@ -61,10 +61,6 @@ Misc
 
 Chart
 - [ ] Chart
-
-Outstanding CSS issues
-* ToggleSwitch
-
 
 
 This go-app component library creates a development environment that rivals the best JavaScript tooling, with instant visual feedback and minimal context switching.
