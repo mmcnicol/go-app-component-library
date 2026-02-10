@@ -12,7 +12,7 @@ func init() {
 
 	storybook.Register("Form", "InputTextArea", 
 		map[string]*storybook.Control{
-			"Value":       {Label: "Initial Value", Type: storybook.ControlText, Value: "Type something here..."}, 
+			"Value":       {Label: "Value", Type: storybook.ControlText, Value: ""}, 
 			"Placeholder": {Label: "Placeholder", Type: storybook.ControlText, Value: "Enter your message"}, 
 			"Rows":        {Label: "Rows", Type: storybook.ControlNumber, Value: 5},
 			"Cols":        {Label: "Cols", Type: storybook.ControlNumber, Value: 30},
