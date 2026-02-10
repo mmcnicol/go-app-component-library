@@ -28,7 +28,7 @@ Form
 
 Messages
 - [x] PhaseBanner
-- [ ] StaticMessage
+- [x] StaticMessage
 - [ ] Growl
 - [ ] Tooltip
 - [ ] NotificationBar / CookieConsent
