@@ -67,12 +67,12 @@ Feedback
 - [ ] Meter
 
 Charts
-- [x] Bar Chart
+- [ ] Bar Chart
 - [x] Box Plot Chart
 - [x] Heatmap
 - [x] Line Chart
 - [x] Pie Chart
-- [ ] Streaming Chart
+- [x] Streaming Chart
 - [ ] Regression Chart
 - [ ] Accessible Chart
 
