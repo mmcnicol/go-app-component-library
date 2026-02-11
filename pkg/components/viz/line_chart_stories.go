@@ -355,50 +355,51 @@ func init() {
     
     // 6. Streaming / Real-time Chart
     storybook.Register("Visualization", "Line Chart - Streaming",
-    map[string]*storybook.Control{
-        "Title":      storybook.NewTextControl("Real-time Data"),
-        "Max Points": storybook.NewRangeControl(20, 200, 10, 50),
-        "Update Rate": storybook.NewRangeControl(10, 200, 10, 50),
-    },
-    func(controls map[string]*storybook.Control) app.UI {
-        maxPoints := controls["Max Points"].Value.(int)
-        updateRate := controls["Update Rate"].Value.(int)
-        
-        // Create streaming chart
-        streamingChart := NewStreamingChart(ChartTypeLine).
-            WithMaxPoints(maxPoints).
-            WithUpdateRate(time.Duration(updateRate) * time.Millisecond)
-        
-        // Create a data channel
-        dataChan := make(chan Point, 100)
-        
-        // Start streaming data in a goroutine
-        go func() {
-            t := 0.0
-            for {
-                t += 0.1
-                point := Point{
-                    X: t,
-                    Y: math.Sin(t) + 0.5*math.Sin(t*3) + 0.2*math.Sin(t*10),
-                }
-                dataChan <- point
-                time.Sleep(50 * time.Millisecond)
-            }
-        }()
-        
-        // Start the stream
-        streamingChart.StreamData(dataChan)
-        
-        return app.Div().ID("viz-streaming-container").Body(
-            app.Div().Class("viz-chart-wrapper").Body(streamingChart),
-            app.Div().Class("viz-chart-footer").Body(
-                app.Small().Class("text-muted").Text(
-                    fmt.Sprintf("Streaming %d points, update rate %dms", 
-                        maxPoints, updateRate),
-                ),
-            ),
-        )
-    },
+		map[string]*storybook.Control{
+			"Title":      storybook.NewTextControl("Real-time Data"),
+			"Max Points": storybook.NewRangeControl(20, 200, 10, 50),
+			"Update Rate": storybook.NewRangeControl(10, 200, 10, 50),
+		},
+		func(controls map[string]*storybook.Control) app.UI {
+			maxPoints := controls["Max Points"].Value.(int)
+			updateRate := controls["Update Rate"].Value.(int)
+			
+			// Create streaming chart
+			streamingChart := NewStreamingChart(ChartTypeLine).
+				WithMaxPoints(maxPoints).
+				WithUpdateRate(time.Duration(updateRate) * time.Millisecond)
+			
+			// Create a data channel
+			dataChan := make(chan Point, 100)
+			
+			// Start streaming data in a goroutine
+			go func() {
+				t := 0.0
+				for {
+					t += 0.1
+					point := Point{
+						X: t,
+						Y: math.Sin(t) + 0.5*math.Sin(t*3) + 0.2*math.Sin(t*10),
+					}
+					dataChan <- point
+					time.Sleep(50 * time.Millisecond)
+				}
+			}()
+			
+			// Start the stream
+			streamingChart.StreamData(dataChan)
+			
+			return app.Div().ID("viz-streaming-container").Body(
+				app.Div().Class("viz-chart-wrapper").Body(streamingChart),
+				app.Div().Class("viz-chart-footer").Body(
+					app.Small().Class("text-muted").Text(
+						fmt.Sprintf("Streaming %d points, update rate %dms", 
+							maxPoints, updateRate),
+					),
+				),
+			)
+		},
+	)
 )
 
 // Helper functions
