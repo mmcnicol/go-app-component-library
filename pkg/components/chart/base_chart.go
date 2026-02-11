@@ -83,7 +83,6 @@ func (bc *BaseChart) setupManagers() {
     bc.zoomPanManager = NewZoomPanManager(bc)
 }
 
-// Update the OnMount method in base_chart.go:
 func (bc *BaseChart) OnMount(ctx app.Context) {
     bc.isRendered = false
     bc.setupManagers()
@@ -92,16 +91,11 @@ func (bc *BaseChart) OnMount(ctx app.Context) {
     renderer, err := NewCanvasRenderer(bc.containerID)
     if err == nil {
         bc.engine = renderer
-    }
-    
-    // Schedule initial render if we have data
-    if len(bc.spec.Data.Datasets) > 0 {
-        ctx.Defer(func(ctx app.Context) {
-            if bc.engine != nil && !bc.isRendered {
-                bc.engine.Render(bc.spec)
-                bc.isRendered = true
-            }
-        })
+        
+        // Render the chart if we have data
+        if len(bc.spec.Data.Datasets) > 0 {
+            bc.engine.Render(bc.spec)
+        }
     }
 }
 
