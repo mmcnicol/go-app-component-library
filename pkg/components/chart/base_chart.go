@@ -83,7 +83,6 @@ func (bc *BaseChart) setupManagers() {
     bc.zoomPanManager = NewZoomPanManager(bc)
 }
 
-// Update the OnMount method in base_chart.go:
 func (bc *BaseChart) OnMount(ctx app.Context) {
     bc.isRendered = false
     bc.setupManagers()
@@ -93,14 +92,22 @@ func (bc *BaseChart) OnMount(ctx app.Context) {
     if err == nil {
         bc.engine = engine
         
-        // Render the chart if we have data
-        if len(bc.spec.Data.Datasets) > 0 {
-            err := bc.engine.Render(bc.spec)
-            if err != nil {
-                // Handle error if needed
-                fmt.Printf("Error rendering chart: %v\n", err)
-            }
-        }
+        // Use Defer to ensure rendering happens after component is fully mounted
+        ctx.Defer(func(ctx app.Context) {
+            // Wait a bit to ensure DOM is ready
+            ctx.After(50*time.Millisecond, func(ctx app.Context) {
+                // Render the chart if we have data
+                if len(bc.spec.Data.Datasets) > 0 {
+                    err := bc.engine.Render(bc.spec)
+                    if err != nil {
+                        // Handle error if needed
+                        fmt.Printf("Error rendering chart: %v\n", err)
+                    } else {
+                        bc.isRendered = true
+                    }
+                }
+            })
+        })
     }
 }
 

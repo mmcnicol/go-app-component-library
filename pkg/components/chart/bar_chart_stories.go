@@ -19,6 +19,7 @@ func convertToDataPoints(values []float64) []DataPoint {
 }
 
 // Use init() to auto-register when this package is imported
+// pkg/components/chart/bar_chart_stories.go
 func init() {
     userActivity := [][]float64{
         {8, 12, 15, 9, 14, 11, 13, 10},
@@ -29,7 +30,7 @@ func init() {
     storybook.Register("Chart", "Bar Chart", 
         nil,
         func(controls map[string]*storybook.Control) app.UI {
-            return NewChart(ChartTypeBar).
+            return NewAccessibleChart(ChartTypeBar).  // Use AccessibleChart
                 Title("User Activity by Hour").
                 Data(ChartData{
                     Labels: []string{"9AM", "10AM", "11AM", "12PM", "1PM", "2PM", "3PM", "4PM"},

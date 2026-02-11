@@ -89,6 +89,8 @@ func (cr *CanvasRenderer) getDrawScript() string {
         return cr.getBarChartScript()
     case ChartTypeLine:
         return cr.getLineChartScript()
+    case ChartTypePie:
+        return cr.getPieChartScript()
     default:
         return cr.getBarChartScript()
     }
@@ -485,4 +487,96 @@ func (cr *CanvasRenderer) OnMount(ctx app.Context) {
 // GetCanvas returns the UI element
 func (cr *CanvasRenderer) GetCanvas() app.UI {
     return cr
+}
+
+func (cr *CanvasRenderer) getPieChartScript() string {
+    data := cr.chartSpec.Data
+    if len(data.Datasets) == 0 || len(data.Datasets[0].Data) == 0 {
+        return "console.log('No data for pie chart');"
+    }
+    
+    dataset := data.Datasets[0]
+    colors := dataset.BackgroundColor
+    points := ""
+    
+    for i, point := range dataset.Data {
+        color := "#4A90E2"
+        if i < len(colors) {
+            color = colors[i]
+        }
+        label := point.Label
+        if label == "" {
+            label = fmt.Sprintf("Item %d", i+1)
+        }
+        points += fmt.Sprintf(`{
+            label: '%s',
+            value: %f,
+            color: '%s'
+        },`, label, point.Y, color)
+    }
+    
+    return fmt.Sprintf(`
+        // Draw pie chart
+        function drawPieChart(ctx, width, height) {
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            // Draw white background
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, width, height);
+            
+            const data = [%s];
+            
+            // Calculate total
+            let total = 0;
+            data.forEach(item => {
+                total += item.value;
+            });
+            
+            // Center and radius
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(width, height) * 0.35;
+            
+            // Starting angle
+            let startAngle = 0;
+            
+            // Draw each segment
+            data.forEach((item, i) => {
+                const sliceAngle = (item.value / total) * 2 * Math.PI;
+                
+                // Draw segment
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
+                ctx.closePath();
+                
+                ctx.fillStyle = item.color;
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // Draw label
+                const midAngle = startAngle + sliceAngle / 2;
+                const labelRadius = radius * 0.7;
+                const labelX = centerX + Math.cos(midAngle) * labelRadius;
+                const labelY = centerY + Math.sin(midAngle) * labelRadius;
+                
+                ctx.fillStyle = '#000000';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                const percentage = (item.value / total * 100).toFixed(1);
+                ctx.fillText(item.label, labelX, labelY);
+                
+                // Update start angle for next segment
+                startAngle += sliceAngle;
+            });
+        }
+        
+        // Call draw function
+        drawPieChart(ctx, width, height);
+    `, points)
 }

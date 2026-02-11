@@ -9,9 +9,8 @@ import (
 )
 
 // Use init() to auto-register when this package is imported
+// pkg/components/chart/pie_chart_stories.go
 func init() {
-
-    // Sample data
     categoryRevenue := []DataPoint{
         {Label: "Electronics", Value: 45000},
         {Label: "Clothing", Value: 32000},
@@ -22,10 +21,11 @@ func init() {
     storybook.Register("Chart", "Pie Chart", 
         nil,
         func(controls map[string]*storybook.Control) app.UI {
-            return NewChart(ChartTypePie).
+            return NewAccessibleChart(ChartTypePie).  // Use AccessibleChart
                 Title("Revenue by Category").
                 Data(ChartData{
                     Datasets: []Dataset{{
+                        Label: "Revenue",
                         Data: categoryRevenue,
                         BackgroundColor: []string{
                             "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0",
@@ -37,21 +37,9 @@ func init() {
                         Legend: LegendOptions{
                             Position: "right",
                         },
-                        Tooltip: TooltipOptions{
-                            Callbacks: TooltipCallbacks{
-                                Label: func(context TooltipContext) string {
-                                    value := context.Value()
-                                    total := context.Total()
-                                    percentage := (value / total) * 100
-                                    return fmt.Sprintf("%s: $%.0f (%.1f%%)",
-                                        context.Label(), value, percentage)
-                                },
-                            },
-                        },
                     },
                 }).
                 Class("dashboard-card", "chart-pie")
         },
     )
-
 }
