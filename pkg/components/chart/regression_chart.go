@@ -44,6 +44,12 @@ func (c *RegressionChartComponent) WithPointColor(color string) *RegressionChart
 	return c
 }
 
+// WithLineColor sets the regression line color
+func (c *RegressionChartComponent) WithLineColor(color string) *RegressionChartComponent {
+	c.lineColor = color
+	return c
+}
+
 // WithShowEquation toggles equation display
 func (c *RegressionChartComponent) WithShowEquation(show bool) *RegressionChartComponent {
 	c.showEquation = show
