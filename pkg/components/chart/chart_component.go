@@ -11,17 +11,18 @@ type CanvasChart struct {
 	app.Compo
 
 	// Internal state
-	canvas      app.Value
-	ctx         app.Value
-	width       int
-	height      int
-	dpr         float64
-	streamData  StreamingData
-	isRunning   bool
-	hoverX      float64
-	hoverY      float64
-	showTooltip bool
-	activePoint Point
+	canvas       app.Value
+	ctx          app.Value
+	width        int
+	height       int
+	dpr          float64
+	streamData   StreamingData
+	isRunning    bool
+	hoverX       float64
+	hoverY       float64
+	showTooltip  bool
+	activePoint  Point
+	streamTicker app.Value
 
 	// Configuration and Data
 	config        ChartConfig
@@ -501,10 +502,8 @@ func (c *CanvasChart) drawAll() {
 
     // 3. Draw specific content based on config
     if len(c.config.BoxData) > 0 {
-        // Calculate DataRange for box plots
-        c.calculateBoxPlotRange()
-        
         // Draw Box Plots
+        c.calculateBoxPlotRange()
         chartWidth := float64(c.width) - c.Padding.Left - c.Padding.Right
         boxSpacing := chartWidth / float64(len(c.config.BoxData)+1)
         
@@ -512,9 +511,27 @@ func (c *CanvasChart) drawAll() {
             xPos := c.Padding.Left + (float64(i+1) * boxSpacing)
             c.DrawBoxPlot(stats, xPos, c.config.BoxWidth)
         }
+        
+    } else if len(c.config.HeatmapMatrix) > 0 {
+        // Draw Heatmap
+        c.calculateHeatmapRange()
+        c.DrawHeatmap(c.config.HeatmapMatrix)
+        
+    } else if len(c.config.PieData) > 0 {
+        // Draw Pie Chart
+        c.DrawPieChart(c.config.PieData, c.getPieColors())
+        
+    } else if c.config.IsStream {
+        // Draw Streaming Chart
+        if len(c.currentPoints) > 0 {
+            c.DrawLine(c.currentPoints, c.config.LineColor, c.config.Thickness)
+        }
+        
     } else if len(c.currentPoints) > 0 {
-        // Draw Line/Scatter if points exist
+        // Draw Line Chart
+        c.calculateLineChartRange()
         c.DrawLine(c.currentPoints, c.config.LineColor, c.config.Thickness)
+        c.drawPoints(c.currentPoints, c.config.LineColor)
     }
 }
 
@@ -679,4 +696,151 @@ func (c *CanvasChart) calculateBoxPlotRange() {
         MinY: minY - padding,
         MaxY: maxY + padding,
     }
+}
+
+func (c *CanvasChart) calculateBoxPlotRange() {
+    if len(c.config.BoxData) == 0 {
+        return
+    }
+    
+    minY := c.config.BoxData[0].Min
+    maxY := c.config.BoxData[0].Max
+    
+    for _, stats := range c.config.BoxData {
+        if stats.Min < minY {
+            minY = stats.Min
+        }
+        if stats.Max > maxY {
+            maxY = stats.Max
+        }
+    }
+    
+    padding := (maxY - minY) * 0.1
+    c.DataRange = DataRange{
+        MinX: 0,
+        MaxX: float64(len(c.config.BoxData) + 1),
+        MinY: minY - padding,
+        MaxY: maxY + padding,
+    }
+}
+
+func (c *CanvasChart) calculateHeatmapRange() {
+    if len(c.config.HeatmapMatrix) == 0 {
+        return
+    }
+    
+    minY := c.config.HeatmapMatrix[0][0]
+    maxY := c.config.HeatmapMatrix[0][0]
+    
+    for _, row := range c.config.HeatmapMatrix {
+        for _, val := range row {
+            if val < minY {
+                minY = val
+            }
+            if val > maxY {
+                maxY = val
+            }
+        }
+    }
+    
+    rows := len(c.config.HeatmapMatrix)
+    cols := len(c.config.HeatmapMatrix[0])
+    
+    c.DataRange = DataRange{
+        MinX: 0,
+        MaxX: float64(cols),
+        MinY: minY,
+        MaxY: maxY,
+    }
+    
+    // Adjust padding for heatmap
+    c.Padding = Padding{
+        Top:    20,
+        Right:  20,
+        Bottom: 40,
+        Left:   50,
+    }
+}
+
+func (c *CanvasChart) calculateLineChartRange() {
+    if len(c.currentPoints) == 0 {
+        return
+    }
+    
+    minX, maxX := c.currentPoints[0].X, c.currentPoints[0].X
+    minY, maxY := c.currentPoints[0].Y, c.currentPoints[0].Y
+    
+    for _, p := range c.currentPoints {
+        if p.X < minX {
+            minX = p.X
+        }
+        if p.X > maxX {
+            maxX = p.X
+        }
+        if p.Y < minY {
+            minY = p.Y
+        }
+        if p.Y > maxY {
+            maxY = p.Y
+        }
+    }
+    
+    xPadding := (maxX - minX) * 0.1
+    yPadding := (maxY - minY) * 0.1
+    
+    c.DataRange = DataRange{
+        MinX: minX - xPadding,
+        MaxX: maxX + xPadding,
+        MinY: minY - yPadding,
+        MaxY: maxY + yPadding,
+    }
+}
+
+func (c *CanvasChart) getPieColors() []string {
+    // Default color palette for pie charts
+    return []string{
+        "#4f46e5", "#10b981", "#f59e0b", "#ef4444", 
+        "#8b5cf6", "#06b6d4", "#84cc16", "#f97316",
+    }
+}
+
+func (c *CanvasChart) startStreaming() {
+    if c.config.IsStream {
+        c.streamData = StreamingData{
+            Points:   make([]float64, 0, c.config.Capacity),
+            Capacity: c.config.Capacity,
+        }
+        
+        // Start generating data
+        c.isRunning = true
+        c.streamLoop()
+    }
+}
+
+func (c *CanvasChart) streamLoop() {
+    if !c.isRunning {
+        return
+    }
+    
+    // Add new random data point
+    newValue := 50.0 + (app.Window().Get("Math").Call("random").Float() * 50.0)
+    c.streamData.Push(newValue)
+    
+    // Convert to Points for drawing
+    c.currentPoints = make([]Point, len(c.streamData.Points))
+    for i, v := range c.streamData.Points {
+        c.currentPoints[i] = Point{X: float64(i), Y: v}
+    }
+    
+    // Update data range
+    c.calculateLineChartRange()
+    
+    // Trigger redraw
+    c.shouldRender = true
+    
+    // Schedule next update (slower for visibility)
+    c.ctx = app.Window().Call("setTimeout", app.FuncOf(func(this app.Value, args []app.Value) any {
+        c.streamLoop()
+        return nil
+    }), 1000/5) // 5 FPS
 }

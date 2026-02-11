@@ -8,7 +8,6 @@ import (
 )
 
 func init() {
-    // Preset datasets
     datasets := map[string][]float64{
         "Browser Market Share": {65, 18, 9, 8},
         "Device Usage":         {40, 30, 20, 10},
@@ -18,8 +17,7 @@ func init() {
     storybook.Register("Charts", "Pie Chart",
         map[string]*storybook.Control{
             "Dataset":      storybook.NewSelectControl([]string{"Browser Market Share", "Device Usage", "Equal Split"}, "Browser Market Share"),
-            "Show Labels":  storybook.NewBoolControl(true),
-            "Inner Radius": storybook.NewRangeControl(0, 80, 5, 0), // 0 = Pie, >0 = Donut
+            "Inner Radius": storybook.NewRangeControl(0, 80, 5, 0),
         },
         func(controls map[string]*storybook.Control) app.UI {
             selectedKey := controls["Dataset"].Value.(string)
@@ -28,6 +26,12 @@ func init() {
             return New(nil,
                 WithTitle(selectedKey),
                 func(c *ChartConfig) {
+                    // Clear other chart types
+                    c.BoxData = nil
+                    c.HeatmapMatrix = nil
+                    c.IsStream = false
+                    
+                    // Set pie chart data
                     c.PieData = data
                     c.InnerRadiusRatio = float64(controls["Inner Radius"].Value.(int)) / 100.0
                 },
