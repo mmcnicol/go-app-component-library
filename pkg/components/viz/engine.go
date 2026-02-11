@@ -59,6 +59,17 @@ func (e *CanvasEngine) Init(canvas app.HTMLCanvas) error {
     return nil
 }
 
+// InitWithValue initializes the engine with a JS value (from GetElementByID)
+func (e *CanvasEngine) InitWithValue(canvasValue app.Value) error {
+    e.jsCanvas = canvasValue
+    
+    // Get dimensions
+    e.width = e.jsCanvas.Get("width").Int()
+    e.height = e.jsCanvas.Get("height").Int()
+    
+    return nil
+}
+
 func (e *CanvasEngine) Render(spec *Spec) error {
     e.spec = spec
     

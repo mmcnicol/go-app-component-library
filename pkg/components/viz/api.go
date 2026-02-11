@@ -431,26 +431,37 @@ func (c *Chart) OnMount(ctx app.Context) {
         canvasID = c.spec.ID + "-canvas"
     }
     
-    canvas := app.Window().GetElementByID(canvasID)
-    if !canvas.Truthy() {
+    canvasElem := app.Window().GetElementByID(canvasID)
+    if !canvasElem.Truthy() {
         app.Log("Canvas element not found:", canvasID)
         return
     }
     
-    // Initialize engine
+    // Initialize engine if not already done
     if c.engine == nil {
         c.engine = AutoEngine(c.spec)
     }
     
-    // Initialize with canvas
-    err := c.engine.Init(canvas)
-    if err != nil {
-        app.Log("Failed to initialize engine:", err)
+    // For engines that need the HTMLCanvas element, we need to adapt
+    // Since we're using CanvasEngine which works with JS values directly,
+    // we can pass the canvas element in a way that works with our fixed engine
+    if canvasEngine, ok := c.engine.(*CanvasEngine); ok {
+        // Create a wrapper that implements app.HTMLCanvas minimally
+        // or better, modify CanvasEngine to accept app.Value instead
+        err := canvasEngine.InitWithValue(canvasElem)
+        if err != nil {
+            app.Log("Failed to initialize engine:", err)
+            return
+        }
+    } else {
+        // For other engine types that need app.HTMLCanvas
+        // This would need to be implemented differently
+        app.Log("Engine type not supported")
         return
     }
     
     // Render the chart
-    err = c.engine.Render(c.spec)
+    err := c.engine.Render(c.spec)
     if err != nil {
         app.Log("Failed to render chart:", err)
     }
