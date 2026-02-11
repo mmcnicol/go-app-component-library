@@ -9,6 +9,7 @@ import (
 
 // RegressionChartComponent extends CanvasChart to add equation display
 type RegressionChartComponent struct {
+	app.Compo
 	CanvasChart
 	pointColor   string
 	lineColor    string
@@ -44,24 +45,33 @@ func (c *RegressionChartComponent) OnUpdate(ctx app.Context) {
 
 // OnDismount - delegate to embedded CanvasChart
 func (c *RegressionChartComponent) OnDismount() {
-	if c.CanvasChart != nil {
-		c.CanvasChart.OnDismount()
+	if !c.Mounted() {
+		return
 	}
+	//if c.CanvasChart != nil {
+		c.CanvasChart.OnDismount()
+	//}
 }
 
 // ShouldUpdate - delegate to embedded CanvasChart
 func (c *RegressionChartComponent) ShouldUpdate(next app.Compo) bool {
-	if c.CanvasChart != nil {
-		return c.CanvasChart.ShouldUpdate(next)
+	if !c.Mounted() {
+		return
 	}
-	return true
+	//if c.CanvasChart != nil {
+		return c.CanvasChart.ShouldUpdate(next)
+	//}
+	//return true
 }
 
 // Render implements app.Compo
 func (c *RegressionChartComponent) Render() app.UI {
-	if c.CanvasChart == nil {
-		return app.Div().Text("Chart not initialized")
+	if !c.Mounted() {
+		return
 	}
+	//if c.CanvasChart == nil {
+	//	return app.Div().Text("Chart not initialized")
+	//}
 	return c.CanvasChart.Render()
 }
 
