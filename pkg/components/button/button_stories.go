@@ -17,14 +17,14 @@ func init() {
             "Look":     {
                 Label: "Look", 
                 Type: storybook.ControlSelect, 
-                Options: []string{"primary", "secondary", "danger"},
+                Value: "primary", // "secondary", "danger"
             },
         },
         func(controls map[string]*storybook.Control) app.UI {
             return &Button{
                 Label:    controls["Label"].Value.(string),
                 Disabled: controls["Disabled"].Value.(bool),
-                Look:     ButtonLook(controls["Look"].Options.(string)),
+                Look:     ButtonLook(controls["Look"].Value.(string)),
                 OnClick: func(ctx app.Context, e app.Event) {
                     app.Log("Button Clicked!")
                 },
