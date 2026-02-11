@@ -1,3 +1,4 @@
+//go:build dev
 // pkg/components/chart/working_chart.go
 package chart
 

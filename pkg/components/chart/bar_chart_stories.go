@@ -1,3 +1,4 @@
+//go:build dev
 // pkg/components/chart/bar_chart_stories.go
 package chart
 
@@ -19,7 +20,6 @@ func convertToDataPoints(values []float64) []DataPoint {
 }
 
 // Use init() to auto-register when this package is imported
-// pkg/components/chart/bar_chart_stories.go
 func init() {
     userActivity := [][]float64{
         {8, 12, 15, 9, 14, 11, 13, 10},

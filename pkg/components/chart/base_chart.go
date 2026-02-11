@@ -302,12 +302,13 @@ func (bc *BaseChart) Style(name, value string) *BaseChart {
 func (bc *BaseChart) drawSimpleChart(ctx app.Context) {
     canvasID := bc.containerID + "-canvas"
     
-    jsCode := fmt.Sprintf(`
-        console.log('Drawing simple chart for:', '%s');
+    // Build JavaScript using string concatenation to avoid % issues
+    jsCode := `
+        console.log('Drawing simple chart for: ` + canvasID + `');
         
-        const canvas = document.getElementById('%s');
+        const canvas = document.getElementById('` + canvasID + `');
         if (!canvas) {
-            console.error('Canvas not found');
+            console.error('Canvas not found: ` + canvasID + `');
             return;
         }
         
@@ -332,7 +333,7 @@ func (bc *BaseChart) drawSimpleChart(ctx app.Context) {
         ctx.fillStyle = '#333';
         ctx.font = 'bold 18px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('%s Chart - Simple Render', canvas.width / 2, 30);
+        ctx.fillText('` + string(bc.spec.Type) + ` Chart - Working!', canvas.width / 2, 30);
         
         // Draw a test pattern
         ctx.fillStyle = '#4A90E2';
@@ -351,8 +352,14 @@ func (bc *BaseChart) drawSimpleChart(ctx app.Context) {
             ctx.fillStyle = '#4A90E2';
         }
         
-        console.log('Simple chart drawn successfully');
-    `, canvasID, canvasID, bc.spec.Type)
+        // Draw some text to show it's working
+        ctx.fillStyle = '#228B22';
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'left';
+        ctx.fillText('Chart is rendering successfully!', 50, 350);
+        
+        console.log('Simple chart drawn successfully for ` + canvasID + `');
+    `
     
     app.Window().Call("eval", jsCode)
 }

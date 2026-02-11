@@ -28,3 +28,28 @@ func GenerateID() string {
     }
     return fmt.Sprintf("%x", b)
 }
+
+// escapeJS properly escapes strings for JavaScript
+func escapeJS(s string) string {
+    // Simple escaping - replace backslashes and quotes
+    result := ""
+    for _, r := range s {
+        switch r {
+        case '\\':
+            result += "\\\\"
+        case '\'':
+            result += "\\'"
+        case '"':
+            result += "\\\""
+        case '\n':
+            result += "\\n"
+        case '\r':
+            result += "\\r"
+        case '\t':
+            result += "\\t"
+        default:
+            result += string(r)
+        }
+    }
+    return result
+}
