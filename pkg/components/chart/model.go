@@ -41,26 +41,6 @@ type Dataset struct {
     PointRadius     int
 }
 
-// Base chart component
-type BaseChart struct {
-    app.Compo
-    
-    // State
-    spec        ChartSpec
-    containerID string
-    engine      ChartEngine
-    isRendered  bool
-    
-    // Refs
-    canvasRef   app.Ref
-    tooltipRef  app.Ref
-    
-    // Event handlers
-    onPointClick    func(point DataPoint, datasetIndex int)
-    onZoom          func(domain AxisRange)
-    onHover         func(point DataPoint, datasetIndex int)
-}
-
 // Specialized chart components
 type LineChart struct {
     BaseChart
