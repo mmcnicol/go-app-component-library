@@ -305,10 +305,24 @@ func (e *CanvasEngine) renderLineChart(spec *Spec, ctx app.Value) error {
         }
         */
 
+        /*
         if len(series.Stroke.Dash) > 0 {
             ctx.Set("lineDash", app.ValueOf(series.Stroke.Dash))
         } else {
             ctx.Set("lineDash", app.ValueOf([]float64{}))
+        }
+        */
+
+        // Set line dash if specified
+        if len(series.Stroke.Dash) > 0 {
+            // Convert []float64 to app.Value properly
+            dashArray := make([]interface{}, len(series.Stroke.Dash))
+            for i, v := range series.Stroke.Dash {
+                dashArray[i] = v
+            }
+            ctx.Set("lineDash", dashArray)
+        } else {
+            ctx.Set("lineDash", []interface{}{})
         }
 
         // Draw the path
