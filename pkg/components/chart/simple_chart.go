@@ -78,6 +78,9 @@ func (sc *SimpleChart) getBarChartJS(canvasID string) string {
     for _, label := range sc.data.Labels {
         labelsJS += fmt.Sprintf("'%s',", label)
     }
+    if len(sc.data.Labels) > 0 {
+        labelsJS = labelsJS[:len(labelsJS)-1] // Remove trailing comma
+    }
     labelsJS += "]"
     
     valuesJS := "["
@@ -85,108 +88,118 @@ func (sc *SimpleChart) getBarChartJS(canvasID string) string {
         for _, point := range sc.data.Datasets[0].Data {
             valuesJS += fmt.Sprintf("%f,", point.Y)
         }
+        valuesJS = valuesJS[:len(valuesJS)-1] // Remove trailing comma
     }
     valuesJS += "]"
     
+    // Fix: Use proper string escaping and avoid % signs
     return fmt.Sprintf(`
-        const canvas = document.createElement('canvas');
-        canvas.id = '%s';
-        canvas.width = %d;
-        canvas.height = %d;
-        canvas.style.width = '100%%';
-        canvas.style.height = '100%%';
-        canvas.style.display = 'block';
-        
-        // Find and replace the chart container
-        const container = document.querySelector('[data-chart-container="%s"]');
-        if (container) {
-            container.innerHTML = '';
-            container.appendChild(canvas);
+        (function() {
+            const canvas = document.createElement('canvas');
+            canvas.id = '%s';
+            canvas.width = %d;
+            canvas.height = %d;
+            canvas.style.width = '100%%';
+            canvas.style.height = '100%%';
+            canvas.style.display = 'block';
             
-            const ctx = canvas.getContext('2d');
-            
-            // Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw background
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw title
-            if ('%s') {
-                ctx.fillStyle = '#333';
-                ctx.font = 'bold 18px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('%s', canvas.width / 2, 30);
-            }
-            
-            // Draw bars
-            const labels = %s;
-            const values = %s;
-            const barCount = labels.length;
-            
-            if (barCount > 0) {
-                const margin = { top: 60, right: 40, bottom: 60, left: 60 };
-                const plotWidth = canvas.width - margin.left - margin.right;
-                const plotHeight = canvas.height - margin.top - margin.bottom;
-                const barWidth = plotWidth / barCount * 0.7;
+            // Find and replace the chart container
+            const container = document.querySelector('[data-chart-container="%s"]');
+            if (container) {
+                container.innerHTML = '';
+                container.appendChild(canvas);
                 
-                // Find max value
-                let maxValue = Math.max(...values);
-                maxValue = maxValue * 1.1; // Add 10%% padding
+                const ctx = canvas.getContext('2d');
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw background
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw title
+                if ('%s' !== '') {
+                    ctx.fillStyle = '#333';
+                    ctx.font = 'bold 18px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('%s', canvas.width / 2, 30);
+                }
                 
                 // Draw bars
-                for (let i = 0; i < barCount; i++) {
-                    const barHeight = (values[i] / maxValue) * plotHeight;
-                    const x = margin.left + (i * plotWidth / barCount) + (plotWidth / barCount - barWidth) / 2;
-                    const y = canvas.height - margin.bottom - barHeight;
-                    
-                    // Draw bar
-                    ctx.fillStyle = '#4A90E2';
-                    ctx.fillRect(x, y, barWidth, barHeight);
-                    
-                    // Draw bar border
-                    ctx.strokeStyle = '#2c6fb3';
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(x, y, barWidth, barHeight);
-                    
-                    // Draw value on top
-                    ctx.fillStyle = '#333';
-                    ctx.font = '12px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.fillText(values[i].toFixed(0), x + barWidth/2, y - 5);
-                    
-                    // Draw label
-                    ctx.fillText(labels[i], x + barWidth/2, canvas.height - margin.bottom + 20);
-                }
+                const labels = %s;
+                const values = %s;
+                const barCount = labels.length;
                 
-                // Draw Y axis
-                ctx.beginPath();
-                ctx.moveTo(margin.left, margin.top);
-                ctx.lineTo(margin.left, canvas.height - margin.bottom);
-                ctx.strokeStyle = '#333';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-                
-                // Draw grid lines
-                ctx.strokeStyle = '#e0e0e0';
-                ctx.lineWidth = 0.5;
-                for (let i = 0; i <= 5; i++) {
-                    const y = canvas.height - margin.bottom - (i * plotHeight / 5);
+                if (barCount > 0 && values.length > 0) {
+                    const margin = { top: 60, right: 40, bottom: 60, left: 60 };
+                    const plotWidth = canvas.width - margin.left - margin.right;
+                    const plotHeight = canvas.height - margin.top - margin.bottom;
+                    const barWidth = plotWidth / barCount * 0.7;
+                    
+                    // Find max value
+                    let maxValue = Math.max(...values);
+                    maxValue = maxValue * 1.1; // Add 10%% padding
+                    
+                    // Draw bars
+                    for (let i = 0; i < barCount; i++) {
+                        const barHeight = (values[i] / maxValue) * plotHeight;
+                        const x = margin.left + (i * plotWidth / barCount) + (plotWidth / barCount - barWidth) / 2;
+                        const y = canvas.height - margin.bottom - barHeight;
+                        
+                        // Draw bar
+                        ctx.fillStyle = '#4A90E2';
+                        ctx.fillRect(x, y, barWidth, barHeight);
+                        
+                        // Draw bar border
+                        ctx.strokeStyle = '#2c6fb3';
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(x, y, barWidth, barHeight);
+                        
+                        // Draw value on top
+                        ctx.fillStyle = '#333';
+                        ctx.font = '12px Arial';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(values[i].toFixed(0), x + barWidth/2, y - 5);
+                        
+                        // Draw label
+                        ctx.fillText(labels[i], x + barWidth/2, canvas.height - margin.bottom + 20);
+                    }
+                    
+                    // Draw Y axis
                     ctx.beginPath();
-                    ctx.moveTo(margin.left, y);
-                    ctx.lineTo(canvas.width - margin.right, y);
+                    ctx.moveTo(margin.left, margin.top);
+                    ctx.lineTo(margin.left, canvas.height - margin.bottom);
+                    ctx.strokeStyle = '#333';
+                    ctx.lineWidth = 1;
                     ctx.stroke();
                     
-                    // Draw Y axis labels
-                    const value = (i * maxValue / 5).toFixed(0);
-                    ctx.fillStyle = '#666';
-                    ctx.font = '12px Arial';
-                    ctx.textAlign = 'right';
-                    ctx.fillText(value, margin.left - 10, y + 4);
+                    // Draw grid lines
+                    ctx.strokeStyle = '#e0e0e0';
+                    ctx.lineWidth = 0.5;
+                    for (let i = 0; i <= 5; i++) {
+                        const y = canvas.height - margin.bottom - (i * plotHeight / 5);
+                        ctx.beginPath();
+                        ctx.moveTo(margin.left, y);
+                        ctx.lineTo(canvas.width - margin.right, y);
+                        ctx.stroke();
+                        
+                        // Draw Y axis labels
+                        const value = (i * maxValue / 5).toFixed(0);
+                        ctx.fillStyle = '#666';
+                        ctx.font = '12px Arial';
+                        ctx.textAlign = 'right';
+                        ctx.fillText(value, margin.left - 10, y + 4);
+                    }
+                } else {
+                    // Draw "no data" message
+                    ctx.fillStyle = '#999';
+                    ctx.font = '16px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('No data available', canvas.width / 2, canvas.height / 2);
                 }
             }
-        }
+        })();
     `, canvasID, sc.width, sc.height, canvasID, sc.title, sc.title, labelsJS, valuesJS)
 }
 

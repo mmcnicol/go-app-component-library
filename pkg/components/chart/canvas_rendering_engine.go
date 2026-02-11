@@ -50,7 +50,10 @@ func (cr *CanvasRenderer) setupCanvas(ctx app.Context) {
     
     fmt.Printf("Setting up canvas for %s chart\n", cr.chartSpec.Type)
     
-    // Use JavaScript to draw the chart
+    // Get the draw script
+    drawScript := cr.getDrawScript()
+    
+    // Simple JavaScript without syntax errors
     jsCode := fmt.Sprintf(`
         try {
             const canvas = document.getElementById('%s');
@@ -59,133 +62,114 @@ func (cr *CanvasRenderer) setupCanvas(ctx app.Context) {
                 return;
             }
             
-            // Ensure canvas parent has dimensions
-            const container = canvas.parentElement;
-            if (container) {
-                if (container.clientWidth === 0) {
-                    container.style.width = '100%%';
-                    container.style.minHeight = '400px';
-                }
-            }
-            
-            // Force canvas dimensions
+            // Set canvas dimensions
             canvas.width = canvas.clientWidth || 800;
             canvas.height = canvas.clientHeight || 400;
             
-            // Get context and draw
+            // Get context
             const ctx = canvas.getContext('2d');
             if (!ctx) {
                 console.error('Could not get 2D context');
                 return;
             }
             
-            // Clear and draw background
+            // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw background
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Draw a test rectangle to verify canvas is working
-            ctx.fillStyle = '#f0f0f0';
-            ctx.fillRect(10, 10, canvas.width - 20, canvas.height - 20);
-            ctx.strokeStyle = '#ccc';
-            ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
-            
-            // Draw chart type text
-            ctx.fillStyle = '#333';
-            ctx.font = '16px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('%s Chart - Canvas Ready', canvas.width / 2, 30);
-            
-            // Now draw the actual chart
+            // Draw the chart
             %s
             
+            console.log('Chart drawn successfully');
         } catch (error) {
-            console.error('Error in chart rendering:', error);
+            console.error('Error drawing chart:', error);
         }
-    `, cr.canvasID, cr.canvasID, cr.chartSpec.Type, cr.getDrawScript())
+    `, cr.canvasID, cr.canvasID, drawScript)
     
+    // Execute the JavaScript
     app.Window().Call("eval", jsCode)
 }
 
-// pkg/components/chart/canvas_rendering_engine.go
-// Update getDrawScript to ensure something is drawn:
-
 func (cr *CanvasRenderer) getDrawScript() string {
-    // First, let's just draw a simple test pattern
-    testScript := `
-        // Simple test drawing
-        ctx.fillStyle = '#4A90E2';
-        
-        // Draw some shapes based on chart type
+    data := cr.chartSpec.Data
+    if len(data.Datasets) == 0 {
+        return "console.log('No data to draw');"
+    }
+    
+    // For now, just draw a simple test chart
+    return `
+        // Draw a simple test chart
         const width = canvas.width;
         const height = canvas.height;
         
-        if ('%s' === 'bar') {
-            // Draw test bars
-            for (let i = 0; i < 5; i++) {
-                const barWidth = 40;
-                const barHeight = 50 + Math.random() * 100;
-                const x = 100 + i * 80;
-                const y = height - 100 - barHeight;
-                
-                ctx.fillRect(x, y, barWidth, barHeight);
-                ctx.strokeStyle = '#333';
-                ctx.strokeRect(x, y, barWidth, barHeight);
-            }
-            ctx.fillStyle = '#000';
-            ctx.font = '14px Arial';
-            ctx.fillText('Bar Chart Test', width/2, 50);
-        } 
-        else if ('%s' === 'line') {
-            // Draw test line
-            ctx.beginPath();
-            ctx.moveTo(50, height - 100);
-            for (let i = 1; i < 6; i++) {
-                ctx.lineTo(50 + i * 80, height - 100 - Math.sin(i) * 50);
-            }
-            ctx.strokeStyle = '#FF6384';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-            ctx.fillStyle = '#000';
-            ctx.font = '14px Arial';
-            ctx.fillText('Line Chart Test', width/2, 50);
-        }
-        else if ('%s' === 'pie') {
-            // Draw test pie
-            const centerX = width / 2;
-            const centerY = height / 2;
-            const radius = Math.min(width, height) * 0.3;
+        // Draw title
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Test Chart', width / 2, 30);
+        
+        // Draw some test bars
+        const barCount = 6;
+        const barWidth = 40;
+        const barSpacing = 20;
+        const totalWidth = (barCount * barWidth) + ((barCount - 1) * barSpacing);
+        const startX = (width - totalWidth) / 2;
+        const maxBarHeight = height - 100;
+        
+        // Test data
+        const values = [30, 50, 80, 40, 60, 90];
+        
+        for (let i = 0; i < barCount; i++) {
+            const barHeight = (values[i] / 100) * maxBarHeight;
+            const x = startX + i * (barWidth + barSpacing);
+            const y = height - 50 - barHeight;
             
-            const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'];
-            let startAngle = 0;
+            // Draw bar
+            ctx.fillStyle = '#4A90E2';
+            ctx.fillRect(x, y, barWidth, barHeight);
             
-            for (let i = 0; i < 4; i++) {
-                const sliceAngle = Math.PI * 2 / 4;
-                ctx.beginPath();
-                ctx.moveTo(centerX, centerY);
-                ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
-                ctx.closePath();
-                ctx.fillStyle = colors[i];
-                ctx.fill();
-                startAngle += sliceAngle;
-            }
-            ctx.fillStyle = '#000';
-            ctx.font = '14px Arial';
-            ctx.fillText('Pie Chart Test', width/2, 50);
-        }
-        else {
-            // Default drawing
+            // Draw bar border
+            ctx.strokeStyle = '#2c6fb3';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x, y, barWidth, barHeight);
+            
+            // Draw value label
             ctx.fillStyle = '#333';
-            ctx.font = '14px Arial';
-            ctx.fillText('%s Chart - Drawing not implemented', width/2, 50);
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(values[i].toString(), x + barWidth/2, y - 10);
+            
+            // Draw x-axis label
+            ctx.fillText('Bar ' + (i+1), x + barWidth/2, height - 30);
+        }
+        
+        // Draw y-axis
+        ctx.beginPath();
+        ctx.moveTo(startX - 10, height - 50);
+        ctx.lineTo(startX - 10, height - 50 - maxBarHeight);
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        // Draw y-axis labels
+        ctx.textAlign = 'right';
+        for (let i = 0; i <= 5; i++) {
+            const y = height - 50 - (i * maxBarHeight / 5);
+            const value = Math.round((i * 100) / 5);
+            ctx.fillText(value.toString(), startX - 15, y + 4);
+            
+            // Draw grid line
+            ctx.beginPath();
+            ctx.moveTo(startX, y);
+            ctx.lineTo(startX + totalWidth, y);
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            ctx.stroke();
         }
     `
-    
-    return fmt.Sprintf(testScript, 
-        string(cr.chartSpec.Type), 
-        string(cr.chartSpec.Type), 
-        string(cr.chartSpec.Type),
-        string(cr.chartSpec.Type))
 }
 
 func (cr *CanvasRenderer) getLineChartScript() string {
