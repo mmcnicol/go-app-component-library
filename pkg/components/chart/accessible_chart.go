@@ -2,6 +2,8 @@
 package chart
 
 import (
+    "fmt"
+    "strings"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
