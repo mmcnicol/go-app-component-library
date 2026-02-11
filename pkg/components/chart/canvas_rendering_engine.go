@@ -15,6 +15,7 @@ type CanvasRenderer struct {
     pixelRatio float64
     mounted    bool
     chartSpec  ChartSpec // Store the chart spec
+    ctx        app.Context // Store context for updates
 }
 
 func NewCanvasRenderer(containerID string) (*CanvasRenderer, error) {
@@ -26,7 +27,8 @@ func NewCanvasRenderer(containerID string) (*CanvasRenderer, error) {
     }, nil
 }
 
-func (cr *CanvasRenderer) Render(chart ChartSpec) error {
+// RenderChart renders the chart spec (implements ChartEngine.Render)
+func (cr *CanvasRenderer) RenderChart(chart ChartSpec) error {
     // Store the chart spec for rendering
     cr.chartSpec = chart
     return nil
@@ -105,8 +107,9 @@ func (cr *CanvasRenderer) getLineChartScript() string {
             label: '%s',
             data: [%s],
             color: '%s',
-            borderWidth: %d
-        },`, dataset.Label, points, color, dataset.BorderWidth)
+            borderWidth: %d,
+            pointRadius: %d
+        },`, dataset.Label, points, color, dataset.BorderWidth, dataset.PointRadius)
     }
     
     labels := ""
@@ -437,8 +440,8 @@ func (cr *CanvasRenderer) getBarChartScript() string {
 func (cr *CanvasRenderer) Update(data ChartData) error {
     // Update the chart spec and re-render
     cr.chartSpec.Data = data
-    if cr.mounted {
-        cr.setupCanvas(nil)
+    if cr.mounted && cr.ctx != nil {
+        cr.setupCanvas(cr.ctx)
     }
     return nil
 }
@@ -448,7 +451,7 @@ func (cr *CanvasRenderer) Destroy() error {
     return nil
 }
 
-// Render method for the component
+// Render method for the component (implements app.UI)
 func (cr *CanvasRenderer) Render() app.UI {
     return app.Canvas().
         ID(cr.canvasID).
@@ -461,6 +464,7 @@ func (cr *CanvasRenderer) Render() app.UI {
 // OnMount is called when the component is mounted
 func (cr *CanvasRenderer) OnMount(ctx app.Context) {
     cr.mounted = true
+    cr.ctx = ctx // Store context for updates
     
     // Schedule drawing after mount
     ctx.Defer(func(ctx app.Context) {
@@ -471,4 +475,9 @@ func (cr *CanvasRenderer) OnMount(ctx app.Context) {
 // GetCanvas returns the UI element
 func (cr *CanvasRenderer) GetCanvas() app.UI {
     return cr
+}
+
+// Render method for ChartEngine interface
+func (cr *CanvasRenderer) Render(chart ChartSpec) error {
+    return cr.RenderChart(chart)
 }

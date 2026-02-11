@@ -218,7 +218,7 @@ type ChartData struct {
 
 // Chart engine interface
 type ChartEngine interface {
-    Render(chart ChartSpec) error
+    Render(chart ChartSpec) error  // This should match CanvasRenderer.Render
     Update(data ChartData) error
     Destroy() error
     GetCanvas() app.UI
