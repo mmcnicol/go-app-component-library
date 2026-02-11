@@ -40,6 +40,7 @@ func init() {
             "Options":     {
                 Label: "Look", 
                 Type: storybook.ControlSelect, 
+                Value: "",
                 Options: []string{"Go", "Python", "Rust", "JavaScript"},
             },
             "SelectedValue": {Label: "Selected Value", Type: storybook.ControlText, Value: ""}, 
