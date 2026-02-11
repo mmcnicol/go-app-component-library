@@ -1,6 +1,10 @@
 // pkg/components/chart/zoom_pan_manager.go
 package chart
 
+import (
+	"github.com/maxence-charriere/go-app/v10/pkg/app"
+)
+
 type ZoomPanManager struct {
     chart       *BaseChart
     isDragging  bool

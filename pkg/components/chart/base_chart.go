@@ -1,6 +1,10 @@
 // pkg/components/chart/base_chart.go
 package chart
 
+import (
+	"github.com/maxence-charriere/go-app/v10/pkg/app"
+)
+
 // Base chart component
 type BaseChart struct {
     app.Compo

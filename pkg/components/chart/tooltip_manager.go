@@ -1,6 +1,10 @@
 // pkg/components/chart/tooltip_manager.go
 package chart
 
+import (
+	"github.com/maxence-charriere/go-app/v10/pkg/app"
+)
+
 type TooltipManager struct {
     chart         *BaseChart
     tooltipElem   app.HTMLDiv

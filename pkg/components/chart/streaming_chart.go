@@ -2,6 +2,7 @@
 package chart
 
 import (
+    "sync"
 	"time"
 )
 
