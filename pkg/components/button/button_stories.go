@@ -16,7 +16,7 @@ func init() {
             "Disabled": {Label: "Disabled", Type: storybook.ControlBool, Value: false},
             "Look":     {
                 Label: "Look", 
-                Type: storybook.ControlSelect, 
+                Type: storybook.ControlText, 
                 Value: "primary", // "secondary", "danger"
             },
         },
