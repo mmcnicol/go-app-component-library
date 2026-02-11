@@ -74,7 +74,7 @@ Charts
 - [x] Line Chart
 - [x] Pie Chart
 - [x] Streaming Chart
-- [ ] Regression Chart
+- [x] Regression Chart
 - [ ] Accessible Chart
 
 Misc
