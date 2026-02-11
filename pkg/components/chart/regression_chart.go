@@ -119,6 +119,7 @@ func (c *RegressionChartComponent) OnUpdate(ctx app.Context) {
 	}
 }
 
+/*
 // Render implements app.Compo
 func (c *RegressionChartComponent) Render() app.UI {
     if c.CanvasChart == nil {
@@ -153,6 +154,7 @@ func (c *RegressionChartComponent) Render() app.UI {
         }),
     )
 }
+*/
 
 // Add OnMouseMove handler
 func (c *RegressionChartComponent) OnMouseMove(ctx app.Context, e app.Event) {
