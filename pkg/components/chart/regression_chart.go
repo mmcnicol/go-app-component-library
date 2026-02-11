@@ -10,7 +10,7 @@ import (
 // RegressionChartComponent extends CanvasChart to add equation display
 type RegressionChartComponent struct {
 	app.Compo
-	CanvasChart
+	*CanvasChart
 	pointColor   string
 	lineColor    string
 	showEquation bool
@@ -21,6 +21,9 @@ type RegressionChartComponent struct {
 
 // Override OnMount to customize the drawing
 func (c *RegressionChartComponent) OnMount(ctx app.Context) {
+	if c.CanvasChart == nil {
+        return
+    }
 	// Call parent OnMount first
 	c.CanvasChart.OnMount(ctx)
 	
@@ -59,9 +62,9 @@ func (c *RegressionChartComponent) ShouldUpdate(next app.Compo) bool {
 		return
 	}
 	//if c.CanvasChart != nil {
-		return c.CanvasChart.ShouldUpdate(next)
+	//	return c.CanvasChart.ShouldUpdate(next)
 	//}
-	//return true
+	return true
 }
 
 // Render implements app.Compo

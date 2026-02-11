@@ -57,7 +57,7 @@ func init() {
 			
 			// Create a custom component that extends CanvasChart
 			regressionChart := &RegressionChartComponent{
-				CanvasChart: *New(data,
+				CanvasChart: New(data,
 					WithTitle(controls["Title"].Value.(string)),
 					WithColor(controls["Point Color"].Value.(string)),
 					func(c *ChartConfig) {
