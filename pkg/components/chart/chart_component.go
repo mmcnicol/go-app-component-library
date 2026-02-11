@@ -221,6 +221,7 @@ func (c *CanvasChart) DrawLine(data []Point, color string, thickness float64) {
 	c.ctx.Call("stroke")
 }
 
+/*
 func (c *CanvasChart) DrawBarChart(values []float64, color string) {
 	if len(values) == 0 {
 		return
@@ -247,6 +248,7 @@ func (c *CanvasChart) DrawBarChart(values []float64, color string) {
 		c.ctx.Call("fillRect", xPos, pyValue, barWidth, barHeight)
 	}
 }
+*/
 
 // DrawHeatmap expects a 2D slice [rows][cols]
 func (c *CanvasChart) DrawHeatmap(grid [][]float64) {
