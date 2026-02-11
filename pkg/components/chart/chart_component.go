@@ -67,7 +67,9 @@ func (c *CanvasChart) OnMount(ctx app.Context) {
         c.drawAll()
         
         // Start streaming if configured
-        c.startStreaming(ctx)
+		if c.config.IsStream {
+			c.startStreaming(ctx)
+		}
     })
 }
 
@@ -113,87 +115,6 @@ func (c *CanvasChart) drawPlaceholder() {
 	c.ctx.Set("fillStyle", "#333")
 	c.ctx.Call("fillText", "Canvas Initialized at v10", 30, 40)
 }
-
-/*
-func (c *CanvasChart) Render() app.UI {
-	return app.Canvas().
-		ID("main-chart").
-		Style("width", "800px").
-		Style("height", "400px").
-		Style("background", "#f9f9f9").
-		OnMount(c.OnMount)
-}
-*/
-
-/*
-func (c *CanvasChart) Render() app.UI {
-    px, py := c.ToPixels(c.activePoint.X, c.activePoint.Y)
-
-    return app.Div().Style("position", "relative").Body(
-        app.Canvas().
-            ID("main-chart").
-            Style("width", "800px").
-            Style("height", "400px").
-            OnMount(c.OnMount).
-            OnMouseMove(c.OnMouseMove), // Added event
-
-        // Tooltip Overlay
-        app.If(c.showTooltip, func() app.UI {
-            return app.Div().
-                Style("position", "absolute").
-                Style("left", fmt.Sprintf("%fpx", px+10)).
-                Style("top", fmt.Sprintf("%fpx", py-40)).
-                Style("background", "rgba(0,0,0,0.8)").
-                Style("color", "white").
-                Style("padding", "5px 10px").
-                Style("border-radius", "4px").
-                Style("pointer-events", "none"). // Don't block mouse events
-                Body(
-                    app.Text(fmt.Sprintf("X: %.2f, Y: %.2f", c.activePoint.X, c.activePoint.Y)),
-                )
-        }),
-    )
-}
-*/
-
-/*
-func (c *CanvasChart) Render() app.UI {
-	px, py := c.ToPixels(c.activePoint.X, c.activePoint.Y)
-
-	return app.Div().Class("chart-wrapper").Body(
-		// The Drawing Surface
-		app.Canvas().
-			Class("chart-canvas").
-			ID("main-chart").
-			Width(c.width).
-			Height(c.height).
-			OnMount(c.OnMount).
-			OnMouseMove(c.OnMouseMove),
-
-		// Tooltip Logic
-		app.If(c.showTooltip, func() app.UI {
-			return app.Div().
-				Class("chart-tooltip").
-				Style("left", fmt.Sprintf("%fpx", px+15)).
-				Style("top", fmt.Sprintf("%fpx", py-50)).
-				Body(
-					app.Div().Class("tooltip-header").Text("Data Point"),
-					app.Div().Class("tooltip-value").Text(
-						fmt.Sprintf("X: %.1f | Y: %.1f", c.activePoint.X, c.activePoint.Y),
-					),
-				)
-		}),
-
-		// Legend (Optional)
-		app.Div().Class("chart-legend").Body(
-			app.Div().Class("legend-item").Body(
-				app.Div().Class("legend-color").Style("background", c.config.LineColor),
-				app.Span().Text(c.config.Title),
-			),
-		),
-	)
-}
-*/
 
 func (c *CanvasChart) Render() app.UI {
 	px, py := c.ToPixels(c.activePoint.X, c.activePoint.Y)
