@@ -1,4 +1,4 @@
-// pkg/component/chart/regression_chart.go
+// pkg/components/chart/regression_chart.go
 package chart
 
 import (
@@ -9,7 +9,7 @@ import (
 
 // RegressionChartComponent extends CanvasChart to add equation display
 type RegressionChartComponent struct {
-	*CanvasChart
+	CanvasChart
 	pointColor   string
 	lineColor    string
 	showEquation bool

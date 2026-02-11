@@ -1,5 +1,5 @@
 //go:build dev
-// pkg/component/chart/regression_chart_stories.go
+// pkg/components/chart/regression_chart_stories.go
 package chart
 
 import (
@@ -57,7 +57,7 @@ func init() {
 			
 			// Create a custom component that extends CanvasChart
 			regressionChart := &RegressionChartComponent{
-				CanvasChart: New(data,
+				CanvasChart: *New(data,
 					WithTitle(controls["Title"].Value.(string)),
 					WithColor(controls["Point Color"].Value.(string)),
 					func(c *ChartConfig) {
