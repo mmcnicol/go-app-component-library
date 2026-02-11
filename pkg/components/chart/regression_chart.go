@@ -10,7 +10,7 @@ import (
 // RegressionChartComponent must embed app.Compo to be a valid go-app component
 type RegressionChartComponent struct {
 	app.Compo            // 1. MUST be here as a value
-	*CanvasChart         // 2. Embedded as a pointer
+	BaseChart *CanvasChart // NAMED field, not anonymous embedding
 	
 	pointColor   string
 	lineColor    string
@@ -21,13 +21,13 @@ type RegressionChartComponent struct {
 }
 
 func (c *RegressionChartComponent) OnMount(ctx app.Context) {
-	if c.CanvasChart != nil {
-		c.CanvasChart.OnMount(ctx)
-	}
-	
-	ctx.Defer(func(ctx app.Context) {
-		c.tryInitialDraw(ctx, 0)
-	})
+    // Note: We don't call OnMount on BaseChart here because 
+    // it will be mounted automatically when Rendered.
+    ctx.Defer(func(ctx app.Context) {
+        if c.BaseChart != nil && c.BaseChart.ctx.Truthy() {
+            c.drawRegressionWithEquation()
+        }
+    })
 }
 
 // A simple retry mechanism to handle the race condition
@@ -55,10 +55,9 @@ func (c *RegressionChartComponent) OnUpdate(ctx app.Context) {
 }
 
 func (c *RegressionChartComponent) Render() app.UI {
-    // Return the inner CanvasChart. 
-    // This allows the base chart to handle the HTML/Canvas generation
-    // while this component handles the regression logic.
-    return c.CanvasChart 
+    // This is the most important part! 
+    // Returning the BaseChart allows it to handle the HTML/Canvas rendering.
+    return c.BaseChart 
 }
 
 // OnDismount - delegate to embedded CanvasChart
