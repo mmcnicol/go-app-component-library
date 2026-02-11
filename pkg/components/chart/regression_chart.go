@@ -1,6 +1,10 @@
 // pkg/components/chart/regression_chart.go
 package chart
 
+import (
+    "math"
+)
+
 type RegressionChart struct {
     ScatterChart
     regressionType RegressionType // "linear", "polynomial", "exponential", "logarithmic"
