@@ -16,12 +16,14 @@ type Shell struct {
 	shouldRender    bool
 	showControls    bool
 	IsDark          bool
+	Notifications   *NotificationComponent
 }
 
 func (s *Shell) OnMount(ctx app.Context) {
-	ctx.LocalStorage().Get("storybook-theme-dark", &s.IsDark)
-	ctx.Update()
-	s.shouldRender = true
+    ctx.LocalStorage().Get("storybook-theme-dark", &s.IsDark)
+    s.Notifications = &NotificationComponent{} // Add this line
+    ctx.Update()
+    s.shouldRender = true
 }
 
 func (s *Shell) Render() app.UI {
@@ -128,6 +130,11 @@ func (s *Shell) Render() app.UI {
                     }),
             ),
             
+			// Add notifications container here
+			app.If(s.Notifications != nil, func() app.UI {
+				return s.Notifications
+			}),
+
             app.Div().Class("canvas-content").Body(
                 app.If(s.activeComponent != "", func() app.UI {
                     story := s.getActiveStory()
