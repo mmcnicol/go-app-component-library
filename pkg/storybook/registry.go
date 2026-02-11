@@ -156,5 +156,3 @@ func NewBoolControl(defaultValue bool) *Control {
 		Value: defaultValue,
 	}
 }
-
-

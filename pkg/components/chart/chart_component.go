@@ -4,6 +4,7 @@ package chart
 import (
 	"fmt"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
+	"github.com/mmcnicol/go-app-component-library/pkg/components/chart/internal"
 )
 
 type CanvasChart struct {
@@ -468,7 +469,7 @@ func (c *CanvasChart) DrawRegression(data []Point, pointColor, lineColor string)
 	c.drawPoints(data, pointColor)
 
 	// 2. Calculate the Line
-	m, b := CalculateLinearRegression(data)
+	m, b := internal.CalculateLinearRegression(data)
 
 	// 3. Define the start and end points of the line based on DataRange
 	xStart := c.DataRange.MinX
