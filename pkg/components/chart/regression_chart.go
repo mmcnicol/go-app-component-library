@@ -19,6 +19,7 @@ type RegressionChartComponent struct {
 	data         []Point
 }
 
+/*
 // Override OnMount to customize the drawing
 func (c *RegressionChartComponent) OnMount(ctx app.Context) {
 	if c.CanvasChart == nil {
@@ -34,13 +35,29 @@ func (c *RegressionChartComponent) OnMount(ctx app.Context) {
 		}
 	})
 }
+*/
 
+func (c *RegressionChartComponent) OnMount(ctx app.Context) {
+    if c.CanvasChart != nil {
+        c.DrawRegression() // Capitalize this
+    }
+}
+
+/*
 // Override OnUpdate to handle updates
 func (c *RegressionChartComponent) OnUpdate(ctx app.Context) bool {
 	if c.CanvasChart != nil {
         c.drawRegression()
     }
     return true
+}
+*/
+
+func (c *RegressionChartComponent) OnUpdate(ctx app.Context) bool {
+    if c.CanvasChart != nil {
+        c.DrawRegression()
+    }
+    return true // Required return
 }
 
 // OnDismount - delegate to embedded CanvasChart
@@ -58,12 +75,18 @@ func (c *RegressionChartComponent) ShouldUpdate(next app.Compo) bool {
 	return true
 }
 
+/*
 // Render implements app.Compo
 func (c *RegressionChartComponent) Render() app.UI {
 	if c.CanvasChart == nil {
 		return app.Div().Text("Chart not initialized")
 	}
 	return c.CanvasChart.Render()
+}
+*/
+
+func (c *RegressionChartComponent) Render() app.UI {
+    return c.CanvasChart // Required return
 }
 
 // Custom drawing method
