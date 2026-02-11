@@ -71,11 +71,13 @@ func (bc *BaseChart) Options(options ChartOptions) *BaseChart {
     return bc
 }
 
+/*
 // WithRegression adds regression to a scatter chart
 func (bc *BaseChart) WithRegression(regType RegressionType, degree int) *BaseChart {
     // This will be used by ScatterChart
     return bc
 }
+*/
 
 // Render renders the chart (implementation in base_chart.go)
 func (bc *BaseChart) Render() app.UI {

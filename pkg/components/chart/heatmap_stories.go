@@ -11,13 +11,6 @@ import (
 func init() {
 
 	// Sample data
-    categoryRevenue := []DataPoint{
-        {Label: "Electronics", Value: 45000},
-        {Label: "Clothing", Value: 32000},
-        {Label: "Home Goods", Value: 28000},
-        {Label: "Books", Value: 15000},
-    }
-
 	userActivity := [][]float64{
         {8, 12, 15, 9, 14, 11, 13, 10},
         {5, 8, 10, 7, 9, 6, 11, 8},
