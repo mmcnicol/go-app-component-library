@@ -400,7 +400,7 @@ func init() {
 			)
 		},
 	)
-)
+}
 
 // Helper functions
 func generateSineWave(n int, start, end, amplitude float64) []Point {
