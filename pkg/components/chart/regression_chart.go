@@ -68,8 +68,62 @@ func (c *RegressionChartComponent) WithDatasetName(name string) *RegressionChart
 	return c
 }
 
-/*
-// Render implements app.Compo
+// OnMount implements app.Compo - THIS WAS MISSING!
+func (c *RegressionChartComponent) OnMount(ctx app.Context) {
+    ctx.Defer(func(ctx app.Context) {
+        chartID := fmt.Sprintf("regression-chart-%p", c)
+        canvasJS := app.Window().GetElementByID(chartID)
+        
+        if !canvasJS.Truthy() {
+            app.Log("Error: Canvas element not found for regression chart")
+            return
+        }
+
+        // Initialize canvas context
+        c.CanvasChart.canvas = canvasJS
+        c.CanvasChart.ctx = canvasJS.Call("getContext", "2d")
+        
+        c.CanvasChart.dpr = app.Window().Get("devicePixelRatio").Float()
+        if c.CanvasChart.dpr == 0 {
+            c.CanvasChart.dpr = 1.0
+        }
+
+        // Set logical size (CSS)
+        c.CanvasChart.width = 800
+        c.CanvasChart.height = 400
+
+        // Set physical size (Actual pixels on the backing store)
+        c.CanvasChart.canvas.Set("width", float64(c.CanvasChart.width)*c.CanvasChart.dpr)
+        c.CanvasChart.canvas.Set("height", float64(c.CanvasChart.height)*c.CanvasChart.dpr)
+
+        // Scale the context so drawing commands use logical pixels
+        c.CanvasChart.ctx.Call("scale", c.CanvasChart.dpr, c.CanvasChart.dpr)
+
+        c.CanvasChart.ctx.Set("imageSmoothingEnabled", true)
+        c.CanvasChart.ctx.Set("textAlign", "center")
+        c.CanvasChart.ctx.Set("textBaseline", "middle")
+
+        c.CanvasChart.Padding = Padding{
+            Top:    20,
+            Right:  20,
+            Bottom: 40,
+            Left:   50,
+        }
+
+        c.drawRegressionWithEquation()
+        c.initialized = true
+    })
+}
+
+// OnUpdate implements app.Compo
+func (c *RegressionChartComponent) OnUpdate(ctx app.Context) {
+	// Only draw if we're initialized and have a valid context
+	if c.CanvasChart != nil && c.CanvasChart.ctx.Truthy() && c.initialized {
+		c.drawRegressionWithEquation()
+	}
+}
+
+// Render implements app.Compo - USE THIS ONE (the commented-out version with width/height initialization)
 func (c *RegressionChartComponent) Render() app.UI {
     if c.CanvasChart == nil {
         return app.Div().Text("Chart not initialized")
@@ -111,55 +165,10 @@ func (c *RegressionChartComponent) Render() app.UI {
         }),
     )
 }
-*/
 
-// OnUpdate implements app.Compo
-func (c *RegressionChartComponent) OnUpdate(ctx app.Context) {
-	// Only draw if we're initialized and have a valid context
-	if c.CanvasChart != nil && c.CanvasChart.ctx.Truthy() && c.initialized {
-		c.drawRegressionWithEquation()
-	}
-}
-
-// Render implements app.Compo
-func (c *RegressionChartComponent) Render() app.UI {
-    if c.CanvasChart == nil {
-        return app.Div().Text("Chart not initialized")
-    }
-    
-    // Generate a unique ID for this chart instance
-    chartID := fmt.Sprintf("regression-chart-%p", c)
-    
-    return app.Div().Class("chart-wrapper").Body(
-        app.Canvas().
-            Class("chart-canvas").
-            ID(chartID).  // Use unique ID instead of "main-chart"
-            Width(c.CanvasChart.width).
-            Height(c.CanvasChart.height).
-            OnMouseMove(c.OnMouseMove),  // Now handled by this component
-        
-        app.If(c.CanvasChart.showTooltip, func() app.UI {
-            px, py := c.CanvasChart.ToPixels(c.CanvasChart.activePoint.X, c.CanvasChart.activePoint.Y)
-            return app.Div().
-                Class("chart-tooltip").
-                Style("left", fmt.Sprintf("%fpx", px+15)).
-                Style("top", fmt.Sprintf("%fpx", py-50)).
-                Body(
-                    app.Div().Class("tooltip-header").Text("Data Point"),
-                    app.Div().Class("tooltip-value").Text(
-                        fmt.Sprintf("X: %.1f | Y: %.1f", 
-                            c.CanvasChart.activePoint.X, 
-                            c.CanvasChart.activePoint.Y),
-                    ),
-                )
-        }),
-    )
-}
-
-// Add OnMouseMove handler
+// OnMouseMove handler
 func (c *RegressionChartComponent) OnMouseMove(ctx app.Context, e app.Event) {
     if c.CanvasChart != nil {
-        // Use the canvas chart's mouse handling logic
         c.CanvasChart.OnMouseMove(ctx, e)
     }
 }
