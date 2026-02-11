@@ -39,7 +39,7 @@ func (c *RegressionChartComponent) OnMount(ctx app.Context) {
 
 func (c *RegressionChartComponent) OnMount(ctx app.Context) {
     if c.CanvasChart != nil {
-        c.DrawRegression() // Capitalize this
+        c.DrawRegression(c.data, c.pointColor, c.lineColor)
     }
 }
 
@@ -55,9 +55,9 @@ func (c *RegressionChartComponent) OnUpdate(ctx app.Context) bool {
 
 func (c *RegressionChartComponent) OnUpdate(ctx app.Context) bool {
     if c.CanvasChart != nil {
-        c.DrawRegression()
+        c.DrawRegression(c.data, c.pointColor, c.lineColor)
     }
-    return true // Required return
+    return true
 }
 
 // OnDismount - delegate to embedded CanvasChart
@@ -86,7 +86,7 @@ func (c *RegressionChartComponent) Render() app.UI {
 */
 
 func (c *RegressionChartComponent) Render() app.UI {
-    return c.CanvasChart // Required return
+    return c.CanvasChart
 }
 
 // Custom drawing method
