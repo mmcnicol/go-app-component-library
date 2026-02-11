@@ -148,7 +148,7 @@ type InteractiveConfig struct {
     Selection SelectionConfig
     OnClick   func(ctx app.Context, e app.Event, points []Point)
     OnHover   func(ctx app.Context, e app.Event, point *Point)
-    OnZoom    func(ctx app.Context, range AxisRange)
+    OnZoom    func(ctx app.Context, axisRange AxisRange)
 }
 
 // TooltipConfig defines tooltip appearance and behavior
@@ -345,7 +345,7 @@ func (c *Chart) WithHoverHandler(handler func(ctx app.Context, e app.Event, poin
     return c
 }
 
-func (c *Chart) WithZoomHandler(handler func(ctx app.Context, range AxisRange)) *Chart {
+func (c *Chart) WithZoomHandler(handler func(ctx app.Context, axisRange AxisRange)) *Chart {
     c.spec.Interactive.OnZoom = handler
     return c
 }

@@ -5,6 +5,7 @@ import (
     "math"
 )
 
+/*
 // Regression types
 type RegressionType string
 
@@ -15,6 +16,7 @@ const (
     Logarithmic RegressionType = "logarithmic"
     Power       RegressionType = "power"
 )
+*/
 
 // RegressionResult contains regression analysis results
 type RegressionResult struct {

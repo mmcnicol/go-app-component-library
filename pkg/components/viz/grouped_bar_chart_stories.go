@@ -1,4 +1,4 @@
-// pkg/components/viz/bar_chart_stories.go
+// pkg/components/viz/grouped_bar_chart_stories.go
 //go:build dev
 package viz
 
