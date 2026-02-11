@@ -1,4 +1,3 @@
-//go:build dev
 // pkg/components/chart/bar_chart_stories.go
 package chart
 
@@ -21,8 +20,7 @@ func convertToDataPoints(values []float64) []DataPoint {
 
 // Use init() to auto-register when this package is imported
 func init() {
-
-	userActivity := [][]float64{
+    userActivity := [][]float64{
         {8, 12, 15, 9, 14, 11, 13, 10},
         {5, 8, 10, 7, 9, 6, 11, 8},
         {12, 15, 18, 14, 16, 13, 17, 15},
@@ -39,36 +37,44 @@ func init() {
                         {
                             Label: "Week 1",
                             Data:  convertToDataPoints(userActivity[0]),
-                            BackgroundColor: []string{"rgba(74, 144, 226, 0.7)"}, // Must be slice
+                            BackgroundColor: []string{"rgba(74, 144, 226, 0.7)"},
+                            BorderColor: "rgba(74, 144, 226, 1)",
+                            BorderWidth: 1,
                         },
                         {
                             Label: "Week 2",
                             Data:  convertToDataPoints(userActivity[1]),
                             BackgroundColor: []string{"rgba(255, 99, 132, 0.7)"},
+                            BorderColor: "rgba(255, 99, 132, 1)",
+                            BorderWidth: 1,
                         },
                         {
                             Label: "Week 3",
                             Data:  convertToDataPoints(userActivity[2]),
                             BackgroundColor: []string{"rgba(75, 192, 192, 0.7)"},
+                            BorderColor: "rgba(75, 192, 192, 1)",
+                            BorderWidth: 1,
                         },
                     },
                 }).
                 Options(ChartOptions{
                     Scales: ChartScales{
                         Y: Axis{
-                            Stacked: true,
+                            BeginAtZero: true,
                             Title: AxisTitle{
                                 Display: true,
                                 Text: "Active Users",
                             },
                         },
                         X: Axis{
-                            Stacked: true,
+                            Title: AxisTitle{
+                                Display: true,
+                                Text: "Time of Day",
+                            },
                         },
                     },
                 }).
                 Class("dashboard-card", "chart-bar")
         },
     )
-
 }

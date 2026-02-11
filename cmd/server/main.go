@@ -53,6 +53,7 @@ func main() {
 			"/web/style/table.css",
 			"/web/style/sortable_table.css",
 			"/web/style/data_grid.css",
+			"/web/style/chart.css",
 		},
 		Icon: app.Icon{
 			//Default: "/web/images/logo.png",

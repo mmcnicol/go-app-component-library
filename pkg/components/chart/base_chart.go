@@ -3,7 +3,8 @@ package chart
 
 import (
     "math"
-	"github.com/maxence-charriere/go-app/v10/pkg/app"
+    "fmt"
+    "github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
 // Base chart component
@@ -29,6 +30,7 @@ type BaseChart struct {
 
 // NewChart creates a new chart of the specified type
 func NewChart(chartType ChartType) *BaseChart {
+    id := fmt.Sprintf("chart-%s", app.GenerateID())
     return &BaseChart{
         spec: ChartSpec{
             Type: chartType,
@@ -47,15 +49,19 @@ func NewChart(chartType ChartType) *BaseChart {
                     },
                 },
             },
+            ContainerID: id,
             Engine: EngineTypeCanvas,
         },
+        containerID: id,
     }
 }
 
 // Title sets the chart title
 func (bc *BaseChart) Title(title string) *BaseChart {
-    // Add title to chart
-    // You might want to add a title field to ChartSpec
+    bc.spec.Options.Plugins.Tooltip = TooltipOptions{
+        Enabled: true,
+        IntersectDistance: 10,
+    }
     return bc
 }
 
@@ -71,34 +77,73 @@ func (bc *BaseChart) Options(options ChartOptions) *BaseChart {
     return bc
 }
 
-/*
-// WithRegression adds regression to a scatter chart
-func (bc *BaseChart) WithRegression(regType RegressionType, degree int) *BaseChart {
-    // This will be used by ScatterChart
-    return bc
-}
-*/
-
 // Initialize managers in constructor or setup method
 func (bc *BaseChart) setupManagers() {
     bc.tooltipManager = NewTooltipManager(bc)
     bc.zoomPanManager = NewZoomPanManager(bc)
 }
 
-// Render renders the chart
-func (bc *BaseChart) Render() app.UI {
+// OnMount is called when the component is mounted
+func (bc *BaseChart) OnMount(ctx app.Context) {
+    bc.isRendered = false
     bc.setupManagers()
     
+    // Initialize the render engine
+    renderer, err := NewCanvasRenderer(bc.containerID)
+    if err == nil {
+        bc.engine = renderer
+    }
+}
+
+// OnNav is called when the component is navigated to
+func (bc *BaseChart) OnNav(ctx app.Context) {
+    if !bc.isRendered && bc.engine != nil && len(bc.spec.Data.Datasets) > 0 {
+        err := bc.engine.Render(bc.spec)
+        if err == nil {
+            bc.isRendered = true
+        }
+    }
+}
+
+// Render renders the chart
+func (bc *BaseChart) Render() app.UI {
     return app.Div().
+        ID(bc.containerID).
         Class(append([]string{"chart-container"}, bc.classes...)...).
+        Style("position", "relative").
+        Style("width", "100%").
+        Style("height", "400px").
         Body(
-            app.Canvas().
-                ID(bc.containerID + "-canvas").
-                Class("chart-canvas").
-                Style("width", "100%").
-                Style("height", "100%"),
-            bc.tooltipManager.GetTooltipUI(),
+            // Canvas element for drawing
+            func() app.UI {
+                if bc.engine != nil {
+                    return bc.engine.GetCanvas()
+                }
+                return app.Canvas().
+                    ID(bc.containerID + "-canvas").
+                    Class("chart-canvas").
+                    Style("width", "100%").
+                    Style("height", "100%").
+                    Style("display", "block")
+            }(),
+            // Tooltip
+            func() app.UI {
+                if bc.tooltipManager != nil {
+                    return bc.tooltipManager.GetTooltipUI()
+                }
+                return app.Div()
+            }(),
         )
+}
+
+// Add this method to render the chart
+func (bc *BaseChart) renderChart() {
+    if bc.engine != nil && !bc.isRendered && len(bc.spec.Data.Datasets) > 0 {
+        err := bc.engine.Render(bc.spec)
+        if err == nil {
+            bc.isRendered = true
+        }
+    }
 }
 
 func (bc *BaseChart) calculateTrend() string {

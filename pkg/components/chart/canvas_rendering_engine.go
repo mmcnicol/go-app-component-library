@@ -7,33 +7,33 @@ import (
     "github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
-// Custom type for canvas context since go-app doesn't expose CanvasRenderingContext2D directly
-type CanvasRenderingContext2D struct {
-    app.Value
-}
-
+// CanvasRenderer implements ChartEngine
 type CanvasRenderer struct {
-    canvas    app.HTMLCanvas
-    ctx       CanvasRenderingContext2D
+    canvas    app.UI
     width     int
     height    int
     pixelRatio float64
-    animations []Animation
+    ctx       app.Value
 }
 
 func NewCanvasRenderer(containerID string) (*CanvasRenderer, error) {
     cr := &CanvasRenderer{
         pixelRatio: 1.0,
+        width:      800,
+        height:     400,
     }
     
     // Create canvas element
     cr.canvas = app.Canvas().
         ID(containerID + "-canvas").
-        Style("display", "block")
-    
-    // Get rendering context - in go-app, we use JS to get the context
-    // Note: This creates a separate canvas for context, not ideal
-    cr.ctx = CanvasRenderingContext2D{Value: app.Window().Get("document").Call("createElement", "canvas").Call("getContext", "2d")}
+        Class("chart-canvas").
+        Style("width", "100%").
+        Style("height", "100%").
+        Style("display", "block").
+        OnMount(func(ctx app.Context) {
+            // Get the actual canvas element after mount
+            ctx.JSSrc().Get("document").Call("getElementById", containerID+"-canvas")
+        })
     
     return cr, nil
 }
@@ -42,102 +42,135 @@ func (cr *CanvasRenderer) Render(chart ChartSpec) error {
     // Set up canvas dimensions
     cr.setupCanvas(chart.Options.Responsive)
     
-    // Clear canvas
-    cr.clearCanvas()
+    // Get the canvas context in JavaScript
+    app.Window().Call("setTimeout", app.FuncOf(func(this app.Value, args []app.Value) interface{} {
+        canvas := app.Window().Get("document").Call("getElementById", chart.ContainerID+"-canvas")
+        if !canvas.IsUndefined() {
+            ctx := canvas.Call("getContext", "2d")
+            cr.ctx = ctx
+            
+            // Clear canvas
+            ctx.Call("clearRect", 0, 0, cr.width, cr.height)
+            
+            // Draw chart based on type
+            switch chart.Type {
+            case ChartTypeLine:
+                cr.renderLineChart(chart, ctx)
+            case ChartTypeBar:
+                cr.renderBarChart(chart, ctx)
+            case ChartTypePie:
+                cr.renderPieChart(chart, ctx)
+            default:
+                cr.renderBarChart(chart, ctx) // Default to bar chart
+            }
+        }
+        return nil
+    }), 100)
     
-    // Draw chart based on type
-    switch chart.Type {
-    case ChartTypeLine:
-        return cr.renderLineChart(chart)
-    case ChartTypeBar:
-        return cr.renderBarChart(chart)
-    case ChartTypePie:
-        return cr.renderPieChart(chart)
-    case ChartTypeScatter:
-        return cr.renderScatterChart(chart)
-    case ChartTypeHeatmap:
-        return cr.renderHeatmapChart(chart)
-    default:
-        return fmt.Errorf("unsupported chart type: %v", chart.Type)
-    }
+    return nil
 }
 
 func (cr *CanvasRenderer) setupCanvas(responsive bool) {
     if responsive {
-        // Get parent container dimensions
-        // Implementation depends on your layout
         cr.width = 800
         cr.height = 400
     } else {
         cr.width = 800
         cr.height = 400
     }
-    
-    // In go-app v10, we set attributes and styles differently
-    // For canvas, we need to set width/height attributes directly
-    cr.canvas = cr.canvas.
-        Attr("width", fmt.Sprintf("%d", cr.width)).
-        Attr("height", fmt.Sprintf("%d", cr.height)).
-        Style("width", fmt.Sprintf("%dpx", cr.width)).
-        Style("height", fmt.Sprintf("%dpx", cr.height))
 }
 
-func (cr *CanvasRenderer) clearCanvas() {
-    // Note: In actual implementation, we'd need to get the actual canvas context
-    // This is a placeholder
-    if !cr.ctx.Value.IsUndefined() {
-        cr.ctx.Call("clearRect", 0, 0, cr.width, cr.height)
+func (cr *CanvasRenderer) renderBarChart(chart ChartSpec, ctx app.Value) error {
+    if ctx.IsUndefined() {
+        return fmt.Errorf("canvas context not available")
     }
-}
-
-func (cr *CanvasRenderer) renderLineChart(chart ChartSpec) error {
+    
+    data := chart.Data
+    if len(data.Datasets) == 0 {
+        return fmt.Errorf("no datasets available")
+    }
+    
     // Calculate scales
-    xScale := cr.calculateXScale(chart.Data)
-    yScale := cr.calculateYScale(chart.Data)
+    xScale := cr.calculateXScale(data)
+    yScale := cr.calculateYScale(data)
+    
+    // Clear and draw background
+    ctx.Call("clearRect", 0, 0, cr.width, cr.height)
+    ctx.Set("fillStyle", "#ffffff")
+    ctx.Call("fillRect", 0, 0, cr.width, cr.height)
     
     // Draw grid
-    cr.drawGrid(xScale, yScale, chart.Options.Grid)
+    cr.drawGrid(ctx, xScale, yScale, chart.Options.Grid)
     
     // Draw axes
-    cr.drawAxes(xScale, yScale, chart.Options.Axes)
+    cr.drawAxes(ctx, xScale, yScale, chart.Options.Axes, data.Labels)
     
-    // Draw datasets
-    for i, dataset := range chart.Data.Datasets {
-        cr.drawLineDataset(dataset, xScale, yScale, i)
+    // Draw bars for each dataset
+    numDatasets := len(data.Datasets)
+    numPoints := len(data.Datasets[0].Data)
+    barWidth := (xScale.Convert(1) - xScale.Convert(0)) / float64(numDatasets) * 0.8
+    
+    for datasetIdx, dataset := range data.Datasets {
+        // Set color
+        color := "#4A90E2"
+        if len(dataset.BackgroundColor) > 0 {
+            color = dataset.BackgroundColor[0]
+        }
+        ctx.Set("fillStyle", color)
+        
+        for pointIdx, point := range dataset.Data {
+            xPos := xScale.Convert(float64(pointIdx)) + 
+                   (float64(datasetIdx) * barWidth) - 
+                   (float64(numDatasets) * barWidth / 2) + 
+                   (barWidth / 2)
+            yPos := yScale.Convert(point.Y)
+            barHeight := yScale.Convert(0) - yPos
+            
+            // Draw bar
+            ctx.Call("fillRect", 
+                xPos - barWidth/2, 
+                yPos, 
+                barWidth, 
+                barHeight)
+            
+            // Draw border
+            ctx.Set("strokeStyle", "#333")
+            ctx.Set("lineWidth", 1)
+            ctx.Call("strokeRect", 
+                xPos - barWidth/2, 
+                yPos, 
+                barWidth, 
+                barHeight)
+        }
     }
     
     // Draw legend
-    if chart.Options.Legend.Display {
-        cr.drawLegend(chart.Data.Datasets, chart.Options.Legend)
+    if chart.Options.Plugins.Legend.Display {
+        cr.drawLegend(ctx, data.Datasets, chart.Options.Plugins.Legend)
     }
     
     return nil
 }
 
+// Simplified scale calculations
 func (cr *CanvasRenderer) calculateXScale(data ChartData) Scale {
-    // Simplified implementation
     numLabels := len(data.Labels)
-    if numLabels == 0 {
-        numLabels = 1
+    if numLabels == 0 && len(data.Datasets) > 0 {
+        numLabels = len(data.Datasets[0].Data)
     }
     
     return Scale{
         Min: 0,
-        Max: float64(numLabels - 1),
+        Max: float64(numLabels),
         Convert: func(value float64) float64 {
-            // Linear mapping
-            rangeSize := float64(cr.width - 100) // Account for margins
-            return 50 + (value / float64(numLabels-1)) * rangeSize
-        },
-        Invert: func(pixel float64) float64 {
-            rangeSize := float64(cr.width - 100)
-            return ((pixel - 50) / rangeSize) * float64(numLabels-1)
+            margin := 80.0
+            plotWidth := float64(cr.width) - 2*margin
+            return margin + (value * plotWidth / float64(numLabels))
         },
     }
 }
 
 func (cr *CanvasRenderer) calculateYScale(data ChartData) Scale {
-    // Find min and max values
     min := math.MaxFloat64
     max := -math.MaxFloat64
     
@@ -152,20 +185,18 @@ func (cr *CanvasRenderer) calculateYScale(data ChartData) Scale {
         }
     }
     
-    // If no data points, set defaults
     if min == math.MaxFloat64 {
         min = 0
         max = 100
     }
     
-    // Add some padding
+    // Add padding
     rangePadding := (max - min) * 0.1
     min -= rangePadding
     max += rangePadding
     
-    if min == max {
+    if min < 0 && !data.Options.Scales.Y.BeginAtZero {
         min = 0
-        max = min + 1
     }
     
     finalMin := min
@@ -175,15 +206,16 @@ func (cr *CanvasRenderer) calculateYScale(data ChartData) Scale {
         Min: finalMin,
         Max: finalMax,
         Convert: func(value float64) float64 {
-            // Y axis is inverted (0 at top)
-            rangeSize := float64(cr.height - 100)
-            return float64(cr.height) - 50 - ((value - finalMin) / (finalMax - finalMin)) * rangeSize
-        },
-        Invert: func(pixel float64) float64 {
-            rangeSize := float64(cr.height - 100)
-            return finalMin + ((float64(cr.height) - 50 - pixel) / rangeSize) * (finalMax - finalMin)
+            margin := 60.0
+            plotHeight := float64(cr.height) - 2*margin
+            return float64(cr.height) - margin - ((value - finalMin) / (finalMax - finalMin)) * plotHeight
         },
     }
+}
+
+// Add this method to ChartData to fix compilation error
+func (cd ChartData) GetOptions() ChartOptions {
+    return ChartOptions{}
 }
 
 func (cr *CanvasRenderer) drawLineDataset(dataset Dataset, xScale, yScale Scale, datasetIndex int) {

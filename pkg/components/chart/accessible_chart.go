@@ -15,14 +15,31 @@ type AccessibleChart struct {
     dataTableID   string
 }
 
+func NewAccessibleChart(chartType ChartType) *AccessibleChart {
+    base := NewChart(chartType)
+    return &AccessibleChart{
+        BaseChart:       *base,
+        ariaLabel:       fmt.Sprintf("%s Chart", chartType),
+        ariaDescribedBy: fmt.Sprintf("chart-desc-%s", app.GenerateID()),
+        dataTableID:     fmt.Sprintf("chart-data-%s", app.GenerateID()),
+    }
+}
+
 func (ac *AccessibleChart) Render() app.UI {
+    // Generate description first
+    description := ac.generateChartDescription()
+    
     return app.Div().
         Role("img").
         Aria("label", ac.ariaLabel).
         Aria("describedby", ac.ariaDescribedBy).
         Body(
-            // Visual chart
-            ac.BaseChart.Render(),
+            // Visual chart container
+            app.Div().
+                Class("chart-visual").
+                Body(
+                    ac.BaseChart.Render(),
+                ),
             
             // Hidden data table for screen readers
             ac.renderDataTable(),
@@ -31,33 +48,41 @@ func (ac *AccessibleChart) Render() app.UI {
             app.Div().
                 ID(ac.ariaDescribedBy).
                 Class("sr-only").
-                Text(ac.generateChartDescription()), // Use Text() instead of Body() with string
+                Text(description),
         )
 }
 
 func (ac *AccessibleChart) generateChartDescription() string {
     var desc strings.Builder
     
-    desc.WriteString(fmt.Sprintf("%s chart showing ", ac.spec.Type))
-    desc.WriteString(fmt.Sprintf("%d datasets with %d data points each. ",
-        len(ac.spec.Data.Datasets), len(ac.spec.Data.Datasets[0].Data)))
-    
-    // Describe trends
-    if ac.spec.Type == ChartTypeLine {
-        trend := ac.calculateTrend()
-        desc.WriteString(fmt.Sprintf("The data shows a %s trend. ", trend))
+    if len(ac.spec.Data.Datasets) > 0 {
+        desc.WriteString(fmt.Sprintf("%s chart showing ", ac.spec.Type))
+        desc.WriteString(fmt.Sprintf("%d datasets with %d data points each. ",
+            len(ac.spec.Data.Datasets), len(ac.spec.Data.Datasets[0].Data)))
+        
+        // Describe trends
+        if ac.spec.Type == ChartTypeLine {
+            trend := ac.calculateTrend()
+            desc.WriteString(fmt.Sprintf("The data shows a %s trend. ", trend))
+        }
+        
+        // Describe key statistics
+        stats := ac.calculateStatistics()
+        desc.WriteString(fmt.Sprintf("Minimum value: %.2f. Maximum value: %.2f. ",
+            stats.Min, stats.Max))
+        desc.WriteString(fmt.Sprintf("Average value: %.2f.", stats.Mean))
+    } else {
+        desc.WriteString("No data available for this chart.")
     }
-    
-    // Describe key statistics
-    stats := ac.calculateStatistics()
-    desc.WriteString(fmt.Sprintf("Minimum value: %.2f. Maximum value: %.2f. ",
-        stats.Min, stats.Max))
-    desc.WriteString(fmt.Sprintf("Average value: %.2f.", stats.Mean))
     
     return desc.String()
 }
 
 func (ac *AccessibleChart) renderDataTable() app.UI {
+    if len(ac.spec.Data.Datasets) == 0 {
+        return app.Div().ID(ac.dataTableID).Class("sr-only").Text("No data available")
+    }
+    
     return app.Table().
         ID(ac.dataTableID).
         Class("sr-only").
@@ -68,7 +93,10 @@ func (ac *AccessibleChart) renderDataTable() app.UI {
                 app.Tr().Body(
                     app.Th().Text("Dataset"),
                     app.Range(ac.spec.Data.Labels).Slice(func(i int) app.UI {
-                        return app.Th().Text(ac.spec.Data.Labels[i])
+                        if i < len(ac.spec.Data.Labels) {
+                            return app.Th().Text(ac.spec.Data.Labels[i])
+                        }
+                        return app.Th().Text(fmt.Sprintf("Point %d", i+1))
                     }),
                 ),
             ),
@@ -78,7 +106,10 @@ func (ac *AccessibleChart) renderDataTable() app.UI {
                     return app.Tr().Body(
                         app.Th().Text(dataset.Label),
                         app.Range(dataset.Data).Slice(func(j int) app.UI {
-                            return app.Td().Text(fmt.Sprintf("%.2f", dataset.Data[j].Y))
+                            if j < len(dataset.Data) {
+                                return app.Td().Text(fmt.Sprintf("%.2f", dataset.Data[j].Y))
+                            }
+                            return app.Td().Text("")
                         }),
                     )
                 }),
