@@ -9,8 +9,8 @@ import (
 
 // RegressionChartComponent must embed app.Compo to be a valid go-app component
 type RegressionChartComponent struct {
-	app.Compo
-	CanvasChart
+	// REMOVE app.Compo. It is already inside *CanvasChart.
+	*CanvasChart
 	
 	pointColor   string
 	lineColor    string
@@ -21,12 +21,13 @@ type RegressionChartComponent struct {
 }
 
 func (c *RegressionChartComponent) OnMount(ctx app.Context) {
-    // REMOVED: c.CanvasChart.OnMount(ctx) <-- go-app does this automatically!
-
-    // Wait for the CanvasChart (child) to be ready
-    ctx.Defer(func(ctx app.Context) {
-        c.tryInitialDraw(ctx, 0)
-    })
+	if c.CanvasChart != nil {
+		c.CanvasChart.OnMount(ctx)
+	}
+	
+	ctx.Defer(func(ctx app.Context) {
+		c.tryInitialDraw(ctx, 0)
+	})
 }
 
 // A simple retry mechanism to handle the race condition
@@ -41,27 +42,21 @@ func (c *RegressionChartComponent) tryInitialDraw(ctx app.Context, attempts int)
     }
 }
 
-func (c *RegressionChartComponent) OnUpdate(ctx app.Context) bool {
-    // REMOVED: c.CanvasChart.OnUpdate(ctx) <-- go-app handles this!
-    
-    if c.CanvasChart == nil {
-        return false
+func (c *RegressionChartComponent) OnUpdate(ctx app.Context) {
+    if c.CanvasChart != nil {
+        c.CanvasChart.OnUpdate(ctx)
     }
-
-    // Trigger our drawing logic after the update
+    
     ctx.Defer(func(ctx app.Context) {
         if c.CanvasChart != nil && c.CanvasChart.ctx.Truthy() {
             c.drawRegressionWithEquation()
         }
     })
-    return true
 }
 
 func (c *RegressionChartComponent) Render() app.UI {
-    if c.CanvasChart == nil {
-        return app.Div().Text("Loading Chart...")
-    }
-    return c.CanvasChart
+	// Now this is valid because c.CanvasChart is a pointer
+	return c.CanvasChart 
 }
 
 // OnDismount - delegate to embedded CanvasChart
@@ -202,5 +197,5 @@ func calculateRSquared(data []Point, m, b float64) float64 {
 	return 1 - (ssRes / ssTot)
 }
 
-// Ensure RegressionChartComponent implements app.Compo
+// Ensure the variable declaration at the bottom uses the pointer
 var _ app.Compo = (*RegressionChartComponent)(nil)
