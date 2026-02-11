@@ -1,6 +1,8 @@
 // pkg/components/chart/internal/math.go
 package internal
 
+import "github.com/mmcnicol/go-app-component-library/pkg/components/chart"
+
 func CalculateLinearRegression(data []Point) (m, b float64) {
 	n := float64(len(data))
 	if n < 2 {
