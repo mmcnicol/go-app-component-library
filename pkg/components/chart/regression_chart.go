@@ -20,19 +20,24 @@ type RegressionChartComponent struct {
 }
 
 func (c *RegressionChartComponent) OnMount(ctx app.Context) {
-    if c.CanvasChart == nil {
-        return
-    }
+    c.CanvasChart.OnMount(ctx) // Let the base class start its setup
     
-    // Initialize the base component
-    c.CanvasChart.OnMount(ctx)
-    
+    // Defer our drawing to the next frame
     ctx.Defer(func(ctx app.Context) {
-        // Access the ctx from the embedded CanvasChart specifically
-        if c.CanvasChart != nil && c.CanvasChart.ctx.Truthy() {
-            c.drawRegressionWithEquation()
-        }
+        c.tryInitialDraw(ctx, 0)
     })
+}
+
+// A simple retry mechanism to handle the race condition
+func (c *RegressionChartComponent) tryInitialDraw(ctx app.Context, attempts int) {
+    if c.CanvasChart != nil && c.CanvasChart.ctx.Truthy() {
+        c.drawRegressionWithEquation()
+    } else if attempts < 5 {
+        // If not ready, wait another frame
+        ctx.Defer(func(ctx app.Context) {
+            c.tryInitialDraw(ctx, attempts+1)
+        })
+    }
 }
 
 func (c *RegressionChartComponent) OnUpdate(ctx app.Context) bool {
@@ -74,13 +79,17 @@ func (c *RegressionChartComponent) ShouldUpdate(next app.Compo) bool {
 
 // Custom drawing method
 func (c *RegressionChartComponent) drawRegressionWithEquation() {
-	if !c.CanvasChart.ctx.Truthy() || len(c.data) == 0 {
-		return
-	}
+	// Check the inner pointer AND the inner context
+    if c.CanvasChart == nil || !c.CanvasChart.ctx.Truthy() {
+        return 
+    }
+
+    // Use c.CanvasChart.ctx, NOT c.ctx
+    canvas := c.CanvasChart.ctx
 
 	// Clear and draw the regression
-	c.CanvasChart.ctx.Set("fillStyle", "#ffffff")
-	c.CanvasChart.ctx.Call("fillRect", 0, 0, c.width, c.height)
+	canvas.Set("fillStyle", "#ffffff")
+	canvas.Call("fillRect", 0, 0, c.width, c.height)
 
 	// Update currentPoints and DataRange
 	c.currentPoints = c.data
