@@ -55,27 +55,23 @@ func init() {
 			selectedKey := controls["Dataset"].Value.(string)
 			data := datasets[selectedKey]
 			
-			// Create a custom component that extends CanvasChart
-			regressionChart := &RegressionChartComponent{
-				CanvasChart: *New(data,
-					WithTitle(controls["Title"].Value.(string)),
-					WithColor(controls["Point Color"].Value.(string)),
-					func(c *ChartConfig) {
-						// Clear other chart types
-						c.BoxData = nil
-						c.PieData = nil
-						c.HeatmapMatrix = nil
-						c.IsStream = false
-						c.Thickness = 2.0
-					},
-				),
-				pointColor:    controls["Point Color"].Value.(string),
-				lineColor:     controls["Line Color"].Value.(string),
-				showEquation:  controls["Show Equation"].Value.(bool),
-				pointSize:     float64(controls["Point Size"].Value.(int)),
-				datasetName:   selectedKey,
-				data:          data,
-			}
+			// Use the constructor instead of manual struct creation
+			regressionChart := NewRegressionChart(data,
+				WithTitle(controls["Title"].Value.(string)),
+				WithColor(controls["Point Color"].Value.(string)),
+				func(c *ChartConfig) {
+					c.BoxData = nil
+					c.PieData = nil
+					c.HeatmapMatrix = nil
+					c.IsStream = false
+					c.Thickness = 2.0
+				},
+			).
+			WithPointColor(controls["Point Color"].Value.(string)).
+			WithLineColor(controls["Line Color"].Value.(string)).
+			WithShowEquation(controls["Show Equation"].Value.(bool)).
+			WithPointSize(float64(controls["Point Size"].Value.(int))).
+			WithDatasetName(selectedKey)
 			
 			return app.Div().ID("regression-chart-container").Body(
 				app.Div().Class("regression-wrapper").Body(
