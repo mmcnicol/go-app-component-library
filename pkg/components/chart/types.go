@@ -228,13 +228,13 @@ type ChartEngine interface {
     GetCanvas() app.UI
 }
 
-// Chart specification
 type ChartSpec struct {
     Type        ChartType
     Data        ChartData
     Options     ChartOptions
     ContainerID string
     Engine      EngineType // "canvas", "svg", "webgl", "hybrid"
+    Metadata    map[string]interface{} // Add this line
 }
 
 /*

@@ -4,7 +4,6 @@ package chart
 import (
     "fmt"
     "github.com/maxence-charriere/go-app/v10/pkg/app"
-    "github.com/mmcnicol/go-app-component-library/pkg/storybook"
 )
 
 type SimpleChart struct {
@@ -61,10 +60,9 @@ func (sc *SimpleChart) drawChart() {
     
     if sc.chartType == ChartTypeBar {
         jsCode = sc.getBarChartJS(canvasID)
-    } else if sc.chartType == ChartTypeLine {
-        jsCode = sc.getLineChartJS(canvasID)
-    } else if sc.chartType == ChartTypePie {
-        jsCode = sc.getPieChartJS(canvasID)
+    } else {
+        // Default to bar chart for now
+        jsCode = sc.getBarChartJS(canvasID)
     }
     
     app.Window().Call("eval", fmt.Sprintf(`

@@ -1,4 +1,3 @@
-//go:build dev
 // pkg/components/chart/simple_chart_stories.go
 package chart
 

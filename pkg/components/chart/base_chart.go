@@ -18,6 +18,7 @@ type BaseChart struct {
     engine      ChartEngine
     isRendered  bool
     classes     []string
+    styles      map[string]string
     
     // Managers
     tooltipManager *TooltipManager
@@ -40,10 +41,6 @@ func NewChart(chartType ChartType) *BaseChart {
                 Responsive: true,
                 MaintainAspectRatio: false,
                 Plugins: ChartPlugins{
-                    Title: TitleOptions{
-                        Display: true,
-                        Text:    string(chartType) + " Chart",
-                    },
                     Legend: LegendOptions{
                         Display: true,
                         Position: "top",
@@ -58,6 +55,7 @@ func NewChart(chartType ChartType) *BaseChart {
             Engine: EngineTypeCanvas,
         },
         containerID: id,
+        styles: make(map[string]string), // Initialize styles map
     }
 }
 
@@ -144,20 +142,21 @@ func (bc *BaseChart) Render() app.UI {
         ID(bc.containerID).
         Class(append([]string{"chart-container"}, bc.classes...)...)
     
-    // Apply styles from metadata if any
-    if bc.spec.Metadata != nil {
-        if styles, ok := bc.spec.Metadata["styles"].(map[string]string); ok {
-            for name, value := range styles {
-                div = div.Style(name, value)
-            }
-        }
+    // Apply custom styles
+    for name, value := range bc.styles {
+        div = div.Style(name, value)
     }
     
-    // Add default styles
-    div = div.
-        Style("position", "relative").
-        Style("width", "100%").
-        Style("height", "400px")
+    // Add default styles if not overridden
+    if _, hasWidth := bc.styles["width"]; !hasWidth {
+        div = div.Style("width", "100%")
+    }
+    if _, hasHeight := bc.styles["height"]; !hasHeight {
+        div = div.Style("height", "400px")
+    }
+    if _, hasPosition := bc.styles["position"]; !hasPosition {
+        div = div.Style("position", "relative")
+    }
     
     return div.Body(
         // Canvas element for drawing
@@ -295,6 +294,7 @@ func (bc *BaseChart) calculateMean(data []float64) float64 {
     return sum / float64(len(data))
 }
 
+/*
 // Style sets inline CSS styles for the chart container
 func (bc *BaseChart) Style(name, value string) *BaseChart {
     // We'll need to store styles and apply them in Render()
@@ -308,5 +308,11 @@ func (bc *BaseChart) Style(name, value string) *BaseChart {
     } else {
         bc.spec.Metadata["styles"] = map[string]string{name: value}
     }
+    return bc
+}
+*/
+
+func (bc *BaseChart) Style(name, value string) *BaseChart {
+    bc.styles[name] = value
     return bc
 }
