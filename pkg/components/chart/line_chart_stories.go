@@ -8,10 +8,6 @@ import (
 )
 
 func init() {
-    monthlySales := []Point{
-        {X: 1, Y: 12000}, {X: 2, Y: 19000}, {X: 3, Y: 15000},
-        {X: 4, Y: 21000}, {X: 5, Y: 18000}, {X: 6, Y: 24000},
-    }
 
     storybook.Register("Charts", "Line Chart",
         map[string]*storybook.Control{

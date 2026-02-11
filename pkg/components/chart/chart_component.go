@@ -131,8 +131,8 @@ func (c *CanvasChart) Render() app.UI {
             ID("main-chart").
             Width(c.width).
             Height(c.height).
-            OnMouseMove(c.OnMouseMove).
-            OnMount(c.OnMount), // Add OnMount back
+            OnMouseMove(c.OnMouseMove),
+            // REMOVE: OnMount(c.OnMount), // OnMount is handled by the component itself
 
         app.If(c.showTooltip, func() app.UI {
             return app.Div().
@@ -147,6 +147,7 @@ func (c *CanvasChart) Render() app.UI {
                 )
         }),
     )
+
 }
 
 // Padding defines the drawing area boundaries
