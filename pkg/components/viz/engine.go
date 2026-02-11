@@ -246,6 +246,11 @@ func (e *CanvasEngine) renderLineChart(spec *Spec, ctx app.Value) error {
     if len(data.Series) == 0 || len(data.Series[0].Points) == 0 {
         return e.renderPlaceholder(spec, ctx)
     }
+
+    theme := spec.Theme
+    if theme == nil {
+        theme = DefaultTheme()
+    }
     
     // Set background
     ctx.Set("fillStyle", spec.Theme.GetBackgroundColor())
