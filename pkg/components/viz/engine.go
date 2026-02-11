@@ -3,6 +3,8 @@ package viz
 
 import (
     "fmt"
+    "math"
+    mathRand "math/rand"
     "github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
@@ -40,6 +42,9 @@ type CanvasEngine struct {
     maxPoints int
     spec      *Spec
     jsCanvas  app.Value // Store the JS canvas value for direct manipulation
+    xScale    func(float64) float64
+    yScale    func(float64) float64
+    margin    Margin
 }
 
 func NewCanvasEngine() *CanvasEngine {
@@ -238,8 +243,137 @@ func (e *CanvasEngine) renderBarChart(spec *Spec, ctx app.Value) error {
 }
 
 func (e *CanvasEngine) renderLineChart(spec *Spec, ctx app.Value) error {
-    // Placeholder implementation
-    return e.renderPlaceholder(spec, ctx)
+    data := spec.Data
+    if len(data.Series) == 0 || len(data.Series[0].Points) == 0 {
+        return e.renderPlaceholder(spec, ctx)
+    }
+    
+    // Set background
+    ctx.Set("fillStyle", spec.Theme.GetBackgroundColor())
+    ctx.Call("fillRect", 0, 0, e.width, e.height)
+    
+    // Calculate scales using all points from all series
+    allPoints := []Point{}
+    for _, series := range data.Series {
+        allPoints = append(allPoints, series.Points...)
+    }
+    e.calculateScales(spec, allPoints)
+    
+    chartWidth := float64(e.width) - e.margin.Left - e.margin.Right
+    chartHeight := float64(e.height) - e.margin.Top - e.margin.Bottom
+    
+    // Draw grid
+    if spec.Axes.Y.Grid.Visible {
+        e.drawLineChartGrid(ctx, chartWidth, chartHeight)
+    }
+    
+    // Draw axes
+    e.drawLineChartAxes(ctx, chartWidth, chartHeight, spec)
+    
+    // Draw each series
+    for seriesIdx, series := range data.Series {
+        points := series.Points
+        
+        if len(points) < 2 {
+            continue
+        }
+        
+        // Apply downsampling for large datasets
+        if len(points) > e.maxPoints {
+            points = e.downsampleLTTB(points, e.maxPoints)
+        }
+        
+        // Determine series color
+        seriesColor := series.Color
+        if seriesColor == "" {
+            colors := spec.Theme.GetColors()
+            seriesColor = colors[seriesIdx%len(colors)]
+        }
+        
+        // Draw the line
+        ctx.Set("strokeStyle", seriesColor)
+        ctx.Set("lineWidth", series.Stroke.Width)
+        if series.Stroke.Width == 0 {
+            ctx.Set("lineWidth", 2)
+        }
+        
+        // Set line dash if specified
+        if len(series.Stroke.Dash) > 0 {
+            ctx.Set("lineDash", series.Stroke.Dash)
+        } else {
+            ctx.Set("lineDash", []float64{})
+        }
+        
+        // Draw the path
+        ctx.Call("beginPath")
+        
+        for i, point := range points {
+            x := e.xScale(point.X)
+            y := e.yScale(point.Y)
+            
+            if i == 0 {
+                ctx.Call("moveTo", x, y)
+            } else {
+                // Smooth curves if tension > 0
+                if series.Tension > 0 && i < len(points)-1 {
+                    e.drawSmoothSegment(ctx, points, i, series.Tension)
+                } else {
+                    ctx.Call("lineTo", x, y)
+                }
+            }
+        }
+        
+        ctx.Call("stroke")
+        
+        // Fill area under line if enabled
+        if series.Fill {
+            ctx.Set("fillStyle", seriesColor+"40") // Add 25% opacity
+            ctx.Call("beginPath")
+            
+            // Start from bottom-left
+            firstPoint := points[0]
+            ctx.Call("moveTo", e.xScale(firstPoint.X), e.yScale(0))
+            
+            // Draw line path
+            for _, point := range points {
+                ctx.Call("lineTo", e.xScale(point.X), e.yScale(point.Y))
+            }
+            
+            // Close back to bottom-right
+            lastPoint := points[len(points)-1]
+            ctx.Call("lineTo", e.xScale(lastPoint.X), e.yScale(0))
+            ctx.Call("closePath")
+            ctx.Call("fill")
+        }
+        
+        // Draw points if enabled
+        if series.PointSize > 0 {
+            for _, point := range points {
+                e.drawPoint(ctx, 
+                    e.xScale(point.X), 
+                    e.yScale(point.Y), 
+                    series.PointSize, 
+                    seriesColor,
+                    series.PointStyle,
+                )
+            }
+        }
+    }
+    
+    // Draw title
+    if spec.Title != "" {
+        ctx.Set("fillStyle", spec.Theme.GetTextColor())
+        ctx.Set("font", fmt.Sprintf("16px %s", spec.Theme.GetFontFamily()))
+        ctx.Set("textAlign", "center")
+        ctx.Call("fillText", spec.Title, float64(e.width)/2, 25)
+    }
+    
+    // Draw legend if enabled
+    if spec.Legend.Visible && len(data.Series) > 1 {
+        e.drawLegend(ctx, spec)
+    }
+    
+    return nil
 }
 
 func (e *CanvasEngine) renderScatterChart(spec *Spec, ctx app.Value) error {
@@ -376,3 +510,256 @@ func (e *CanvasEngine) GetMetrics() Metrics {
         PointCount: e.maxPoints,
     }
 }
+
+type Margin struct {
+    Top, Right, Bottom, Left float64
+}
+
+func (e *CanvasEngine) calculateScales(spec *Spec, points []Point) {
+    // Find min/max values
+    if len(points) == 0 {
+        return
+    }
+    
+    minX, maxX := points[0].X, points[0].X
+    minY, maxY := points[0].Y, points[0].Y
+    
+    for _, p := range points {
+        minX = math.Min(minX, p.X)
+        maxX = math.Max(maxX, p.X)
+        minY = math.Min(minY, p.Y)
+        maxY = math.Max(maxY, p.Y)
+    }
+    
+    // Add padding
+    if maxX == minX {
+        maxX = minX + 1
+    }
+    if maxY == minY {
+        maxY = minY + 1
+    }
+    
+    // Add 10% padding to Y axis
+    yPadding := (maxY - minY) * 0.1
+    minY -= yPadding
+    maxY += yPadding
+    
+    if spec.Axes.Y.BeginAtZero {
+        minY = 0
+    }
+    
+    // Set margins
+    e.margin = Margin{
+        Top:    40,
+        Right:  40,
+        Bottom: 60,
+        Left:   60,
+    }
+    
+    chartWidth := float64(e.width) - e.margin.Left - e.margin.Right
+    chartHeight := float64(e.height) - e.margin.Top - e.margin.Bottom
+    
+    // Create scale functions
+    e.xScale = func(x float64) float64 {
+        return e.margin.Left + ((x - minX) / (maxX - minX)) * chartWidth
+    }
+    
+    e.yScale = func(y float64) float64 {
+        return e.margin.Top + chartHeight - ((y - minY) / (maxY - minY)) * chartHeight
+    }
+}
+
+func (e *CanvasEngine) drawSmoothSegment(ctx app.Value, points []Point, i int, tension float64) {
+    p0 := points[i-1]
+    p1 := points[i]
+    p2 := points[i+1]
+    
+    x0, y0 := e.xScale(p0.X), e.yScale(p0.Y)
+    x1, y1 := e.xScale(p1.X), e.yScale(p1.Y)
+    x2, y2 := e.xScale(p2.X), e.yScale(p2.Y)
+    
+    // Control points for Catmull-Rom spline
+    cp1x := x1 + (x2-x0)*tension/6
+    cp1y := y1 + (y2-y0)*tension/6
+    cp2x := x2 - (x3-x1)*tension/6
+    cp2y := y2 - (y3-y1)*tension/6
+    
+    ctx.Call("bezierCurveTo", cp1x, cp1y, cp2x, cp2y, x2, y2)
+}
+
+func (e *CanvasEngine) drawPoint(ctx app.Value, x, y float64, size int, color string, style PointStyle) {
+    ctx.Set("fillStyle", color)
+    ctx.Set("strokeStyle", "#ffffff")
+    ctx.Set("lineWidth", 1)
+    
+    radius := float64(size) / 2
+    
+    switch style {
+    case PointStyleCircle, "":
+        ctx.Call("beginPath")
+        ctx.Call("arc", x, y, radius, 0, 2*math.Pi)
+        ctx.Call("fill")
+        ctx.Call("stroke")
+        
+    case PointStyleSquare:
+        ctx.Call("fillRect", x-radius, y-radius, radius*2, radius*2)
+        ctx.Call("strokeRect", x-radius, y-radius, radius*2, radius*2)
+        
+    case PointStyleTriangle:
+        ctx.Call("beginPath")
+        ctx.Call("moveTo", x, y-radius)
+        ctx.Call("lineTo", x+radius, y+radius)
+        ctx.Call("lineTo", x-radius, y+radius)
+        ctx.Call("closePath")
+        ctx.Call("fill")
+        ctx.Call("stroke")
+        
+    case PointStyleDiamond:
+        ctx.Call("beginPath")
+        ctx.Call("moveTo", x, y-radius)
+        ctx.Call("lineTo", x+radius, y)
+        ctx.Call("lineTo", x, y+radius)
+        ctx.Call("lineTo", x-radius, y)
+        ctx.Call("closePath")
+        ctx.Call("fill")
+        ctx.Call("stroke")
+        
+    case PointStyleCross:
+        ctx.Set("strokeStyle", color)
+        ctx.Set("lineWidth", 2)
+        ctx.Call("beginPath")
+        ctx.Call("moveTo", x-radius, y-radius)
+        ctx.Call("lineTo", x+radius, y+radius)
+        ctx.Call("moveTo", x+radius, y-radius)
+        ctx.Call("lineTo", x-radius, y+radius)
+        ctx.Call("stroke")
+    }
+}
+
+func (e *CanvasEngine) downsampleLTTB(data []Point, threshold int) []Point {
+    if threshold >= len(data) || threshold == 0 {
+        return data
+    }
+    
+    sampled := make([]Point, 0, threshold)
+    sampled = append(sampled, data[0])
+    
+    bucketSize := float64(len(data)-2) / float64(threshold-2)
+    a := 0
+    
+    for i := 0; i < threshold-2; i++ {
+        avgRangeStart := int(math.Floor(float64(i+1)*bucketSize)) + 1
+        avgRangeEnd := int(math.Floor(float64(i+2)*bucketSize)) + 1
+        if avgRangeEnd > len(data) {
+            avgRangeEnd = len(data)
+        }
+        
+        avgRangeLength := avgRangeEnd - avgRangeStart
+        
+        var avgX, avgY float64
+        for j := avgRangeStart; j < avgRangeEnd; j++ {
+            avgX += data[j].X
+            avgY += data[j].Y
+        }
+        avgX /= float64(avgRangeLength)
+        avgY /= float64(avgRangeLength)
+        
+        rangeOffs := int(math.Floor(float64(i)*bucketSize)) + 1
+        rangeTo := int(math.Floor(float64(i+1)*bucketSize)) + 1
+        
+        pointA := data[a]
+        maxArea := -1.0
+        maxAreaPoint := Point{}
+        maxAreaIndex := a
+        
+        for j := rangeOffs; j < rangeTo; j++ {
+            area := math.Abs(
+                (pointA.X-avgX)*(data[j].Y-pointA.Y)-
+                    (pointA.X-data[j].X)*(avgY-pointA.Y),
+            ) * 0.5
+            
+            if area > maxArea {
+                maxArea = area
+                maxAreaPoint = data[j]
+                maxAreaIndex = j
+            }
+        }
+        
+        sampled = append(sampled, maxAreaPoint)
+        a = maxAreaIndex
+    }
+    
+    sampled = append(sampled, data[len(data)-1])
+    return sampled
+}
+
+func (e *CanvasEngine) drawLineChartGrid(ctx app.Value, chartWidth, chartHeight float64) {
+    ctx.Set("strokeStyle", "#e5e7eb")
+    ctx.Set("lineWidth", 0.5)
+    
+    // Vertical grid lines
+    for i := 0; i <= 10; i++ {
+        x := e.margin.Left + (float64(i)/10)*chartWidth
+        ctx.Call("beginPath")
+        ctx.Call("moveTo", x, e.margin.Top)
+        ctx.Call("lineTo", x, e.margin.Top+chartHeight)
+        ctx.Call("stroke")
+    }
+    
+    // Horizontal grid lines
+    for i := 0; i <= 5; i++ {
+        y := e.margin.Top + (float64(i)/5)*chartHeight
+        ctx.Call("beginPath")
+        ctx.Call("moveTo", e.margin.Left, y)
+        ctx.Call("lineTo", e.margin.Left+chartWidth, y)
+        ctx.Call("stroke")
+    }
+}
+
+func (e *CanvasEngine) drawLineChartAxes(ctx app.Value, chartWidth, chartHeight float64, spec *Spec) {
+    ctx.Set("strokeStyle", "#9ca3af")
+    ctx.Set("lineWidth", 1)
+    
+    // X-axis
+    ctx.Call("beginPath")
+    ctx.Call("moveTo", e.margin.Left, e.margin.Top+chartHeight)
+    ctx.Call("lineTo", e.margin.Left+chartWidth, e.margin.Top+chartHeight)
+    ctx.Call("stroke")
+    
+    // Y-axis
+    ctx.Call("beginPath")
+    ctx.Call("moveTo", e.margin.Left, e.margin.Top)
+    ctx.Call("lineTo", e.margin.Left, e.margin.Top+chartHeight)
+    ctx.Call("stroke")
+}
+
+func (e *CanvasEngine) drawLegend(ctx app.Value, spec *Spec) {
+    data := spec.Data
+    legendX := e.margin.Left
+    legendY := e.margin.Top - 25
+    
+    ctx.Set("font", fmt.Sprintf("12px %s", spec.Theme.GetFontFamily()))
+    ctx.Set("textBaseline", "middle")
+    
+    for i, series := range data.Series {
+        color := series.Color
+        if color == "" {
+            colors := spec.Theme.GetColors()
+            color = colors[i%len(colors)]
+        }
+        
+        // Draw color box
+        ctx.Set("fillStyle", color)
+        ctx.Call("fillRect", legendX, legendY-6, 12, 12)
+        
+        // Draw label
+        ctx.Set("fillStyle", spec.Theme.GetTextColor())
+        ctx.Set("textAlign", "left")
+        ctx.Call("fillText", series.Label, legendX+18, legendY)
+        
+        // Move to next legend item
+        bounds := ctx.Call("measureText", series.Label)
+        legendX += 18 + bounds.Get("width").Float() + 20
+    }
+}
+

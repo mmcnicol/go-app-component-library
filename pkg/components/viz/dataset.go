@@ -69,6 +69,9 @@ type Series struct {
     // Additional
     Stack     string      `json:"stack,omitempty"` // for stacked charts
     YAxisID   string      `json:"yAxisID,omitempty"` // for multi-axis
+
+    // Line smoothing (0-1)
+    Tension   float64     `json:"tension,omitempty"`
 }
 
 // Point represents a single data point

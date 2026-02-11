@@ -77,6 +77,21 @@ Charts
 - [x] Regression Chart
 - [ ] Accessible Chart
 
+Viz
+- [x] Bar Chart
+- [x] Grouped Bar Chart
+- [ ] Stacked Bar Charts
+- [ ] Horizontal Bar Chart
+- [ ] Line Chart
+- [ ] Pie/Donut Chart
+- [ ] Scatter/Bubble Chart
+- [ ] Streaming Chart
+- [ ] Regression Chart
+- [ ] Accessible Chart
+- [ ] Box plot
+- [ ] Histogram
+- [ ] Heatmap
+
 Misc
 - [x] Icons
 - [x] Themes
