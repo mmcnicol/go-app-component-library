@@ -83,6 +83,7 @@ func (bc *BaseChart) setupManagers() {
     bc.zoomPanManager = NewZoomPanManager(bc)
 }
 
+// Update the OnMount method in base_chart.go:
 func (bc *BaseChart) OnMount(ctx app.Context) {
     bc.isRendered = false
     bc.setupManagers()

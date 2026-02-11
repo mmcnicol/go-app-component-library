@@ -27,13 +27,13 @@ func NewCanvasRenderer(containerID string) (*CanvasRenderer, error) {
     }, nil
 }
 
-// RenderChart renders the chart spec (implements ChartEngine.Render)
+// RenderChart renders the chart spec
 func (cr *CanvasRenderer) RenderChart(chart ChartSpec) error {
     // Store the chart spec for rendering
     cr.chartSpec = chart
     
     // If already mounted, update immediately
-    if cr.mounted && !cr.ctx.IsZero() {
+    if cr.mounted && cr.ctx != (app.Context{}) {
         cr.setupCanvas(cr.ctx)
     }
     
@@ -446,7 +446,7 @@ func (cr *CanvasRenderer) getBarChartScript() string {
 func (cr *CanvasRenderer) Update(data ChartData) error {
     // Update the chart spec and re-render
     cr.chartSpec.Data = data
-    if cr.mounted && !cr.ctx.IsZero() {
+    if cr.mounted && cr.ctx != (app.Context{}) {
         cr.setupCanvas(cr.ctx)
     }
     return nil
