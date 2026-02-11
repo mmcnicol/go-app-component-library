@@ -32,77 +32,6 @@ type CanvasChart struct {
 	DataRange     DataRange
 }
 
-/*
-func (c *CanvasChart) OnMount(ctx app.Context) {
-	c.canvas = ctx.SrcElement()
-	c.ctx = c.canvas.Call("getContext", "2d")
-	c.dpr = app.Window().Get("devicePixelRatio").Float()
-	if c.dpr == 0 { c.dpr = 1.0 }
-
-	// Phase B: Setup defaults
-	c.Padding = Padding{Top: 20, Right: 20, Bottom: 40, Left: 50}
-	c.DataRange = DataRange{MinX: 0, MaxX: 100, MinY: 0, MaxY: 100}
-
-	c.resize()
-	c.drawAxes() // Instead of placeholder
-}
-*/
-
-/*
-func (c *CanvasChart) OnMount(ctx app.Context) {
-	// 1. Get the Canvas Element
-	c.canvas = ctx.JSSrc()
-	c.ctx = c.canvas.Call("getContext", "2d")
-
-	// 2. Determine Display Density
-	c.dpr = app.Window().Get("devicePixelRatio").Float()
-	if c.dpr == 0 {
-		c.dpr = 1.0
-	}
-
-	ctx.Set("imageSmoothingEnabled", true)
-
-	// Test Data for Bars
-    barData := []float64{45, 80, 55, 92, 30, 66, 78}
-    
-    c.resize()
-    c.drawAxes()
-    c.DrawBarChart(barData, "#4a90e2")
-
-
-
-	c.streamData = StreamingData{
-        Points:   make([]float64, 0, 100),
-        Capacity: 100,
-    }
-    
-    c.resize()
-    
-    // Start the animation
-    c.StartStreaming(ctx)
-}
-*/
-
-/*
-func (c *CanvasChart) OnMount(ctx app.Context) {
-	// 1. Get the Canvas Element using JSSrc()
-	c.canvas = ctx.JSSrc()
-	c.ctx = c.canvas.Call("getContext", "2d")
-
-	// 2. Determine Display Density
-	c.dpr = app.Window().Get("devicePixelRatio").Float()
-	if c.dpr == 0 {
-		c.dpr = 1.0
-	}
-
-	// Set property on the JS Context, not the app.Context
-	c.ctx.Set("imageSmoothingEnabled", true)
-
-	c.resize()
-	c.drawAxes()
-}
-*/
-
 func (c *CanvasChart) OnMount(ctx app.Context) {
     ctx.Defer(func(ctx app.Context) {
         canvasJS := app.Window().GetElementByID("main-chart")
@@ -138,9 +67,7 @@ func (c *CanvasChart) OnMount(ctx app.Context) {
         c.drawAll()
         
         // Start streaming if configured
-        if c.config.IsStream {
-            c.startStreaming()
-        }
+        c.startStreaming(ctx)
     })
 }
 
@@ -667,15 +594,6 @@ func (c *CanvasChart) DrawBoxPlot(stats BoxPlotStats, xPos float64, width float6
     c.ctx.Call("stroke")
 }
 
-/*
-func (c *CanvasChart) OnUpdate(ctx app.Context) {
-    // Check if data changed and trigger a redraw
-    ctx.Dispatch(func(ctx app.Context) {
-        c.drawAll() 
-    })
-}
-*/
-
 func (c *CanvasChart) OnUpdate(ctx app.Context) {
     // Redraw when any configuration changes
     if c.ctx.Truthy() {
@@ -683,40 +601,10 @@ func (c *CanvasChart) OnUpdate(ctx app.Context) {
         
         // Start streaming if configured
         if c.config.IsStream && !c.isRunning {
-            c.startStreaming()
+            c.startStreaming(ctx)
         }
     }
 }
-
-/*
-func (c *CanvasChart) calculateBoxPlotRange() {
-    if len(c.config.BoxData) == 0 {
-        return
-    }
-    
-    // Find min and max across all box plots
-    minY := c.config.BoxData[0].Min
-    maxY := c.config.BoxData[0].Max
-    
-    for _, stats := range c.config.BoxData {
-        if stats.Min < minY {
-            minY = stats.Min
-        }
-        if stats.Max > maxY {
-            maxY = stats.Max
-        }
-    }
-    
-    // Add some padding
-    padding := (maxY - minY) * 0.1
-    c.DataRange = DataRange{
-        MinX: 0,
-        MaxX: float64(len(c.config.BoxData) + 1),
-        MinY: minY - padding,
-        MaxY: maxY + padding,
-    }
-}
-*/
 
 func (c *CanvasChart) calculateBoxPlotRange() {
     if len(c.config.BoxData) == 0 {
@@ -825,8 +713,8 @@ func (c *CanvasChart) getPieColors() []string {
     }
 }
 
-func (c *CanvasChart) startStreaming() {
-    if c.config.IsStream {
+func (c *CanvasChart) startStreaming(ctx app.Context) {
+    if c.config.IsStream && !c.isRunning {
         c.streamData = StreamingData{
             Points:   make([]float64, 0, c.config.Capacity),
             Capacity: c.config.Capacity,
@@ -834,15 +722,9 @@ func (c *CanvasChart) startStreaming() {
         
         // Start generating data
         c.isRunning = true
-        
-        // Use a context for the stream loop
-        ctx := app.NewContext(c)
         c.streamLoop(ctx)
     }
 }
-
-// Remove or rename the duplicate streamLoop() method at line 820
-// Keep the original one at line 415 and update it:
 
 func (c *CanvasChart) streamLoop(ctx app.Context) {
 	if !c.isRunning {
@@ -853,22 +735,28 @@ func (c *CanvasChart) streamLoop(ctx app.Context) {
 	newValue := 50.0 + (app.Window().Get("Math").Call("random").Float() * 50.0)
 	c.streamData.Push(newValue)
 
-	// 2. Clear and Redraw
-	ctx.Dispatch(func(ctx app.Context) {
-		// Convert to Points for drawing
-		c.currentPoints = make([]Point, len(c.streamData.Points))
-		for i, v := range c.streamData.Points {
-			c.currentPoints[i] = Point{X: float64(i), Y: v}
+	// 2. Update points and redraw
+	c.currentPoints = make([]Point, len(c.streamData.Points))
+	for i, v := range c.streamData.Points {
+		c.currentPoints[i] = Point{X: float64(i), Y: v}
+	}
+	
+	// Update data range for streaming
+	if len(c.currentPoints) > 0 {
+		c.DataRange = DataRange{
+			MinX: 0,
+			MaxX: float64(c.streamData.Capacity),
+			MinY: 0,
+			MaxY: 100, // Assuming values between 0-100
 		}
-		
-		// Update data range
-		c.calculateLineChartRange()
-		
-		// Redraw
+	}
+	
+	// 3. Trigger a redraw
+	ctx.Dispatch(func(ctx app.Context) {
 		c.drawAll()
 	})
 
-	// 3. Request next frame (slower for visibility)
+	// 4. Request next frame (slower for visibility)
 	app.Window().Call("setTimeout", app.FuncOf(func(this app.Value, args []app.Value) any {
 		c.streamLoop(ctx)
 		return nil
