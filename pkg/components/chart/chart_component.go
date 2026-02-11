@@ -420,34 +420,35 @@ func (c *CanvasChart) streamLoop(ctx app.Context) {
 }
 
 func (c *CanvasChart) OnMouseMove(ctx app.Context, e app.Event) {
-    // Get mouse position relative to the canvas element
     rect := e.Get("target").Call("getBoundingClientRect")
     mouseX := e.Get("clientX").Float() - rect.Get("left").Float()
     mouseY := e.Get("clientY").Float() - rect.Get("top").Float()
 
-    // Find the nearest data point (Simple Linear Search for now)
-    // In a production app with thousands of points, use a QuadTree or Binary Search
-    closest := Point{}
-    minDist := 20.0 // Interaction radius in pixels
+    closest := Point{} // Declared here
+    minDist := 20.0 
+    found := false
 
-    for _, p := range c.currentPoints { // assume we store points from Phase C
+    for _, p := range c.currentPoints {
         px, py := c.ToPixels(p.X, p.Y)
         dx := mouseX - px
         dy := mouseY - py
-        dist := app.Window().Get("Math").Call("sqrt", dx*dx+dy*dy).Float()
+        dist := math.Sqrt(dx*dx + dy*dy)
 
         if dist < minDist {
             minDist = dist
-            closest = p
-            c.showTooltip = true
-            c.activePoint = p
+            closest = p // Assigned here
+            found = true
         }
     }
 
-    if minDist >= 20.0 {
+    if found {
+        c.showTooltip = true
+        c.activePoint = closest // USED HERE - This fixes the compiler error
+    } else {
         c.showTooltip = false
     }
-    ctx.Update()
+    
+    c.Update()
 }
 
 func (c *CanvasChart) OnUpdate(ctx app.Context) {
