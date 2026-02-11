@@ -1,5 +1,5 @@
 //go:build dev
-// pkg/components/chart/box_plot_stories.go
+// pkg/components/chart/box_plot_chart_stories.go
 package chart
 
 import (

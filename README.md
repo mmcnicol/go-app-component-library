@@ -66,11 +66,20 @@ Feedback
 - [x] Progress
 - [ ] Meter
 
+Charts
+- [x] Bar Chart
+- [x] Box Plot Chart
+- [x] Heatmap
+- [x] Line Chart
+- [x] Pie Chart
+- [ ] Streaming Chart
+- [ ] Regression Chart
+- [ ] Accessible Chart
+
 Misc
 - [x] Icons
 - [x] Themes
 - [ ] Canvas
-- [ ] Chart
 - [ ] Skeleton
 
 
