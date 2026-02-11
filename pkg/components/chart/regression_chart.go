@@ -33,7 +33,7 @@ func (c *RegressionChartComponent) tryInitialDraw(ctx app.Context, attempts int)
     // Check if component exists AND if context is ready
     if c.CanvasChart != nil && c.CanvasChart.ctx.Truthy() {
         c.drawRegressionWithEquation()
-    } else if attempts < 20 { // Increased attempts slightly for safety
+    } else if attempts < 20 { // Retry for ~20 frames if not ready
         ctx.Defer(func(ctx app.Context) {
             c.tryInitialDraw(ctx, attempts+1)
         })
@@ -202,4 +202,4 @@ func calculateRSquared(data []Point, m, b float64) float64 {
 }
 
 // Ensure RegressionChartComponent implements app.Compo
-//var _ app.Compo = (*RegressionChartComponent)(nil)
+var _ app.Compo = (*RegressionChartComponent)(nil)
