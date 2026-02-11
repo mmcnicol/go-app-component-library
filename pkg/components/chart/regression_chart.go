@@ -19,25 +19,25 @@ type RegressionChartComponent struct {
 	data         []Point
 }
 
-// pkg/components/chart/regression_chart.go
-
 func (c *RegressionChartComponent) OnMount(ctx app.Context) {
-    // 1. Let the parent CanvasChart mount first
     c.CanvasChart.OnMount(ctx)
     
-    // 2. Defer drawing to ensure CanvasChart's ctx is initialized
     ctx.Defer(func(ctx app.Context) {
+        // Use c.CanvasChart.ctx instead of c.CanvasChart.ctx
         if c.CanvasChart != nil && c.CanvasChart.ctx.Truthy() {
-            c.DrawRegression(c.data, c.pointColor, c.lineColor)
+            c.drawRegressionWithEquation()
         }
     })
 }
 
 func (c *RegressionChartComponent) OnUpdate(ctx app.Context) bool {
-    // Return true to allow go-app to update the component
+    // CanvasChart.OnUpdate returns void, so we just call it
+    c.CanvasChart.OnUpdate(ctx)
+    
     ctx.Defer(func(ctx app.Context) {
+        // Use c.CanvasChart.ctx instead of c.CanvasChart.ctx
         if c.CanvasChart != nil && c.CanvasChart.ctx.Truthy() {
-            c.DrawRegression(c.data, c.pointColor, c.lineColor)
+            c.drawRegressionWithEquation()
         }
     })
     return true
@@ -65,13 +65,13 @@ func (c *RegressionChartComponent) ShouldUpdate(next app.Compo) bool {
 
 // Custom drawing method
 func (c *RegressionChartComponent) drawRegressionWithEquation() {
-	if !c.ctx.Truthy() || len(c.data) == 0 {
+	if !c.CanvasChart.ctx.Truthy() || len(c.data) == 0 {
 		return
 	}
 
 	// Clear and draw the regression
-	c.ctx.Set("fillStyle", "#ffffff")
-	c.ctx.Call("fillRect", 0, 0, c.width, c.height)
+	c.CanvasChart.ctx.Set("fillStyle", "#ffffff")
+	c.CanvasChart.ctx.Call("fillRect", 0, 0, c.width, c.height)
 
 	// Update currentPoints and DataRange
 	c.currentPoints = c.data
@@ -94,16 +94,16 @@ func (c *RegressionChartComponent) drawRegressionWithEquation() {
 
 // Draw points with custom size
 func (c *RegressionChartComponent) drawPointsWithSize(data []Point, color string, size float64) {
-	c.ctx.Set("fillStyle", "white")
-	c.ctx.Set("strokeStyle", color)
-	c.ctx.Set("lineWidth", 2)
+	c.CanvasChart.ctx.Set("fillStyle", "white")
+	c.CanvasChart.ctx.Set("strokeStyle", color)
+	c.CanvasChart.ctx.Set("lineWidth", 2)
 
 	for _, pt := range data {
 		px, py := c.ToPixels(pt.X, pt.Y)
-		c.ctx.Call("beginPath")
-		c.ctx.Call("arc", px, py, size, 0, 6.28)
-		c.ctx.Call("fill")
-		c.ctx.Call("stroke")
+		c.CanvasChart.ctx.Call("beginPath")
+		c.CanvasChart.ctx.Call("arc", px, py, size, 0, 6.28)
+		c.CanvasChart.ctx.Call("fill")
+		c.CanvasChart.ctx.Call("stroke")
 	}
 }
 
@@ -125,26 +125,26 @@ func (c *RegressionChartComponent) drawRegressionStats(data []Point) {
 	}
 	
 	// Draw on canvas
-	c.ctx.Set("font", "14px monospace")
-	c.ctx.Set("fillStyle", "#333")
-	c.ctx.Set("textAlign", "left")
-	c.ctx.Set("textBaseline", "top")
+	c.CanvasChart.ctx.Set("font", "14px monospace")
+	c.CanvasChart.ctx.Set("fillStyle", "#333")
+	c.CanvasChart.ctx.Set("textAlign", "left")
+	c.CanvasChart.ctx.Set("textBaseline", "top")
 	
 	// Background for text
-	c.ctx.Set("fillStyle", "rgba(255, 255, 255, 0.9)")
-	c.ctx.Call("fillRect", c.Padding.Left, c.Padding.Top, 220, 65)
+	c.CanvasChart.ctx.Set("fillStyle", "rgba(255, 255, 255, 0.9)")
+	c.CanvasChart.ctx.Call("fillRect", c.Padding.Left, c.Padding.Top, 220, 65)
 	
-	c.ctx.Set("strokeStyle", "#ccc")
-	c.ctx.Set("lineWidth", 1)
-	c.ctx.Call("strokeRect", c.Padding.Left, c.Padding.Top, 220, 65)
+	c.CanvasChart.ctx.Set("strokeStyle", "#ccc")
+	c.CanvasChart.ctx.Set("lineWidth", 1)
+	c.CanvasChart.ctx.Call("strokeRect", c.Padding.Left, c.Padding.Top, 220, 65)
 	
 	// Draw text
-	c.ctx.Set("fillStyle", "#1e293b")
-	c.ctx.Call("fillText", "Regression Statistics:", c.Padding.Left+10, c.Padding.Top+10)
-	c.ctx.Set("fillStyle", "#2563eb")
-	c.ctx.Call("fillText", equation, c.Padding.Left+10, c.Padding.Top+30)
-	c.ctx.Set("fillStyle", "#0f172a")
-	c.ctx.Call("fillText", fmt.Sprintf("R² = %.3f", r2), c.Padding.Left+10, c.Padding.Top+50)
+	c.CanvasChart.ctx.Set("fillStyle", "#1e293b")
+	c.CanvasChart.ctx.Call("fillText", "Regression Statistics:", c.Padding.Left+10, c.Padding.Top+10)
+	c.CanvasChart.ctx.Set("fillStyle", "#2563eb")
+	c.CanvasChart.ctx.Call("fillText", equation, c.Padding.Left+10, c.Padding.Top+30)
+	c.CanvasChart.ctx.Set("fillStyle", "#0f172a")
+	c.CanvasChart.ctx.Call("fillText", fmt.Sprintf("R² = %.3f", r2), c.Padding.Left+10, c.Padding.Top+50)
 }
 
 // Helper function to calculate R-squared
