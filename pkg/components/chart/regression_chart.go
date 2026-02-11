@@ -1,4 +1,4 @@
-// pkg/component/regression_chart_component.go
+// pkg/component/chart/regression_chart.go
 package chart
 
 import (

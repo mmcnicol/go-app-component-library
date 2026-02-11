@@ -1,5 +1,5 @@
 //go:build dev
-// pkg/component/regression_chart_stories.go
+// pkg/component/chart/regression_chart_stories.go
 package chart
 
 import (
