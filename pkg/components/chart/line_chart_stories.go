@@ -1,3 +1,4 @@
+//go:build dev
 // pkg/components/chart/line_chart_stories.go
 package chart
 

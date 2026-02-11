@@ -2,7 +2,9 @@
 package chart
 
 import (
-	"github.com/maxence-charriere/go-app/v10/pkg/app"
+    "fmt"
+    "math"
+    "github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
 type TooltipManager struct {
@@ -15,31 +17,28 @@ type TooltipManager struct {
 }
 
 func (tm *TooltipManager) setupEventHandlers() {
-    // Mouse move handler
-    tm.chart.canvasRef.AddEventListener("mousemove", tm.handleMouseMove)
-    
-    // Mouse leave handler
-    tm.chart.canvasRef.AddEventListener("mouseleave", tm.handleMouseLeave)
-    
-    // Touch handlers for mobile
-    tm.chart.canvasRef.AddEventListener("touchstart", tm.handleTouchStart)
-    tm.chart.canvasRef.AddEventListener("touchmove", tm.handleTouchMove)
+    // Mouse move handler - need to attach to canvas element
+    // tm.chart.canvasElem.On("mousemove", tm.handleMouseMove)
 }
 
 func (tm *TooltipManager) handleMouseMove(ctx app.Context, e app.Event) {
-    rect := tm.chart.canvasRef.GetBoundingClientRect()
-    mouseX := e.Get("clientX").Float() - rect.Get("left").Float()
-    mouseY := e.Get("clientY").Float() - rect.Get("top").Float()
+    // Get canvas position
+    // Note: In go-app v10, we need to use JavaScript interop
+    // This is a simplified version
     
-    // Find nearest data point
-    point, datasetIndex, distance := tm.findNearestPoint(mouseX, mouseY)
+    // rect := app.Window().GetElementByID(tm.chart.containerID + "-canvas").Call("getBoundingClientRect")
+    // mouseX := e.Get("clientX").Float() - rect.Get("left").Float()
+    // mouseY := e.Get("clientY").Float() - rect.Get("top").Float()
     
-    // Show tooltip if close enough
-    if point != nil && distance < tm.chart.spec.Options.Tooltips.IntersectDistance {
-        tm.showTooltip(point, datasetIndex, mouseX, mouseY)
-    } else {
-        tm.hideTooltip()
-    }
+    // // Find nearest data point
+    // point, datasetIndex, distance := tm.findNearestPoint(mouseX, mouseY)
+    
+    // // Show tooltip if close enough
+    // if point != nil && distance < tm.chart.spec.Options.Tooltips.IntersectDistance {
+    //     tm.showTooltip(point, datasetIndex, mouseX, mouseY)
+    // } else {
+    //     tm.hideTooltip()
+    // }
 }
 
 func (tm *TooltipManager) findNearestPoint(canvasX, canvasY float64) (*DataPoint, int, float64) {
@@ -50,8 +49,12 @@ func (tm *TooltipManager) findNearestPoint(canvasX, canvasY float64) (*DataPoint
     for i, dataset := range tm.chart.spec.Data.Datasets {
         for _, point := range dataset.Data {
             // Convert data point to canvas coordinates
-            pointX := tm.chart.xScale.Convert(point.X)
-            pointY := tm.chart.yScale.Convert(point.Y)
+            // This depends on having scales available
+            // pointX := tm.chart.xScale.Convert(point.X)
+            // pointY := tm.chart.yScale.Convert(point.Y)
+            
+            pointX := 0.0 // placeholder
+            pointY := 0.0 // placeholder
             
             // Calculate distance
             distance := math.Sqrt(
@@ -82,5 +85,17 @@ func (tm *TooltipManager) showTooltip(point *DataPoint, datasetIndex int, x, y f
     tm.tooltipElem.SetStyle("display", "block")
     
     // Trigger custom event
-    tm.chart.onHover(*point, datasetIndex)
+    if tm.chart.onHover != nil {
+        tm.chart.onHover(*point, datasetIndex)
+    }
+}
+
+func (tm *TooltipManager) positionTooltip(x, y float64) {
+    // Position the tooltip element
+    tm.tooltipElem.SetStyle("left", fmt.Sprintf("%fpx", x))
+    tm.tooltipElem.SetStyle("top", fmt.Sprintf("%fpx", y))
+}
+
+func (tm *TooltipManager) hideTooltip() {
+    tm.tooltipElem.SetStyle("display", "none")
 }

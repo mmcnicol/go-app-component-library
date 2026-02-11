@@ -2,7 +2,8 @@
 package chart
 
 import (
-	"github.com/maxence-charriere/go-app/v10/pkg/app"
+    "fmt"
+    "github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
 type ZoomPanManager struct {
@@ -93,4 +94,12 @@ func (zpm *ZoomPanManager) zoomAt(centerX, centerY, factor float64) {
     
     // Trigger zoom event
     zpm.chart.onZoom(AxisRange{X: [2]float64{newXMin, newXMax}, Y: [2]float64{newYMin, newYMax}})
+}
+
+func (zpm *ZoomPanManager) pushZoomState() {
+    zpm.zoomHistory = append(zpm.zoomHistory, zpm.currentZoom)
+    // Limit history size
+    if len(zpm.zoomHistory) > 50 {
+        zpm.zoomHistory = zpm.zoomHistory[1:]
+    }
 }

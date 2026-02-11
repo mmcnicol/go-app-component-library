@@ -1,3 +1,4 @@
+//go:build dev
 // pkg/components/chart/bar_chart_stories.go
 package chart
 
