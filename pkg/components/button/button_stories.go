@@ -24,7 +24,7 @@ func init() {
             return &Button{
                 Label:    controls["Label"].Value.(string),
                 Disabled: controls["Disabled"].Value.(bool),
-                Look:     ButtonLook(controls["Look"].Value.(string)),
+                Look:     ButtonLook(controls["Look"].Options.(string)),
                 OnClick: func(ctx app.Context, e app.Event) {
                     app.Log("Button Clicked!")
                 },
