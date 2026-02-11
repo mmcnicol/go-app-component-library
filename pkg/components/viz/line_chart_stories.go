@@ -6,8 +6,8 @@ package viz
 import (
     "fmt"
     "math"
+    mathRand "math/rand"
     "time"
-	mathRand "math/rand"
     
     "github.com/maxence-charriere/go-app/v10/pkg/app"
     "github.com/mmcnicol/go-app-component-library/pkg/storybook"
@@ -171,23 +171,36 @@ func init() {
             // Generate data with baseline
             data := generateSineWave(50, 0, 4*math.Pi, 1.0)
             
+            // Create color with opacity
+            baseColor := "#4f46e5"
+            // Convert opacity to hex (approximate)
+            opacityHex := fmt.Sprintf("%02x", int(opacity*255))
+            fillColor := baseColor + opacityHex
+            
             dataset := DataSet{
                 Labels: sinLabels,
                 Series: []Series{
                     {
                         Label:  "sin(x)",
                         Points: data,
-                        Color:  "#4f46e5",
-                        Stroke: Stroke{Width: 2, Color: "#4f46e5"},
+                        Color:  baseColor,
+                        Stroke: Stroke{Width: 2, Color: baseColor},
                         Fill:   true,
                     },
                 },
+            }
+            
+            // Override theme colors to include opacity
+            theme := &CustomTheme{
+                BaseTheme: DefaultTheme(),
+                Colors:    []string{fillColor},
             }
             
             spec := Spec{
                 Type:  ChartTypeLine,
                 Title: controls["Title"].Value.(string),
                 Data:  dataset,
+                Theme: theme,
                 Width: 800,
                 Height: 400,
                 Axes: AxesConfig{
@@ -201,6 +214,11 @@ func init() {
             
             return app.Div().ID("viz-area-container").Body(
                 app.Div().Class("viz-chart-wrapper").Body(chart),
+                app.Div().Class("viz-chart-footer").Body(
+                    app.Small().Class("text-muted").Text(
+                        fmt.Sprintf("Fill opacity: %.0f%%", opacity*100),
+                    ),
+                ),
             )
         },
     )
@@ -327,46 +345,51 @@ func init() {
     
     // 6. Streaming / Real-time Chart
     storybook.Register("Visualization", "Line Chart - Streaming",
-        map[string]*storybook.Control{
-            "Title":     storybook.NewTextControl("Real-time Data"),
-            "Max Points": storybook.NewRangeControl(20, 200, 10, 50),
-            "Update Rate": storybook.NewRangeControl(10, 200, 10, 50),
-        },
-        func(controls map[string]*storybook.Control) app.UI {
-            maxPoints := controls["Max Points"].Value.(int)
-            updateRate := controls["Update Rate"].Value.(int)
-            
-            // Create streaming chart
-            streamingChart := NewStreamingChart(ChartTypeLine).
-                WithMaxPoints(maxPoints).
-                WithUpdateRate(time.Duration(updateRate) * time.Millisecond)
-            
-            // Start streaming data
-            go func() {
-                t := 0.0
-                for {
-                    t += 0.1
-                    point := Point{
-                        X: t,
-                        Y: math.Sin(t) + 0.5*math.Sin(t*3) + 0.2*math.Sin(t*10),
-                    }
-                    
-                    // Send data through channel
-                    dataChan := make(chan Point, 1)
-                    dataChan <- point
-                    streamingChart.StreamData(dataChan)
-                    close(dataChan)
-                    
-                    time.Sleep(50 * time.Millisecond)
+    map[string]*storybook.Control{
+        "Title":      storybook.NewTextControl("Real-time Data"),
+        "Max Points": storybook.NewRangeControl(20, 200, 10, 50),
+        "Update Rate": storybook.NewRangeControl(10, 200, 10, 50),
+    },
+    func(controls map[string]*storybook.Control) app.UI {
+        maxPoints := controls["Max Points"].Value.(int)
+        updateRate := controls["Update Rate"].Value.(int)
+        
+        // Create streaming chart
+        streamingChart := NewStreamingChart(ChartTypeLine).
+            WithMaxPoints(maxPoints).
+            WithUpdateRate(time.Duration(updateRate) * time.Millisecond)
+        
+        // Create a data channel
+        dataChan := make(chan Point, 100)
+        
+        // Start streaming data in a goroutine
+        go func() {
+            t := 0.0
+            for {
+                t += 0.1
+                point := Point{
+                    X: t,
+                    Y: math.Sin(t) + 0.5*math.Sin(t*3) + 0.2*math.Sin(t*10),
                 }
-            }()
-            
-            return app.Div().ID("viz-streaming-container").Body(
-                app.Div().Class("viz-chart-wrapper").Body(streamingChart),
-            )
-        },
-    )
-}
+                dataChan <- point
+                time.Sleep(50 * time.Millisecond)
+            }
+        }()
+        
+        // Start the stream
+        streamingChart.StreamData(dataChan)
+        
+        return app.Div().ID("viz-streaming-container").Body(
+            app.Div().Class("viz-chart-wrapper").Body(streamingChart),
+            app.Div().Class("viz-chart-footer").Body(
+                app.Small().Class("text-muted").Text(
+                    fmt.Sprintf("Streaming %d points, update rate %dms", 
+                        maxPoints, updateRate),
+                ),
+            ),
+        )
+    },
+)
 
 // Helper functions
 func generateSineWave(n int, start, end, amplitude float64) []Point {

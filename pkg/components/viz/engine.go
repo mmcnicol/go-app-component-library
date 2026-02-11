@@ -569,15 +569,22 @@ func (e *CanvasEngine) calculateScales(spec *Spec, points []Point) {
 }
 
 func (e *CanvasEngine) drawSmoothSegment(ctx app.Value, points []Point, i int, tension float64) {
+    // Need to ensure we don't go out of bounds
+    if i <= 0 || i >= len(points)-2 {
+        return
+    }
+    
     p0 := points[i-1]
     p1 := points[i]
     p2 := points[i+1]
+    p3 := points[i+2] // Need this for Catmull-Rom
     
     x0, y0 := e.xScale(p0.X), e.yScale(p0.Y)
     x1, y1 := e.xScale(p1.X), e.yScale(p1.Y)
     x2, y2 := e.xScale(p2.X), e.yScale(p2.Y)
+    x3, y3 := e.xScale(p3.X), e.yScale(p3.Y)
     
-    // Control points for Catmull-Rom spline
+    // Catmull-Rom spline to bezier control points
     cp1x := x1 + (x2-x0)*tension/6
     cp1y := y1 + (y2-y0)*tension/6
     cp2x := x2 - (x3-x1)*tension/6
