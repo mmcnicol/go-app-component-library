@@ -9,7 +9,7 @@ import (
 
 // RegressionChartComponent must embed app.Compo to be a valid go-app component
 type RegressionChartComponent struct {
-	//app.Compo
+	app.Compo
 	*CanvasChart
 	
 	pointColor   string
@@ -25,12 +25,12 @@ func NewRegressionChart(data []Point, opts ...Option) *RegressionChartComponent 
 	canvasChart := New(data, opts...)
 	
 	return &RegressionChartComponent{
-		CanvasChart: canvasChart,
-		data:        data,
-		pointColor:  canvasChart.config.LineColor,
-		lineColor:   "#ef4444", // default line color
+		CanvasChart:  canvasChart,
+		data:         data,
+		pointColor:   canvasChart.config.LineColor,
+		lineColor:    "#ef4444", // default line color
 		showEquation: true,
-		pointSize:   4,
+		pointSize:    4,
 	}
 }
 
@@ -67,11 +67,13 @@ func (c *RegressionChartComponent) WithDatasetName(name string) *RegressionChart
 // Override OnMount to customize the drawing
 func (c *RegressionChartComponent) OnMount(ctx app.Context) {
 	// Call parent OnMount first
-	c.CanvasChart.OnMount(ctx)
+	if c.CanvasChart != nil {
+		c.CanvasChart.OnMount(ctx)
+	}
 	
 	// After canvas is mounted, we need to override the drawing
 	ctx.Defer(func(ctx app.Context) {
-		if c.ctx.Truthy() {
+		if c.CanvasChart != nil && c.CanvasChart.ctx.Truthy() {
 			c.drawRegressionWithEquation()
 		}
 	})
@@ -91,13 +93,13 @@ func (c *RegressionChartComponent) tryInitialDraw(ctx app.Context, attempts int)
 
 // Override OnUpdate to handle updates
 func (c *RegressionChartComponent) OnUpdate(ctx app.Context) {
-	c.CanvasChart.OnUpdate(ctx)
+	// Don't call parent OnUpdate directly - it causes issues
+	// Instead, let the parent update handle the drawing
 	
-	ctx.Defer(func(ctx app.Context) {
-		if c.ctx.Truthy() {
-			c.drawRegressionWithEquation()
-		}
-	})
+	// Redraw when any configuration changes
+	if c.CanvasChart != nil && c.CanvasChart.ctx.Truthy() {
+		c.drawRegressionWithEquation()
+	}
 }
 
 // Render implements app.Compo
@@ -105,7 +107,12 @@ func (c *RegressionChartComponent) Render() app.UI {
 	if c.CanvasChart == nil {
 		return app.Div().Text("Chart not initialized")
 	}
-	return c.CanvasChart.Render()
+	
+	// Get the canvas from the parent's Render
+	canvasUI := c.CanvasChart.Render()
+	
+	// Add the regression-specific tooltip if needed
+	return canvasUI
 }
 
 // OnDismount - delegate to embedded CanvasChart
@@ -126,12 +133,12 @@ func (c *RegressionChartComponent) ShouldUpdate(next app.Compo) bool {
 // Custom drawing method
 func (c *RegressionChartComponent) drawRegressionWithEquation() {
 	// Check the inner pointer AND the inner context
-    if c.CanvasChart == nil || !c.CanvasChart.ctx.Truthy() {
-        return 
-    }
+	if c.CanvasChart == nil || !c.CanvasChart.ctx.Truthy() || len(c.data) == 0 {
+		return 
+	}
 
-    // Use c.CanvasChart.ctx, NOT c.ctx
-    canvas := c.CanvasChart.ctx
+	// Use c.CanvasChart.ctx, NOT c.ctx
+	canvas := c.CanvasChart.ctx
 
 	// Clear and draw the regression
 	canvas.Set("fillStyle", "#ffffff")
