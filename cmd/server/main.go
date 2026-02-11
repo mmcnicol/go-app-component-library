@@ -22,6 +22,7 @@ import (
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/table"
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/panel"
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/chart"
+	_ "github.com/mmcnicol/go-app-component-library/pkg/components/viz"
 
 	"log"
 	"net/http"
