@@ -497,11 +497,40 @@ func (c *CanvasChart) OnUpdate(ctx app.Context) {
     })
 }
 
+/*
 // Centralized drawing method to prevent code duplication
 func (c *CanvasChart) drawAll() {
     c.ctx.Call("clearRect", 0, 0, c.width, c.height)
     c.drawAxes()
     c.DrawLine(c.currentPoints, c.config.LineColor, c.config.Thickness)
+}
+*/
+
+func (c *CanvasChart) drawAll() {
+	if !c.ctx.Truthy() {
+		return
+	}
+
+	// 1. Clear the canvas
+	c.ctx.Call("clearRect", 0, 0, c.width, c.height)
+
+	// 2. Draw the foundation
+	c.drawAxes()
+
+	// 3. Draw specific content based on config
+	if len(c.config.BoxData) > 0 {
+		// Draw Box Plots
+		// Space them out based on the number of items
+		for i, stats := range c.config.BoxData {
+			// Calculate horizontal position
+			xPos := c.Padding.Left + (float64(i+1) * 100.0) 
+			c.DrawBoxPlot(stats, xPos, c.config.BoxWidth)
+		}
+	} else if len(c.currentPoints) > 0 {
+		// Draw Line/Scatter if points exist
+		c.DrawLine(c.currentPoints, c.config.LineColor, c.config.Thickness)
+	}
+    // ... add other types like Pie/Heatmap here ...
 }
 
 func (c *CanvasChart) DrawRegression(data []Point, pointColor, lineColor string) {
