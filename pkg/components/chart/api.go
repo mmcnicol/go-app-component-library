@@ -1,7 +1,7 @@
 // pkg/components/chart/api.go
 package chart
 
-import "github.com/maxence-charriere/go-app/v10/pkg/app"
+//import "github.com/maxence-charriere/go-app/v10/pkg/app"
 
 // ChartConfig defines the public interface for customization
 /*

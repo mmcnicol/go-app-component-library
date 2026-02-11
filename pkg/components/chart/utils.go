@@ -1,6 +1,10 @@
 // pkg/components/chart/utils.go
 package chart
 
+import (
+	"sort"
+)
+
 func CalculateBoxStats(data []float64) BoxPlotStats {
 	// Sort the data first
 	sort.Float64s(data)
