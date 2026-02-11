@@ -9,8 +9,8 @@ import (
 
 // RegressionChartComponent must embed app.Compo to be a valid go-app component
 type RegressionChartComponent struct {
-	app.Compo      // This MUST be embedded as a value, not a pointer
-	*CanvasChart   // Embedded pointer to the base chart logic
+	app.Compo
+	CanvasChart
 	
 	pointColor   string
 	lineColor    string
