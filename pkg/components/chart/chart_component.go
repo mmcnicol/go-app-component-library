@@ -102,6 +102,16 @@ func (c *CanvasChart) OnMount(ctx app.Context) {
 */
 
 func (c *CanvasChart) OnMount(ctx app.Context) {
+
+	/*
+	ctx.Defer(func(ctx app.Context) {
+		canvasJS := app.Window().GetElementByID("main-chart")
+		if !canvasJS.Truthy() { return }
+
+		c.canvas = canvasJS
+		c.ctx = c.canvas.Call("getContext", "2d")
+	*/
+
     // 1. Wait for the next frame to ensure the DOM is fully rendered
     ctx.Defer(func(ctx app.Context) {
         // 2. Explicitly find the canvas element by its ID
@@ -127,6 +137,7 @@ func (c *CanvasChart) OnMount(ctx app.Context) {
 
         // 4. Initialize layout and draw
         c.resize()
+		c.drawAll() // Call the orchestrator
         c.drawAxes()
         
         // Trigger specific painters based on config
