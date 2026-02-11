@@ -10,7 +10,7 @@ type ChartEngine interface {
     Render(chart ChartSpec) error
     Update(data ChartData) error
     Destroy() error
-    GetCanvas() app.HTMLCanvas
+    GetCanvas() app.UI
 }
 
 // Chart specification

@@ -16,8 +16,10 @@ type BaseChart struct {
     isRendered  bool
     
     // Refs
-    canvasRef   app.Ref
-    tooltipRef  app.Ref
+    //canvasRef   app.Ref
+    //tooltipRef  app.Ref
+    canvasElem  app.HTMLCanvas
+    tooltipElem app.HTMLDiv
     
     // Event handlers
     onPointClick    func(point DataPoint, datasetIndex int)
