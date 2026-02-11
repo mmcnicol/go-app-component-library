@@ -18,6 +18,9 @@ type RegressionChartComponent struct {
 	pointSize    float64
 	datasetName  string
 	data         []Point
+
+	// Add a flag to track if we've initialized
+	initialized bool
 }
 
 // NewRegressionChart creates a new RegressionChartComponent
@@ -31,18 +34,13 @@ func NewRegressionChart(data []Point, opts ...Option) *RegressionChartComponent 
 		lineColor:    "#ef4444", // default line color
 		showEquation: true,
 		pointSize:    4,
+		initialized:  false,
 	}
 }
 
 // WithPointColor sets the point color
 func (c *RegressionChartComponent) WithPointColor(color string) *RegressionChartComponent {
 	c.pointColor = color
-	return c
-}
-
-// WithLineColor sets the regression line color
-func (c *RegressionChartComponent) WithLineColor(color string) *RegressionChartComponent {
-	c.lineColor = color
 	return c
 }
 
@@ -64,40 +62,26 @@ func (c *RegressionChartComponent) WithDatasetName(name string) *RegressionChart
 	return c
 }
 
-// Override OnMount to customize the drawing
+// OnMount implements app.Compo
 func (c *RegressionChartComponent) OnMount(ctx app.Context) {
-	// Call parent OnMount first
+	// Initialize the canvas chart
 	if c.CanvasChart != nil {
 		c.CanvasChart.OnMount(ctx)
 	}
 	
-	// After canvas is mounted, we need to override the drawing
+	// Schedule the initial draw
 	ctx.Defer(func(ctx app.Context) {
 		if c.CanvasChart != nil && c.CanvasChart.ctx.Truthy() {
 			c.drawRegressionWithEquation()
+			c.initialized = true
 		}
 	})
 }
 
-// A simple retry mechanism to handle the race condition
-func (c *RegressionChartComponent) tryInitialDraw(ctx app.Context, attempts int) {
-    // Check if component exists AND if context is ready
-    if c.CanvasChart != nil && c.CanvasChart.ctx.Truthy() {
-        c.drawRegressionWithEquation()
-    } else if attempts < 20 { // Retry for ~20 frames if not ready
-        ctx.Defer(func(ctx app.Context) {
-            c.tryInitialDraw(ctx, attempts+1)
-        })
-    }
-}
-
-// Override OnUpdate to handle updates
+// OnUpdate implements app.Compo
 func (c *RegressionChartComponent) OnUpdate(ctx app.Context) {
-	// Don't call parent OnUpdate directly - it causes issues
-	// Instead, let the parent update handle the drawing
-	
-	// Redraw when any configuration changes
-	if c.CanvasChart != nil && c.CanvasChart.ctx.Truthy() {
+	// Only draw if we're initialized and have a valid context
+	if c.CanvasChart != nil && c.CanvasChart.ctx.Truthy() && c.initialized {
 		c.drawRegressionWithEquation()
 	}
 }
@@ -107,26 +91,21 @@ func (c *RegressionChartComponent) Render() app.UI {
 	if c.CanvasChart == nil {
 		return app.Div().Text("Chart not initialized")
 	}
-	
-	// Get the canvas from the parent's Render
-	canvasUI := c.CanvasChart.Render()
-	
-	// Add the regression-specific tooltip if needed
-	return canvasUI
+	return c.CanvasChart.Render()
 }
 
-// OnDismount - delegate to embedded CanvasChart
+// OnDismount implements app.Compo
 func (c *RegressionChartComponent) OnDismount() {
+	// Clean up
 	if c.CanvasChart != nil {
 		c.CanvasChart.OnDismount()
 	}
+	c.initialized = false
 }
 
-// ShouldUpdate - delegate to embedded CanvasChart
+// ShouldUpdate implements app.Compo
 func (c *RegressionChartComponent) ShouldUpdate(next app.Compo) bool {
-	if c.CanvasChart != nil {
-		return c.CanvasChart.ShouldUpdate(next)
-	}
+	// Always update to reflect changes
 	return true
 }
 
@@ -137,16 +116,13 @@ func (c *RegressionChartComponent) drawRegressionWithEquation() {
 		return 
 	}
 
-	// Use c.CanvasChart.ctx, NOT c.ctx
-	canvas := c.CanvasChart.ctx
-
-	// Clear and draw the regression
-	canvas.Set("fillStyle", "#ffffff")
-	canvas.Call("fillRect", 0, 0, c.width, c.height)
-
 	// Update currentPoints and DataRange
 	c.currentPoints = c.data
 	c.calculateLineChartRange()
+	
+	// Clear the canvas first
+	c.CanvasChart.ctx.Set("fillStyle", "#ffffff")
+	c.CanvasChart.ctx.Call("fillRect", 0, 0, c.width, c.height)
 	
 	// Draw axes
 	c.drawAxes()
@@ -165,6 +141,10 @@ func (c *RegressionChartComponent) drawRegressionWithEquation() {
 
 // Draw points with custom size
 func (c *RegressionChartComponent) drawPointsWithSize(data []Point, color string, size float64) {
+	if c.CanvasChart == nil || !c.CanvasChart.ctx.Truthy() {
+		return
+	}
+	
 	c.CanvasChart.ctx.Set("fillStyle", "white")
 	c.CanvasChart.ctx.Set("strokeStyle", color)
 	c.CanvasChart.ctx.Set("lineWidth", 2)
@@ -180,7 +160,7 @@ func (c *RegressionChartComponent) drawPointsWithSize(data []Point, color string
 
 // Draw regression equation and R-squared
 func (c *RegressionChartComponent) drawRegressionStats(data []Point) {
-	if len(data) < 2 {
+	if len(data) < 2 || c.CanvasChart == nil || !c.CanvasChart.ctx.Truthy() {
 		return
 	}
 
@@ -252,6 +232,3 @@ func calculateRSquared(data []Point, m, b float64) float64 {
 
 	return 1 - (ssRes / ssTot)
 }
-
-// Ensure the variable declaration at the bottom uses the pointer
-//var _ app.Compo = (*RegressionChartComponent)(nil)
