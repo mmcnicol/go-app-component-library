@@ -36,45 +36,33 @@ func (c *RegressionChartComponent) OnMount(ctx app.Context) {
 }
 
 // Override OnUpdate to handle updates
-func (c *RegressionChartComponent) OnUpdate(ctx app.Context) {
-	c.CanvasChart.OnUpdate(ctx)
-	
-	ctx.Defer(func(ctx app.Context) {
-		if c.ctx.Truthy() {
-			c.drawRegressionWithEquation()
-		}
-	})
+func (c *RegressionChartComponent) OnUpdate(ctx app.Context) bool {
+	if c.CanvasChart != nil {
+        c.drawRegression()
+    }
+    return true
 }
 
 // OnDismount - delegate to embedded CanvasChart
 func (c *RegressionChartComponent) OnDismount() {
-	if !c.Mounted() {
-		return
-	}
-	//if c.CanvasChart != nil {
+	if c.CanvasChart != nil {
 		c.CanvasChart.OnDismount()
-	//}
+	}
 }
 
 // ShouldUpdate - delegate to embedded CanvasChart
 func (c *RegressionChartComponent) ShouldUpdate(next app.Compo) bool {
-	if !c.Mounted() {
-		return
+	if c.CanvasChart != nil {
+		return c.CanvasChart.ShouldUpdate(next)
 	}
-	//if c.CanvasChart != nil {
-	//	return c.CanvasChart.ShouldUpdate(next)
-	//}
 	return true
 }
 
 // Render implements app.Compo
 func (c *RegressionChartComponent) Render() app.UI {
-	if !c.Mounted() {
-		return
+	if c.CanvasChart == nil {
+		return app.Div().Text("Chart not initialized")
 	}
-	//if c.CanvasChart == nil {
-	//	return app.Div().Text("Chart not initialized")
-	//}
 	return c.CanvasChart.Render()
 }
 
