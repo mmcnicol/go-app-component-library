@@ -77,14 +77,13 @@ func init() {
 				},
 			}
 			
-			// Use nil theme first to see if that's the issue
 			spec := Spec{
 				Type:   ChartTypeLine,
 				Title:  controls["Title"].Value.(string),
 				Data:   dataset,
 				Width:  800,
 				Height: 400,
-				Theme:  nil, // Try without custom theme first
+				Theme:  &CustomTheme{BaseTheme: DefaultTheme()},
 				Axes: AxesConfig{
 					X: AxisConfig{
 						Visible: true,
