@@ -7,10 +7,11 @@ import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
-// RegressionChartComponent extends CanvasChart to add equation display
+// RegressionChartComponent must embed app.Compo to be a valid go-app component
 type RegressionChartComponent struct {
-	app.Compo
-	*CanvasChart
+	app.Compo      // This MUST be embedded as a value, not a pointer
+	*CanvasChart   // Embedded pointer to the base chart logic
+	
 	pointColor   string
 	lineColor    string
 	showEquation bool
