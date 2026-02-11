@@ -688,30 +688,7 @@ func (c *CanvasChart) resetCanvas() {
 }
 
 // ShouldUpdate implements the app.Compo interface
-func (c *CanvasChart) ShouldUpdate(ctx app.Context, newComponent app.Componenter) bool {
-    newChart, ok := newComponent.(*CanvasChart)
-    if !ok {
-        return true
-    }
-    
-    // Check if the chart type changed
-    if (len(c.config.BoxData) > 0) != (len(newChart.config.BoxData) > 0) {
-        return true
-    }
-    if (len(c.config.HeatmapMatrix) > 0) != (len(newChart.config.HeatmapMatrix) > 0) {
-        return true
-    }
-    if (len(c.config.PieData) > 0) != (len(newChart.config.PieData) > 0) {
-        return true
-    }
-    if c.config.IsStream != newChart.config.IsStream {
-        return true
-    }
-    
-    // For line charts, check if data changed
-    if len(c.currentPoints) != len(newChart.currentPoints) {
-        return true
-    }
-    
-    return false
+func (c *CanvasChart) ShouldUpdate(next app.Compo) bool {
+    // Always update to ensure charts render correctly
+    return true
 }
