@@ -23,6 +23,7 @@ type CanvasChart struct {
 	showTooltip  bool
 	activePoint  Point
 	streamTicker app.Value
+	shouldRender bool 
 
 	// Configuration and Data
 	config        ChartConfig
@@ -123,13 +124,25 @@ func (c *CanvasChart) OnMount(ctx app.Context) {
         c.ctx.Set("textAlign", "center")
         c.ctx.Set("textBaseline", "middle")
 
+        // Initialize default padding
+        c.Padding = Padding{
+            Top:    20,
+            Right:  20,
+            Bottom: 40,
+            Left:   50,
+        }
+
         c.resize()
         
         // Draw based on what type of chart we have
         c.drawAll()
+        
+        // Start streaming if configured
+        if c.config.IsStream {
+            c.startStreaming()
+        }
     })
 }
-
 
 func (c *CanvasChart) drawPoints(data []Point, color string) {
 	c.ctx.Set("fillStyle", "white")
@@ -667,9 +680,15 @@ func (c *CanvasChart) OnUpdate(ctx app.Context) {
     // Redraw when any configuration changes
     if c.ctx.Truthy() {
         c.drawAll()
+        
+        // Start streaming if configured
+        if c.config.IsStream && !c.isRunning {
+            c.startStreaming()
+        }
     }
 }
 
+/*
 func (c *CanvasChart) calculateBoxPlotRange() {
     if len(c.config.BoxData) == 0 {
         return
@@ -697,6 +716,7 @@ func (c *CanvasChart) calculateBoxPlotRange() {
         MaxY: maxY + padding,
     }
 }
+*/
 
 func (c *CanvasChart) calculateBoxPlotRange() {
     if len(c.config.BoxData) == 0 {
@@ -743,7 +763,8 @@ func (c *CanvasChart) calculateHeatmapRange() {
         }
     }
     
-    rows := len(c.config.HeatmapMatrix)
+    // Remove the unused rows variable:
+    // rows := len(c.config.HeatmapMatrix)
     cols := len(c.config.HeatmapMatrix[0])
     
     c.DataRange = DataRange{
@@ -813,34 +834,43 @@ func (c *CanvasChart) startStreaming() {
         
         // Start generating data
         c.isRunning = true
-        c.streamLoop()
+        
+        // Use a context for the stream loop
+        ctx := app.NewContext(c)
+        c.streamLoop(ctx)
     }
 }
 
-func (c *CanvasChart) streamLoop() {
-    if !c.isRunning {
-        return
-    }
-    
-    // Add new random data point
-    newValue := 50.0 + (app.Window().Get("Math").Call("random").Float() * 50.0)
-    c.streamData.Push(newValue)
-    
-    // Convert to Points for drawing
-    c.currentPoints = make([]Point, len(c.streamData.Points))
-    for i, v := range c.streamData.Points {
-        c.currentPoints[i] = Point{X: float64(i), Y: v}
-    }
-    
-    // Update data range
-    c.calculateLineChartRange()
-    
-    // Trigger redraw
-    c.shouldRender = true
-    
-    // Schedule next update (slower for visibility)
-    c.ctx = app.Window().Call("setTimeout", app.FuncOf(func(this app.Value, args []app.Value) any {
-        c.streamLoop()
-        return nil
-    }), 1000/5) // 5 FPS
+// Remove or rename the duplicate streamLoop() method at line 820
+// Keep the original one at line 415 and update it:
+
+func (c *CanvasChart) streamLoop(ctx app.Context) {
+	if !c.isRunning {
+		return
+	}
+
+	// 1. Update Data (Simulating a data feed)
+	newValue := 50.0 + (app.Window().Get("Math").Call("random").Float() * 50.0)
+	c.streamData.Push(newValue)
+
+	// 2. Clear and Redraw
+	ctx.Dispatch(func(ctx app.Context) {
+		// Convert to Points for drawing
+		c.currentPoints = make([]Point, len(c.streamData.Points))
+		for i, v := range c.streamData.Points {
+			c.currentPoints[i] = Point{X: float64(i), Y: v}
+		}
+		
+		// Update data range
+		c.calculateLineChartRange()
+		
+		// Redraw
+		c.drawAll()
+	})
+
+	// 3. Request next frame (slower for visibility)
+	app.Window().Call("setTimeout", app.FuncOf(func(this app.Value, args []app.Value) any {
+		c.streamLoop(ctx)
+		return nil
+	}), 200) // ~5 FPS
 }
