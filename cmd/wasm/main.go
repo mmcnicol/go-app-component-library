@@ -21,6 +21,7 @@ import (
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/button"
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/label"
 	_ "github.com/mmcnicol/go-app-component-library/pkg/components/table"
+	_ "github.com/mmcnicol/go-app-component-library/pkg/components/panel"
 )
 
 func main() {
