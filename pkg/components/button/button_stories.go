@@ -17,7 +17,7 @@ func init() {
             "Look":     {
                 Label: "Look", 
                 Type: storybook.ControlSelect, 
-                Options: []string{"primary", "secondary", "danger"}
+                Options: []string{"primary", "secondary", "danger"},
             },
         },
         func(controls map[string]*storybook.Control) app.UI {
