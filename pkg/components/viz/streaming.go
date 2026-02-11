@@ -5,7 +5,7 @@ package viz
 import (
     "sync"
     "time"
-    "github.com/maxence-charriere/go-app/v10/pkg/app"
+    //"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
 // DataBuffer implements a circular buffer for streaming data
