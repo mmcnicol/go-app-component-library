@@ -42,6 +42,7 @@ func (i *Icon) GetIcon(name string, size int) app.UI {
 		d = "M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"
 	case "file":
 		d = "M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"
+	/*
 	case "hospital-inpatient":
 		// Consistent: Hospital bed (inpatient) with medical weight
 		d = "M18 10h-5V5h-2v5H6v2h5v5h2v-5h5v-2zm3 7H3v-2h18v2zm-2-5h-2v3H7v-3H5v6h14v-6z"
@@ -51,6 +52,16 @@ func (i *Icon) GetIcon(name string, size int) app.UI {
 	case "hospital-alert-covid":
 		// Improved: Medical cross with a central 'virus' alert point to match the outpatient style
 		d = "M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-3.12c-.22-.61-.69-1.12-1.32-1.38V9h2v2h2v2h-2v1zm-6-5h2v2.62c-.63.26-1.1.77-1.32 1.38H9V11h2V9zm-2 4h3.12c.22.61.69 1.12 1.32 1.38V18h-2v-2H9v-2h2v-1zm6 5h-2v-2.62c.63-.26 1.1-.77 1.32-1.38H18v2h-2v2h-1z"
+	*/
+	case "hospital-inpatient":
+		// A clean, recognizable hospital bed with a medical cross above it
+		d = "M19 7h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4zm-7 5h2V9h2v3h2v2h-2v3h-2v-3h-2v-2z"
+	case "hospital-outpatient":
+		// A medical cross with a person silhouette next to it (Ambulatory)
+		d = "M18 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-11 2v-3h2v3h3v2H9v3H7v-3H4v-2h3zm11 1c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z"
+	case "hospital-alert-covid":
+		// A medical cross with a high-visibility alert '!' in the center
+		d = "M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-6 15h-2v-2h2v2zm0-4h-2V7h2v7z"
 	case "spinner":
 		d = "M12 4V2C6.48 2 2 6.48 2 12h2c0-4.41 3.59-8 8-8z"
 	}
