@@ -41,22 +41,22 @@ func init() {
 
 	storybook.Register("Charts", "Regression Chart",
 		map[string]*storybook.Control{
-			"Dataset":        storybook.NewSelectControl(
-				[]string{"Strong Positive", "Moderate Positive", "Negative Correlation", "Weak Correlation", "With Outliers"}, 
+			"Dataset": storybook.NewSelectControl(
+				[]string{"Strong Positive", "Moderate Positive", "Negative Correlation", "Weak Correlation", "With Outliers"},
 				"Strong Positive",
 			),
-			"Point Color":    storybook.NewColorControl("#4f46e5"),
-			"Line Color":     storybook.NewColorControl("#ef4444"),
-			"Show Equation":  storybook.NewBoolControl(true),
-			"Title":          storybook.NewTextControl("Linear Regression Analysis"),
-			"Point Size":     storybook.NewRangeControl(2, 10, 1, 4),
+			"Point Color":   storybook.NewColorControl("#4f46e5"),
+			"Line Color":    storybook.NewColorControl("#ef4444"),
+			"Show Equation": storybook.NewBoolControl(true),
+			"Title":         storybook.NewTextControl("Linear Regression Analysis"),
+			"Point Size":    storybook.NewRangeControl(2, 10, 1, 4),
 		},
 		func(controls map[string]*storybook.Control) app.UI {
 			selectedKey := controls["Dataset"].Value.(string)
 			data := datasets[selectedKey]
 			
-			// Use the constructor instead of manual struct creation
-			regressionChart := NewRegressionChart(data,
+			// Create the chart
+			chart := NewRegressionChart(data,
 				WithTitle(controls["Title"].Value.(string)),
 				WithColor(controls["Point Color"].Value.(string)),
 				func(c *ChartConfig) {
@@ -66,16 +66,18 @@ func init() {
 					c.IsStream = false
 					c.Thickness = 2.0
 				},
-			).
-			WithPointColor(controls["Point Color"].Value.(string)).
-			WithLineColor(controls["Line Color"].Value.(string)).
-			WithShowEquation(controls["Show Equation"].Value.(bool)).
-			WithPointSize(float64(controls["Point Size"].Value.(int))).
-			WithDatasetName(selectedKey)
+			)
+			
+			// Apply settings
+			chart.WithPointColor(controls["Point Color"].Value.(string))
+			chart.WithLineColor(controls["Line Color"].Value.(string))
+			chart.WithShowEquation(controls["Show Equation"].Value.(bool))
+			chart.WithPointSize(float64(controls["Point Size"].Value.(int)))
+			chart.WithDatasetName(selectedKey)
 			
 			return app.Div().ID("regression-chart-container").Body(
 				app.Div().Class("regression-wrapper").Body(
-					regressionChart,
+					chart,
 				),
 			)
 		},
