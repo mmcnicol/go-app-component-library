@@ -1,6 +1,10 @@
 // pkg/components/viz/interactive/config.go
 package viz
 
+import (
+    "github.com/maxence-charriere/go-app/v10/pkg/app"
+)
+
 // InteractiveConfig defines interactivity options
 type InteractiveConfig struct {
     Enabled     bool

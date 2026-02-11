@@ -1,5 +1,9 @@
-// pkg/components/viz/data/dataset.go
+// pkg/components/viz/dataset.go
 package viz
+
+import (
+    "fmt"
+)
 
 // DataSet represents a complete dataset for visualization
 type DataSet struct {

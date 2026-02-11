@@ -1,4 +1,4 @@
-// pkg/components/viz/charts/types.go
+// pkg/components/viz/types.go
 package viz
 
 // ChartType defines available chart types
