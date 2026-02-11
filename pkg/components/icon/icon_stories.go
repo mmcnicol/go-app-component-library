@@ -37,6 +37,13 @@ func init() {
 				"file",
 				"hospital-inpatient", 
 				"hospital-outpatient",
+				"pharmacy",
+				"emergency",
+				"ambulance",
+				"stethoscope",
+				"records",
+				"telehealth",
+				"vaccine",
 				"hospital-alert-covid", 
 				"spinner",  
 			}

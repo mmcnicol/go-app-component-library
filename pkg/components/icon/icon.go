@@ -59,6 +59,27 @@ func (i *Icon) GetIcon(name string, size int) app.UI {
 	case "hospital-outpatient":
 		// A medical cross with a person silhouette next to it (Ambulatory)
 		d = "M18 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-11 2v-3h2v3h3v2H9v3H7v-3H4v-2h3zm11 1c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z"
+	case "pharmacy":
+		// A mortar and pestle—the universal symbol for pharmacy/medication
+		d = "M21 5h-2.64l1.14-3.14L17.59 1 16.2 4.81 3 5v2h2l2 6-2 6v2h14v-2l-2-6 2-6h2V5zM7 17l1.33-4h7.34L17 17H7z"
+	case "emergency":
+		// A siren/beacon to represent urgent care or emergency services
+		d = "M7 11h2V7H7v4zm10-4h-2v4h2V7zm-6 4h2V7h-2v4zM12 2C6.48 2 2 6.48 2 12v9h20v-9c0-5.52-4.48-10-10-10zm8 17H4v-7c0-4.41 3.59-8 8-8s8 3.59 8 8v7z"
+	case "ambulance":
+		// A medical vehicle silhouette with the distinctive cross
+		d = "M19 11h-3V8h-2v3h-3v2h3v3h2v-3h3v-2zm3-3c0-1.1-.9-2-2-2h-3V4h-2v2H5c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h1.1c.45 1.18 1.58 2 2.9 2s2.45-.82 2.9-2h4.2c.45 1.18 1.58 2 2.9 2s2.45-.82 2.9-2H21c1.1 0 2-.9 2-2V8zm-13 9c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm9 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"		
+	case "stethoscope":
+		// Consultation icon: Stethoscope with a clean, circular chest piece
+		d = "M12 2a5 5 0 00-5 5v5a5 5 0 0010 0V7a5 5 0 00-5-5zm3 10a3 3 0 01-6 0V7a3 3 0 016 0v5zm-3 8a3 3 0 100-6 3 3 0 000 6zm6-6v-1h2v1c0 3.87-3.13 7-7 7s-7-3.13-7-7v-1h2v1c0 2.76 2.24 5 5 5s5-2.24 5-5z"
+	case "records":
+		// Medical records icon: Clipboard with a centered medical cross
+		d = "M18 2h-3.18C14.4 0.84 13.3 0 12 0s-2.4.84-2.82 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-6 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm3 14h-2v2h-2v-2H9v-2h2v-2h2v2h2v2z"
+	case "telehealth":
+		// A computer monitor featuring a centered medical cross
+		d = "M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 3v1h8v-1l-2-3h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H3V4h18v12zm-5-7h-3V6h-2v3H8v2h3v3h2v-3h3V9z"
+	case "vaccine":
+		// A syringe icon with a visible droplet and plunger
+		d = "M19.88 3.5c-.39-.39-1.03-.39-1.42 0l-1.06 1.06-1.54-1.54-1.41 1.41 1.54 1.54-1.77 1.77-2.12-2.12-1.41 1.41 2.12 2.12-4.24 4.24H6v2l2.3 2.3L3 22.1l1.41 1.41 4.51-4.51 2.3 2.3h2v-2.41l4.24-4.24 2.12 2.12 1.41-1.41-2.12-2.12 1.77-1.77 1.54 1.54 1.41-1.41-1.54-1.54 1.06-1.06c.39-.39.39-1.03 0-1.42z"
 	case "hospital-alert-covid":
 		// A medical cross with a high-visibility alert '!' in the center
 		d = "M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-6 15h-2v-2h2v2zm0-4h-2V7h2v7z"
