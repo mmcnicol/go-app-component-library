@@ -30,7 +30,7 @@ type BaseChart struct {
 
 // NewChart creates a new chart of the specified type
 func NewChart(chartType ChartType) *BaseChart {
-    id := fmt.Sprintf("chart-%s", app.GenerateID())
+    id := fmt.Sprintf("chart-%s", GenerateID())
     return &BaseChart{
         spec: ChartSpec{
             Type: chartType,
@@ -83,7 +83,7 @@ func (bc *BaseChart) setupManagers() {
     bc.zoomPanManager = NewZoomPanManager(bc)
 }
 
-// OnMount is called when the component is mounted
+// Update the OnMount method in base_chart.go:
 func (bc *BaseChart) OnMount(ctx app.Context) {
     bc.isRendered = false
     bc.setupManagers()
@@ -92,6 +92,16 @@ func (bc *BaseChart) OnMount(ctx app.Context) {
     renderer, err := NewCanvasRenderer(bc.containerID)
     if err == nil {
         bc.engine = renderer
+    }
+    
+    // Schedule initial render if we have data
+    if len(bc.spec.Data.Datasets) > 0 {
+        ctx.Defer(func(ctx app.Context) {
+            if bc.engine != nil && !bc.isRendered {
+                bc.engine.Render(bc.spec)
+                bc.isRendered = true
+            }
+        })
     }
 }
 

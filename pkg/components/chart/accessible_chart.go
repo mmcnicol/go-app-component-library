@@ -20,8 +20,8 @@ func NewAccessibleChart(chartType ChartType) *AccessibleChart {
     return &AccessibleChart{
         BaseChart:       *base,
         ariaLabel:       fmt.Sprintf("%s Chart", chartType),
-        ariaDescribedBy: fmt.Sprintf("chart-desc-%s", app.GenerateID()),
-        dataTableID:     fmt.Sprintf("chart-data-%s", app.GenerateID()),
+        ariaDescribedBy: fmt.Sprintf("chart-desc-%s", GenerateID()),
+        dataTableID:     fmt.Sprintf("chart-data-%s", GenerateID()),
     }
 }
 
