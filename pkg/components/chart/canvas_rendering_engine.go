@@ -16,6 +16,7 @@ type CanvasRenderer struct {
     mounted    bool
     chartSpec  ChartSpec // Store the chart spec
     ctx        app.Context // Store context for updates
+    ctxValid   bool // Add a flag to track if context is valid
 }
 
 func NewCanvasRenderer(containerID string) (*CanvasRenderer, error) {
@@ -24,6 +25,7 @@ func NewCanvasRenderer(containerID string) (*CanvasRenderer, error) {
         pixelRatio: 1.0,
         width:      800,
         height:     400,
+        ctxValid:   false,
     }, nil
 }
 
@@ -32,8 +34,8 @@ func (cr *CanvasRenderer) RenderChart(chart ChartSpec) error {
     // Store the chart spec for rendering
     cr.chartSpec = chart
     
-    // If already mounted, update immediately
-    if cr.mounted && cr.ctx != (app.Context{}) {
+    // If already mounted and context is valid, update immediately
+    if cr.mounted && cr.ctxValid {
         cr.setupCanvas(cr.ctx)
     }
     
@@ -443,10 +445,11 @@ func (cr *CanvasRenderer) getBarChartScript() string {
     `, datasets, labels, cr.chartSpec.Options.Scales.Y.BeginAtZero)
 }
 
+// Update implements ChartEngine.Update
 func (cr *CanvasRenderer) Update(data ChartData) error {
     // Update the chart spec and re-render
     cr.chartSpec.Data = data
-    if cr.mounted && cr.ctx != (app.Context{}) {
+    if cr.mounted && cr.ctxValid {
         cr.setupCanvas(cr.ctx)
     }
     return nil
@@ -470,7 +473,8 @@ func (cr *CanvasRenderer) Render() app.UI {
 // OnMount is called when the component is mounted
 func (cr *CanvasRenderer) OnMount(ctx app.Context) {
     cr.mounted = true
-    cr.ctx = ctx // Store context for updates
+    cr.ctx = ctx
+    cr.ctxValid = true // Mark context as valid
     
     // Schedule drawing after mount
     ctx.Defer(func(ctx app.Context) {
