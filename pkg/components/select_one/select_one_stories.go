@@ -37,7 +37,7 @@ func init() {
 		map[string]*storybook.Control{
 			"PromptText": {Label: "Prompt Text", Type: storybook.ControlText, Value: "Choose an option..."},
 			"Disabled": {Label: "Disabled", Type: storybook.ControlBool, Value: false},
-			"Options": {Label: "Options", Type: storybook.ControlSelect, Value: selectOptions}, 
+			"Options": {Label: "Options", Type: storybook.ControlSelect, Options: selectOptions}, 
             "SelectedValue": {Label: "Selected Value", Type: storybook.ControlText, Value: ""}, 
 		},
 		func(controls map[string]*storybook.Control) app.UI {
