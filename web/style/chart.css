@@ -1,74 +1,70 @@
-/* Add to your global CSS */
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
+/* web/styles/chart.css */
 
-.chart-visual {
+/* Container for the chart and its overlays */
+.chart-wrapper {
     position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-/*
-.chart-container {
-    position: relative;
-    width: 100%;
-    height: 400px;
-}
-*/
-
-.chart-container {
-    width: 100% !important;
-    height: 400px !important;
-    border: 2px solid #4A90E2 !important;
-    background: #f9f9f9 !important;
-    position: relative !important;
-    margin: 20px 0 !important;
-}
-
-.chart-canvas {
-    width: 100% !important;
-    height: 100% !important;
-    display: block !important;
-}
-
-/*
-.dashboard-card {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     padding: 20px;
-    background: white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    margin: 20px 0;
-}
-*/
-
-.dashboard-card {
-    width: 100% !important;
-    min-height: 400px !important;
-    background: white !important;
-    border: 1px solid #ddd !important;
-    border-radius: 8px !important;
-    padding: 20px !important;
-    margin: 20px 0 !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    border: 1px solid #f0f0f0;
+    overflow: hidden;
 }
 
-.test-chart {
-    width: 100% !important;
-    height: 400px !important;
-    background: #f9f9f9 !important;
+/* The Canvas itself */
+.chart-canvas {
+    display: block;
+    cursor: crosshair;
 }
 
-.chart-bar {
-    width: 100% !important;
-    height: 400px !important;
+/* Modern Tooltip Design */
+.chart-tooltip {
+    position: absolute;
+    z-index: 100;
+    pointer-events: none;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(4px);
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transition: transform 0.1s ease-out, opacity 0.15s ease-in-out;
+    min-width: 120px;
+}
+
+.tooltip-header {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.tooltip-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+/* Axis Labels and Legend */
+.chart-legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+    justify-content: center;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: #475569;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    margin-right: 6px;
 }
