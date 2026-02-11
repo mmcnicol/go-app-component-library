@@ -21,20 +21,29 @@ func init() {
             "Show Points": storybook.NewBoolControl(true),
         },
         func(controls map[string]*storybook.Control) app.UI {
-            return New(monthlySales,
-                WithTitle(controls["Title"].Value.(string)),
-                WithColor(controls["Line Color"].Value.(string)),
-                func(c *ChartConfig) {
-                    // Clear other chart types
-                    c.BoxData = nil
-                    c.PieData = nil
-                    c.HeatmapMatrix = nil
-                    c.IsStream = false
-                    
-                    // Set line chart properties
-                    c.Thickness = float64(controls["Thickness"].Value.(int))
-                },
-            )
-        },
+			monthlySales := []Point{
+				{X: 1, Y: 12000}, {X: 2, Y: 19000}, {X: 3, Y: 15000},
+				{X: 4, Y: 21000}, {X: 5, Y: 18000}, {X: 6, Y: 24000},
+			}
+
+			chart := New(monthlySales,
+				WithTitle(controls["Title"].Value.(string)),
+				WithColor(controls["Line Color"].Value.(string)),
+				func(c *ChartConfig) {
+					// Clear other chart types
+					c.BoxData = nil
+					c.PieData = nil
+					c.HeatmapMatrix = nil
+					c.IsStream = false
+					
+					// Set line chart properties
+					c.Thickness = float64(controls["Thickness"].Value.(int))
+				},
+			)
+			
+			// Reset the chart when controls change
+			// This needs to be done in the component's OnUpdate
+			return chart
+		},
     )
 }

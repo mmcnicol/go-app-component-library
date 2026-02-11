@@ -117,29 +117,36 @@ func (c *CanvasChart) drawPlaceholder() {
 }
 
 func (c *CanvasChart) Render() app.UI {
-	px, py := c.ToPixels(c.activePoint.X, c.activePoint.Y)
+    // Force an update if we need to render
+    if c.shouldRender {
+        c.shouldRender = false
+        // This will trigger OnUpdate
+    }
 
-	return app.Div().Class("chart-wrapper").Body(
-		app.Canvas().
-			Class("chart-canvas").
-			ID("main-chart"). // This must match GetElementByID
-			Width(c.width).
-			Height(c.height).
-			OnMouseMove(c.OnMouseMove),
+    px, py := c.ToPixels(c.activePoint.X, c.activePoint.Y)
 
-		app.If(c.showTooltip, func() app.UI {
-			return app.Div().
-				Class("chart-tooltip").
-				Style("left", fmt.Sprintf("%fpx", px+15)).
-				Style("top", fmt.Sprintf("%fpx", py-50)).
-				Body(
-					app.Div().Class("tooltip-header").Text("Data Point"),
-					app.Div().Class("tooltip-value").Text(
-						fmt.Sprintf("X: %.1f | Y: %.1f", c.activePoint.X, c.activePoint.Y),
-					),
-				)
-		}),
-	)
+    return app.Div().Class("chart-wrapper").Body(
+        app.Canvas().
+            Class("chart-canvas").
+            ID("main-chart").
+            Width(c.width).
+            Height(c.height).
+            OnMouseMove(c.OnMouseMove).
+            OnMount(c.OnMount), // Add OnMount back
+
+        app.If(c.showTooltip, func() app.UI {
+            return app.Div().
+                Class("chart-tooltip").
+                Style("left", fmt.Sprintf("%fpx", px+15)).
+                Style("top", fmt.Sprintf("%fpx", py-50)).
+                Body(
+                    app.Div().Class("tooltip-header").Text("Data Point"),
+                    app.Div().Class("tooltip-value").Text(
+                        fmt.Sprintf("X: %.1f | Y: %.1f", c.activePoint.X, c.activePoint.Y),
+                    ),
+                )
+        }),
+    )
 }
 
 // Padding defines the drawing area boundaries
@@ -268,51 +275,6 @@ func (c *CanvasChart) DrawHeatmap(grid [][]float64) {
 	}
 }
 
-/*
-func (c *CanvasChart) StartStreaming(ctx app.Context) {
-	c.isRunning = true
-	c.streamLoop(ctx)
-}
-*/
-
-/*
-func (c *CanvasChart) streamLoop(ctx app.Context) {
-	if !c.isRunning {
-		return
-	}
-
-	// 1. Update Data (Simulating a data feed)
-	// In a real app, this might come from a WebSocket or Channel
-	newValue := 50.0 + (app.Window().Get("Math").Call("random").Float() * 20.0)
-	c.streamData.Push(newValue)
-
-	// 2. Clear and Redraw
-	ctx.Dispatch(func(ctx app.Context) {
-		// Clear Canvas
-		c.ctx.Call("clearRect", 0, 0, c.width, c.height)
-		
-		// Draw Infrastructure
-		c.drawAxes()
-		
-		// Draw the moving line
-		points := make([]Point, len(c.streamData.Points))
-		for i, v := range c.streamData.Points {
-			points[i] = Point{X: float64(i), Y: v}
-		}
-		
-		// Update DataRange MaxX to match Capacity so the line "fills" the space
-		c.DataRange.MaxX = float64(c.streamData.Capacity)
-		c.DrawLine(points, "#28a745", 2.0)
-	})
-
-	// 3. Request next frame
-	app.Window().Call("requestAnimationFrame", app.FuncOf(func(this app.Value, args []app.Value) any {
-		c.streamLoop(ctx)
-		return nil
-	}))
-}
-*/
-
 func (c *CanvasChart) OnMouseMove(ctx app.Context, e app.Event) {
     rect := e.Get("target").Call("getBoundingClientRect")
     mouseX := e.Get("clientX").Float() - rect.Get("left").Float()
@@ -345,25 +307,17 @@ func (c *CanvasChart) OnMouseMove(ctx app.Context, e app.Event) {
     ctx.Update()
 }
 
-/*
-// Centralized drawing method to prevent code duplication
-func (c *CanvasChart) drawAll() {
-    c.ctx.Call("clearRect", 0, 0, c.width, c.height)
-    c.drawAxes()
-    c.DrawLine(c.currentPoints, c.config.LineColor, c.config.Thickness)
-}
-*/
-
 func (c *CanvasChart) drawAll() {
     if !c.ctx.Truthy() {
         return
     }
 
-    // 1. Clear the canvas
-    c.ctx.Call("clearRect", 0, 0, c.width, c.height)
+    // 1. Clear the canvas with a background
+    c.ctx.Set("fillStyle", "#ffffff")
+    c.ctx.Call("fillRect", 0, 0, c.width, c.height)
 
-    // 2. Draw the foundation
-    c.drawAxes()
+    // 2. Reset tooltip state
+    c.showTooltip = false
 
     // 3. Draw specific content based on config
     if len(c.config.BoxData) > 0 {
@@ -376,25 +330,30 @@ func (c *CanvasChart) drawAll() {
             xPos := c.Padding.Left + (float64(i+1) * boxSpacing)
             c.DrawBoxPlot(stats, xPos, c.config.BoxWidth)
         }
+        c.drawAxes()
         
     } else if len(c.config.HeatmapMatrix) > 0 {
         // Draw Heatmap
         c.calculateHeatmapRange()
         c.DrawHeatmap(c.config.HeatmapMatrix)
+        c.drawAxes()
         
     } else if len(c.config.PieData) > 0 {
-        // Draw Pie Chart
+        // Draw Pie Chart - no axes for pie charts
         c.DrawPieChart(c.config.PieData, c.getPieColors())
         
     } else if c.config.IsStream {
         // Draw Streaming Chart
         if len(c.currentPoints) > 0 {
+            c.calculateLineChartRange()
+            c.drawAxes()
             c.DrawLine(c.currentPoints, c.config.LineColor, c.config.Thickness)
         }
         
     } else if len(c.currentPoints) > 0 {
         // Draw Line Chart
         c.calculateLineChartRange()
+        c.drawAxes()
         c.DrawLine(c.currentPoints, c.config.LineColor, c.config.Thickness)
         c.drawPoints(c.currentPoints, c.config.LineColor)
     }
@@ -520,11 +479,20 @@ func (c *CanvasChart) DrawBoxPlot(stats BoxPlotStats, xPos float64, width float6
 }
 
 func (c *CanvasChart) OnUpdate(ctx app.Context) {
+    // Stop any existing streaming when config changes
+    if !c.config.IsStream && c.isRunning {
+        c.isRunning = false
+        if c.streamTicker.Truthy() {
+            app.Window().Call("clearTimeout", c.streamTicker)
+            c.streamTicker = app.Undefined()
+        }
+    }
+    
     // Redraw when any configuration changes
     if c.ctx.Truthy() {
         c.drawAll()
         
-        // Start streaming if configured
+        // Start streaming if configured and not already running
         if c.config.IsStream && !c.isRunning {
             c.startStreaming(ctx)
         }
@@ -640,50 +608,81 @@ func (c *CanvasChart) getPieColors() []string {
 
 func (c *CanvasChart) startStreaming(ctx app.Context) {
     if c.config.IsStream && !c.isRunning {
+        // Clear any existing data
         c.streamData = StreamingData{
             Points:   make([]float64, 0, c.config.Capacity),
             Capacity: c.config.Capacity,
         }
+        c.currentPoints = []Point{}
         
         // Start generating data
         c.isRunning = true
+        
+        // Store the context for the stream loop
         c.streamLoop(ctx)
     }
 }
 
 func (c *CanvasChart) streamLoop(ctx app.Context) {
-	if !c.isRunning {
-		return
-	}
+    if !c.isRunning {
+        return
+    }
 
-	// 1. Update Data (Simulating a data feed)
-	newValue := 50.0 + (app.Window().Get("Math").Call("random").Float() * 50.0)
-	c.streamData.Push(newValue)
+    // 1. Update Data (Simulating a data feed)
+    newValue := 50.0 + (app.Window().Get("Math").Call("random").Float() * 50.0)
+    c.streamData.Push(newValue)
 
-	// 2. Update points and redraw
-	c.currentPoints = make([]Point, len(c.streamData.Points))
-	for i, v := range c.streamData.Points {
-		c.currentPoints[i] = Point{X: float64(i), Y: v}
-	}
-	
-	// Update data range for streaming
-	if len(c.currentPoints) > 0 {
-		c.DataRange = DataRange{
-			MinX: 0,
-			MaxX: float64(c.streamData.Capacity),
-			MinY: 0,
-			MaxY: 100, // Assuming values between 0-100
-		}
-	}
-	
-	// 3. Trigger a redraw
-	ctx.Dispatch(func(ctx app.Context) {
-		c.drawAll()
-	})
+    // 2. Update points and redraw
+    c.currentPoints = make([]Point, len(c.streamData.Points))
+    for i, v := range c.streamData.Points {
+        c.currentPoints[i] = Point{X: float64(i), Y: v}
+    }
+    
+    // 3. Trigger a redraw
+    ctx.Dispatch(func(ctx app.Context) {
+        if c.ctx.Truthy() {
+            c.drawAll()
+        }
+    })
 
-	// 4. Request next frame (slower for visibility)
-	app.Window().Call("setTimeout", app.FuncOf(func(this app.Value, args []app.Value) any {
-		c.streamLoop(ctx)
-		return nil
-	}), 200) // ~5 FPS
+    // 4. Schedule next update and store the ticker
+    c.streamTicker = app.Window().Call("setTimeout", app.FuncOf(func(this app.Value, args []app.Value) any {
+        if c.isRunning {
+            c.streamLoop(ctx)
+        }
+        return nil
+    }), 200) // ~5 FPS
+}
+
+func (c *CanvasChart) OnDismount() {
+    // Stop any running streaming
+    c.isRunning = false
+    
+    // Clear any pending timeouts
+    if c.streamTicker.Truthy() {
+        app.Window().Call("clearTimeout", c.streamTicker)
+        c.streamTicker = app.Undefined()
+    }
+    
+    // Reset state
+    c.canvas = app.Undefined()
+    c.ctx = app.Undefined()
+    c.streamData = StreamingData{}
+    c.currentPoints = nil
+    c.showTooltip = false
+    c.shouldRender = false
+}
+
+func (c *CanvasChart) resetCanvas() {
+    // Clear any existing streaming
+    c.isRunning = false
+    if c.streamTicker.Truthy() {
+        app.Window().Call("clearTimeout", c.streamTicker)
+        c.streamTicker = app.Undefined()
+    }
+    
+    // Reset canvas state
+    c.canvas = app.Undefined()
+    c.ctx = app.Undefined()
+    c.shouldRender = true
 }
