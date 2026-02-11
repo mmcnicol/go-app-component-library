@@ -490,13 +490,6 @@ func (c *CanvasChart) OnMouseMove(ctx app.Context, e app.Event) {
     ctx.Update()
 }
 
-func (c *CanvasChart) OnUpdate(ctx app.Context) {
-    // Check if data changed and trigger a redraw
-    ctx.Dispatch(func(ctx app.Context) {
-        c.drawAll() 
-    })
-}
-
 /*
 // Centralized drawing method to prevent code duplication
 func (c *CanvasChart) drawAll() {
@@ -637,4 +630,18 @@ func (c *CanvasChart) DrawBoxPlot(stats BoxPlotStats, xPos float64, width float6
 	c.ctx.Call("moveTo", xPos-(width/2), yMed)
 	c.ctx.Call("lineTo", xPos+(width/2), yMed)
 	c.ctx.Call("stroke")
+}
+
+/*
+func (c *CanvasChart) OnUpdate(ctx app.Context) {
+    // Check if data changed and trigger a redraw
+    ctx.Dispatch(func(ctx app.Context) {
+        c.drawAll() 
+    })
+}
+*/
+
+func (c *CanvasChart) OnUpdate(ctx app.Context) {
+    // Whenever the storybook controls change the config, redraw
+	c.drawAll()
 }
