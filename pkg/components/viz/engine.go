@@ -578,7 +578,7 @@ func (e *CanvasEngine) calculateScales(spec *Spec, points []Point) {
 
 func (e *CanvasEngine) drawSmoothSegment(ctx app.Value, points []Point, i int, tension float64) {
     // Need to ensure we don't go out of bounds
-    if i <= 0 || i >= len(points)-2 {
+    if i <= 0 || i >= len(points)-3 {  // Changed from -2 to -3
         return
     }
     
