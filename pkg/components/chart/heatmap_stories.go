@@ -18,6 +18,12 @@ func init() {
         {Label: "Books", Value: 15000},
     }
 
+	userActivity := [][]float64{
+        {8, 12, 15, 9, 14, 11, 13, 10},
+        {5, 8, 10, 7, 9, 6, 11, 8},
+        {12, 15, 18, 14, 16, 13, 17, 15},
+    }
+
     storybook.Register("Chart", "Heatmap", 
         nil,
         func(controls map[string]*storybook.Control) app.UI {
