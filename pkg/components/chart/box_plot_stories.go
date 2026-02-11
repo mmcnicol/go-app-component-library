@@ -17,6 +17,7 @@ func init() {
 			"Box Width":   storybook.NewRangeControl(20, 100, 5, 50),
 			"Theme Color": storybook.NewColorControl("#4a90e2"),
 		},
+		// In box_plot_stories.go, modify the render function:
 		func(controls map[string]*storybook.Control) app.UI {
 			statsA := CalculateBoxStats(groupA)
 			statsB := CalculateBoxStats(groupB)
@@ -25,9 +26,11 @@ func init() {
 				WithTitle("Comparison of Distributions"),
 				WithColor(controls["Theme Color"].Value.(string)),
 				func(c *ChartConfig) {
-					// We can pass a slice of BoxPlotStats to draw multiple
 					c.BoxWidth = float64(controls["Box Width"].Value.(int))
 					c.BoxData = []BoxPlotStats{statsA, statsB}
+					// Ensure the chart knows to draw box plots
+					c.PieData = nil  // Clear any pie chart data
+					c.HeatmapMatrix = nil  // Clear any heatmap data
 				},
 			)
 		},

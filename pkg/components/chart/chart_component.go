@@ -102,21 +102,7 @@ func (c *CanvasChart) OnMount(ctx app.Context) {
 */
 
 func (c *CanvasChart) OnMount(ctx app.Context) {
-
-	/*
-	ctx.Defer(func(ctx app.Context) {
-		canvasJS := app.Window().GetElementByID("main-chart")
-		if !canvasJS.Truthy() { return }
-
-		c.canvas = canvasJS
-		c.ctx = c.canvas.Call("getContext", "2d")
-	*/
-
-    // 1. Wait for the next frame to ensure the DOM is fully rendered
     ctx.Defer(func(ctx app.Context) {
-        // 2. Explicitly find the canvas element by its ID
-        // Note: In a library, you should generate a unique ID, 
-        // but for now we use the ID defined in Render()
         canvasJS := app.Window().GetElementByID("main-chart")
         
         if !canvasJS.Truthy() {
@@ -127,27 +113,19 @@ func (c *CanvasChart) OnMount(ctx app.Context) {
         c.canvas = canvasJS
         c.ctx = c.canvas.Call("getContext", "2d")
 
-        // 3. Setup Display Density
         c.dpr = app.Window().Get("devicePixelRatio").Float()
         if c.dpr == 0 {
             c.dpr = 1.0
         }
 
         c.ctx.Set("imageSmoothingEnabled", true)
+        c.ctx.Set("textAlign", "center")
+        c.ctx.Set("textBaseline", "middle")
 
-        // 4. Initialize layout and draw
         c.resize()
-		c.drawAll() // Call the orchestrator
-        c.drawAxes()
         
-        // Trigger specific painters based on config
-        if len(c.config.BoxData) > 0 {
-            // Draw your box plots here
-            for i, stats := range c.config.BoxData {
-                xPos := float64(i+1) * 100.0 // Example spacing
-                c.DrawBoxPlot(stats, xPos, c.config.BoxWidth)
-            }
-        }
+        // Draw based on what type of chart we have
+        c.drawAll()
     })
 }
 
@@ -511,30 +489,33 @@ func (c *CanvasChart) drawAll() {
 */
 
 func (c *CanvasChart) drawAll() {
-	if !c.ctx.Truthy() {
-		return
-	}
+    if !c.ctx.Truthy() {
+        return
+    }
 
-	// 1. Clear the canvas
-	c.ctx.Call("clearRect", 0, 0, c.width, c.height)
+    // 1. Clear the canvas
+    c.ctx.Call("clearRect", 0, 0, c.width, c.height)
 
-	// 2. Draw the foundation
-	c.drawAxes()
+    // 2. Draw the foundation
+    c.drawAxes()
 
-	// 3. Draw specific content based on config
-	if len(c.config.BoxData) > 0 {
-		// Draw Box Plots
-		// Space them out based on the number of items
-		for i, stats := range c.config.BoxData {
-			// Calculate horizontal position
-			xPos := c.Padding.Left + (float64(i+1) * 100.0) 
-			c.DrawBoxPlot(stats, xPos, c.config.BoxWidth)
-		}
-	} else if len(c.currentPoints) > 0 {
-		// Draw Line/Scatter if points exist
-		c.DrawLine(c.currentPoints, c.config.LineColor, c.config.Thickness)
-	}
-    // ... add other types like Pie/Heatmap here ...
+    // 3. Draw specific content based on config
+    if len(c.config.BoxData) > 0 {
+        // Calculate DataRange for box plots
+        c.calculateBoxPlotRange()
+        
+        // Draw Box Plots
+        chartWidth := float64(c.width) - c.Padding.Left - c.Padding.Right
+        boxSpacing := chartWidth / float64(len(c.config.BoxData)+1)
+        
+        for i, stats := range c.config.BoxData {
+            xPos := c.Padding.Left + (float64(i+1) * boxSpacing)
+            c.DrawBoxPlot(stats, xPos, c.config.BoxWidth)
+        }
+    } else if len(c.currentPoints) > 0 {
+        // Draw Line/Scatter if points exist
+        c.DrawLine(c.currentPoints, c.config.LineColor, c.config.Thickness)
+    }
 }
 
 func (c *CanvasChart) DrawRegression(data []Point, pointColor, lineColor string) {
@@ -613,34 +594,47 @@ func (c *CanvasChart) DrawPieChart(data []float64, colors []string) {
 }
 
 func (c *CanvasChart) DrawBoxPlot(stats BoxPlotStats, xPos float64, width float64) {
-	// Map statistical values to Y pixels
-	_, yMin := c.ToPixels(0, stats.Min)
-	_, yQ1 := c.ToPixels(0, stats.Q1)
-	_, yMed := c.ToPixels(0, stats.Median)
-	_, yQ3 := c.ToPixels(0, stats.Q3)
-	_, yMax := c.ToPixels(0, stats.Max)
+    // Map statistical values to Y pixels
+    _, yMin := c.ToPixels(0, stats.Min)
+    _, yQ1 := c.ToPixels(0, stats.Q1)
+    _, yMed := c.ToPixels(0, stats.Median)
+    _, yQ3 := c.ToPixels(0, stats.Q3)
+    _, yMax := c.ToPixels(0, stats.Max)
 
-	c.ctx.Set("strokeStyle", "#333")
-	c.ctx.Set("lineWidth", 2)
+    c.ctx.Set("strokeStyle", "#333")
+    c.ctx.Set("lineWidth", 2)
 
-	// 1. Draw Whisker (Vertical line from Min to Max)
-	c.ctx.Call("beginPath")
-	c.ctx.Call("moveTo", xPos, yMin)
-	c.ctx.Call("lineTo", xPos, yMax)
-	c.ctx.Call("stroke")
+    // 1. Draw Whisker (Vertical line from Min to Max)
+    c.ctx.Call("beginPath")
+    c.ctx.Call("moveTo", xPos, yMin)
+    c.ctx.Call("lineTo", xPos, yMax)
+    c.ctx.Call("stroke")
 
-	// 2. Draw the Box (Q1 to Q3)
-	c.ctx.Set("fillStyle", c.config.LineColor)
-	boxHeight := yQ1 - yQ3
-	c.ctx.Call("fillRect", xPos-(width/2), yQ3, width, boxHeight)
-	c.ctx.Call("strokeRect", xPos-(width/2), yQ3, width, boxHeight)
+    // 2. Draw the Box (Q1 to Q3)
+    c.ctx.Set("fillStyle", c.config.LineColor + "80") // Add transparency
+    boxHeight := yQ1 - yQ3
+    c.ctx.Call("fillRect", xPos-(width/2), yQ3, width, boxHeight)
+    
+    c.ctx.Set("strokeStyle", "#333")
+    c.ctx.Call("strokeRect", xPos-(width/2), yQ3, width, boxHeight)
 
-	// 3. Draw Median Line
-	c.ctx.Set("strokeStyle", "white")
-	c.ctx.Call("beginPath")
-	c.ctx.Call("moveTo", xPos-(width/2), yMed)
-	c.ctx.Call("lineTo", xPos+(width/2), yMed)
-	c.ctx.Call("stroke")
+    // 3. Draw Median Line
+    c.ctx.Set("strokeStyle", "white")
+    c.ctx.Set("lineWidth", 2)
+    c.ctx.Call("beginPath")
+    c.ctx.Call("moveTo", xPos-(width/2), yMed)
+    c.ctx.Call("lineTo", xPos+(width/2), yMed)
+    c.ctx.Call("stroke")
+
+    // 4. Draw Whisker caps
+    c.ctx.Set("strokeStyle", "#333")
+    c.ctx.Set("lineWidth", 2)
+    c.ctx.Call("beginPath")
+    c.ctx.Call("moveTo", xPos-(width/4), yMin)
+    c.ctx.Call("lineTo", xPos+(width/4), yMin)
+    c.ctx.Call("moveTo", xPos-(width/4), yMax)
+    c.ctx.Call("lineTo", xPos+(width/4), yMax)
+    c.ctx.Call("stroke")
 }
 
 /*
@@ -653,6 +647,36 @@ func (c *CanvasChart) OnUpdate(ctx app.Context) {
 */
 
 func (c *CanvasChart) OnUpdate(ctx app.Context) {
-    // Whenever the storybook controls change the config, redraw
-	c.drawAll()
+    // Redraw when any configuration changes
+    if c.ctx.Truthy() {
+        c.drawAll()
+    }
+}
+
+func (c *CanvasChart) calculateBoxPlotRange() {
+    if len(c.config.BoxData) == 0 {
+        return
+    }
+    
+    // Find min and max across all box plots
+    minY := c.config.BoxData[0].Min
+    maxY := c.config.BoxData[0].Max
+    
+    for _, stats := range c.config.BoxData {
+        if stats.Min < minY {
+            minY = stats.Min
+        }
+        if stats.Max > maxY {
+            maxY = stats.Max
+        }
+    }
+    
+    // Add some padding
+    padding := (maxY - minY) * 0.1
+    c.DataRange = DataRange{
+        MinX: 0,
+        MaxX: float64(len(c.config.BoxData) + 1),
+        MinY: minY - padding,
+        MaxY: maxY + padding,
+    }
 }
