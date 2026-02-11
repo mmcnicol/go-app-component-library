@@ -10,11 +10,13 @@ import (
 // Use init() to auto-register when this package is imported
 func init() {
 
+    selectOptions := []string{"primary", "secondary", "danger"}
+
     storybook.Register("Form", "Button", 
         map[string]*storybook.Control{
             "Label":    {Label: "Label", Type: storybook.ControlText, Value: "Click Me"},
             "Disabled": {Label: "Disabled", Type: storybook.ControlBool, Value: false},
-            "Look":     {Label: "Look", Type: storybook.ControlText, Value: "primary"}, // Use select in future
+            "Look":     {Label: "Look", Type: storybook.ControlSelect, Value: selectOptions},
         },
         func(controls map[string]*storybook.Control) app.UI {
             return &Button{
