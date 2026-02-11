@@ -40,12 +40,14 @@ func init() {
 		},
 	)
 
+	selectOptions := []string{"Go", "Python", "Rust", "JavaScript"}
+
 	storybook.Register("Built In", "Select", 
 		map[string]*storybook.Control{
 			"PromptText": {Label: "Prompt Text", Type: storybook.ControlText, Value: "Choose an option..."},
 			"Disabled":   {Label: "Disabled", Type: storybook.ControlBool, Value: false},
 			// Make sure to set the Value field so the type assertion doesn't panic
-			"Options":    {Label: "Options", Type: storybook.ControlSelect([]string{"Go", "Python", "Rust", "JavaScript"}), Value: ""}, 
+			"Options":    {Label: "Options", Type: storybook.ControlSelect, Value: selectOptions}, 
 			"SelectedValue": {Label: "Selected Value", Type: storybook.ControlText, Value: ""}, 
 		},
 		func(controls map[string]*storybook.Control) app.UI {
