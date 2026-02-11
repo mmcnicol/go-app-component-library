@@ -132,7 +132,7 @@ func (c *CanvasChart) Render() app.UI {
             Width(c.width).
             Height(c.height).
             OnMouseMove(c.OnMouseMove),
-            // REMOVE: OnMount(c.OnMount), // OnMount is handled by the component itself
+            // REMOVED: .OnMount(c.OnMount), // This was causing the error
 
         app.If(c.showTooltip, func() app.UI {
             return app.Div().
@@ -147,7 +147,6 @@ func (c *CanvasChart) Render() app.UI {
                 )
         }),
     )
-
 }
 
 // Padding defines the drawing area boundaries

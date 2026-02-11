@@ -23,7 +23,7 @@ func init() {
             selectedKey := controls["Dataset"].Value.(string)
             data := datasets[selectedKey]
 
-            return New(nil,
+            chart := New(nil,
                 WithTitle(selectedKey),
                 func(c *ChartConfig) {
                     // Clear other chart types
@@ -36,6 +36,7 @@ func init() {
                     c.InnerRadiusRatio = float64(controls["Inner Radius"].Value.(int)) / 100.0
                 },
             )
+            return chart.Key("pie-chart")
         },
     )
 }

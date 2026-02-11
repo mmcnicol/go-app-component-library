@@ -8,7 +8,6 @@ import (
 )
 
 func init() {
-
     storybook.Register("Charts", "Line Chart",
         map[string]*storybook.Control{
             "Title":      storybook.NewTextControl("Monthly Sales"),
@@ -36,10 +35,7 @@ func init() {
 					c.Thickness = float64(controls["Thickness"].Value.(int))
 				},
 			)
-			
-			// Reset the chart when controls change
-			// This needs to be done in the component's OnUpdate
-			return chart
+			return chart.Key("line-chart")
 		},
     )
 }

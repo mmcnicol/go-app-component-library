@@ -26,7 +26,7 @@ func init() {
             "Cell Opacity":  storybook.NewRangeControl(0, 100, 10, 100),
         },
         func(controls map[string]*storybook.Control) app.UI {
-            return New(nil,
+            chart := New(nil,
                 WithTitle(controls["Title"].Value.(string)),
                 func(c *ChartConfig) {
                     // Clear other chart types
@@ -40,6 +40,7 @@ func init() {
                     c.Opacity = float64(controls["Cell Opacity"].Value.(int)) / 100.0
                 },
             )
+            return chart.Key("heatmap")
         },
     )
 }

@@ -17,7 +17,7 @@ func init() {
         func(controls map[string]*storybook.Control) app.UI {
             cap := controls["Buffer Capacity"].Value.(int)
             
-            return New([]Point{},
+            chart := New([]Point{},
                 WithTitle("Live Data Feed"),
                 WithColor(controls["Line Color"].Value.(string)),
                 func(c *ChartConfig) {
@@ -31,6 +31,7 @@ func init() {
                     c.Capacity = cap
                 },
             )
+            return chart.Key("streaming-chart")
         },
     )
 }

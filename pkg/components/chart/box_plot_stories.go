@@ -17,12 +17,11 @@ func init() {
 			"Box Width":   storybook.NewRangeControl(20, 100, 5, 50),
 			"Theme Color": storybook.NewColorControl("#4a90e2"),
 		},
-		// In box_plot_stories.go, modify the render function:
 		func(controls map[string]*storybook.Control) app.UI {
 			statsA := CalculateBoxStats(groupA)
 			statsB := CalculateBoxStats(groupB)
 
-			return New(nil,
+			chart := New(nil,
 				WithTitle("Comparison of Distributions"),
 				WithColor(controls["Theme Color"].Value.(string)),
 				func(c *ChartConfig) {
@@ -33,6 +32,7 @@ func init() {
 					c.HeatmapMatrix = nil  // Clear any heatmap data
 				},
 			)
+			return chart.Key("box-plot")
 		},
 	)
 }
