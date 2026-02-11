@@ -1,6 +1,10 @@
 // pkg/components/chart/box_plot_chart.go
 package chart
 
+import (
+    "sort"
+)
+
 type BoxPlotChart struct {
     BaseChart
     showOutliers bool
