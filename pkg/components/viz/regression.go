@@ -1,10 +1,6 @@
 // pkg/components/viz/regression.go
 package viz
 
-import (
-    "math"
-)
-
 // RegressionResult contains regression analysis results
 type RegressionResult struct {
     Type        RegressionType

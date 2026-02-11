@@ -1,10 +1,6 @@
 // pkg/components/viz/config.go
 package viz
 
-import (
-    "github.com/maxence-charriere/go-app/v10/pkg/app"
-)
-
 // This file should only contain extensions and additional helper functions
 // for the InteractiveConfig, not redeclarations
 
