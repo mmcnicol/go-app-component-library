@@ -140,33 +140,46 @@ func (bc *BaseChart) OnNav(ctx app.Context) {
 
 // Render renders the chart
 func (bc *BaseChart) Render() app.UI {
-    return app.Div().
+    div := app.Div().
         ID(bc.containerID).
-        Class(append([]string{"chart-container"}, bc.classes...)...).
+        Class(append([]string{"chart-container"}, bc.classes...)...)
+    
+    // Apply styles from metadata if any
+    if bc.spec.Metadata != nil {
+        if styles, ok := bc.spec.Metadata["styles"].(map[string]string); ok {
+            for name, value := range styles {
+                div = div.Style(name, value)
+            }
+        }
+    }
+    
+    // Add default styles
+    div = div.
         Style("position", "relative").
         Style("width", "100%").
-        Style("height", "400px").
-        Body(
-            // Canvas element for drawing
-            func() app.UI {
-                if bc.engine != nil {
-                    return bc.engine.GetCanvas()
-                }
-                return app.Canvas().
-                    ID(bc.containerID + "-canvas").
-                    Class("chart-canvas").
-                    Style("width", "100%").
-                    Style("height", "100%").
-                    Style("display", "block")
-            }(),
-            // Tooltip
-            func() app.UI {
-                if bc.tooltipManager != nil {
-                    return bc.tooltipManager.GetTooltipUI()
-                }
-                return app.Div()
-            }(),
-        )
+        Style("height", "400px")
+    
+    return div.Body(
+        // Canvas element for drawing
+        func() app.UI {
+            if bc.engine != nil {
+                return bc.engine.GetCanvas()
+            }
+            return app.Canvas().
+                ID(bc.containerID + "-canvas").
+                Class("chart-canvas").
+                Style("width", "100%").
+                Style("height", "100%").
+                Style("display", "block")
+        }(),
+        // Tooltip
+        func() app.UI {
+            if bc.tooltipManager != nil {
+                return bc.tooltipManager.GetTooltipUI()
+            }
+            return app.Div()
+        }(),
+    )
 }
 
 // Add this method to render the chart
@@ -280,4 +293,20 @@ func (bc *BaseChart) calculateMean(data []float64) float64 {
         sum += v
     }
     return sum / float64(len(data))
+}
+
+// Style sets inline CSS styles for the chart container
+func (bc *BaseChart) Style(name, value string) *BaseChart {
+    // We'll need to store styles and apply them in Render()
+    // For now, we can add them to classes or handle differently
+    // Let's add a style map to BaseChart
+    if bc.spec.Metadata == nil {
+        bc.spec.Metadata = make(map[string]interface{})
+    }
+    if styles, ok := bc.spec.Metadata["styles"].(map[string]string); ok {
+        styles[name] = value
+    } else {
+        bc.spec.Metadata["styles"] = map[string]string{name: value}
+    }
+    return bc
 }
