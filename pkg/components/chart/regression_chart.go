@@ -119,7 +119,7 @@ func (c *RegressionChartComponent) OnUpdate(ctx app.Context) {
 	}
 }
 
-/ Render implements app.Compo
+// Render implements app.Compo
 func (c *RegressionChartComponent) Render() app.UI {
     if c.CanvasChart == nil {
         return app.Div().Text("Chart not initialized")
