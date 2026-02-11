@@ -68,45 +68,47 @@ func (c *RegressionChartComponent) WithDatasetName(name string) *RegressionChart
 	return c
 }
 
-// Update OnMount to use the new canvas ID
-func (c *RegressionChartComponent) OnMount(ctx app.Context) {
-    // Don't call c.CanvasChart.OnMount(ctx) - it looks for "main-chart"
+// Render implements app.Compo
+func (c *RegressionChartComponent) Render() app.UI {
+    if c.CanvasChart == nil {
+        return app.Div().Text("Chart not initialized")
+    }
     
-    // Instead, initialize the canvas directly
-    ctx.Defer(func(ctx app.Context) {
-        chartID := fmt.Sprintf("regression-chart-%p", c)
-        canvasJS := app.Window().GetElementByID(chartID)
+    // Generate a unique ID for this chart instance
+    chartID := fmt.Sprintf("regression-chart-%p", c)
+    
+    // Initialize width/height if not set
+    if c.CanvasChart.width == 0 {
+        c.CanvasChart.width = 800
+    }
+    if c.CanvasChart.height == 0 {
+        c.CanvasChart.height = 400
+    }
+    
+    return app.Div().Class("chart-wrapper").Body(
+        app.Canvas().
+            Class("chart-canvas").
+            ID(chartID).
+            Width(c.CanvasChart.width).
+            Height(c.CanvasChart.height).
+            OnMouseMove(c.OnMouseMove),
         
-        if !canvasJS.Truthy() {
-            app.Log("Error: Canvas element not found for regression chart")
-            return
-        }
-
-        // Initialize canvas context on the component itself
-        c.CanvasChart.canvas = canvasJS
-        c.CanvasChart.ctx = canvasJS.Call("getContext", "2d")
-        
-        // ... rest of canvas initialization from CanvasChart.OnMount ...
-        c.CanvasChart.dpr = app.Window().Get("devicePixelRatio").Float()
-        if c.CanvasChart.dpr == 0 {
-            c.CanvasChart.dpr = 1.0
-        }
-
-        c.CanvasChart.ctx.Set("imageSmoothingEnabled", true)
-        c.CanvasChart.ctx.Set("textAlign", "center")
-        c.CanvasChart.ctx.Set("textBaseline", "middle")
-
-        c.CanvasChart.Padding = Padding{
-            Top:    20,
-            Right:  20,
-            Bottom: 40,
-            Left:   50,
-        }
-
-        c.CanvasChart.resize()
-        c.drawRegressionWithEquation()
-        c.initialized = true
-    })
+        app.If(c.CanvasChart.showTooltip, func() app.UI {
+            px, py := c.CanvasChart.ToPixels(c.CanvasChart.activePoint.X, c.CanvasChart.activePoint.Y)
+            return app.Div().
+                Class("chart-tooltip").
+                Style("left", fmt.Sprintf("%fpx", px+15)).
+                Style("top", fmt.Sprintf("%fpx", py-50)).
+                Body(
+                    app.Div().Class("tooltip-header").Text("Data Point"),
+                    app.Div().Class("tooltip-value").Text(
+                        fmt.Sprintf("X: %.1f | Y: %.1f", 
+                            c.CanvasChart.activePoint.X, 
+                            c.CanvasChart.activePoint.Y),
+                    ),
+                )
+        }),
+    )
 }
 
 // OnUpdate implements app.Compo
