@@ -1,6 +1,12 @@
 // pkg/component/regression_chart_component.go
 package chart
 
+import (
+	"fmt"
+	"math"
+	"github.com/maxence-charriere/go-app/v10/pkg/app"
+)
+
 // RegressionChartComponent extends CanvasChart to add equation display
 type RegressionChartComponent struct {
 	*CanvasChart
