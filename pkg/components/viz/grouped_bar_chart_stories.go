@@ -1,10 +1,14 @@
+// pkg/components/viz/bar_chart_stories.go
 //go:build dev
-// pkg/components/viz/grouped_bar_chart_stories.go
 package viz
 
 import (
-	"github.com/maxence-charriere/go-app/v10/pkg/app"
-	"github.com/mmcnicol/go-app-component-library/pkg/storybook"
+    "fmt"
+    "sort"
+    "strings"
+    
+    "github.com/maxence-charriere/go-app/v10/pkg/app"
+    "github.com/mmcnicol/go-app-component-library/pkg/storybook"
 )
 
 func init() {
