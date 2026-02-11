@@ -19,45 +19,33 @@ type RegressionChartComponent struct {
 	data         []Point
 }
 
-/*
-// Override OnMount to customize the drawing
-func (c *RegressionChartComponent) OnMount(ctx app.Context) {
-	if c.CanvasChart == nil {
-        return
-    }
-	// Call parent OnMount first
-	c.CanvasChart.OnMount(ctx)
-	
-	// After canvas is mounted, we need to override the drawing
-	ctx.Defer(func(ctx app.Context) {
-		if c.ctx.Truthy() {
-			c.drawRegressionWithEquation()
-		}
-	})
-}
-*/
+// pkg/components/chart/regression_chart.go
 
 func (c *RegressionChartComponent) OnMount(ctx app.Context) {
-    if c.CanvasChart != nil {
-        c.DrawRegression(c.data, c.pointColor, c.lineColor)
-    }
+    // 1. Let the parent CanvasChart mount first
+    c.CanvasChart.OnMount(ctx)
+    
+    // 2. Defer drawing to ensure CanvasChart's ctx is initialized
+    ctx.Defer(func(ctx app.Context) {
+        if c.CanvasChart != nil && c.CanvasChart.ctx.Truthy() {
+            c.DrawRegression(c.data, c.pointColor, c.lineColor)
+        }
+    })
 }
 
-/*
-// Override OnUpdate to handle updates
 func (c *RegressionChartComponent) OnUpdate(ctx app.Context) bool {
-	if c.CanvasChart != nil {
-        c.drawRegression()
-    }
+    // Return true to allow go-app to update the component
+    ctx.Defer(func(ctx app.Context) {
+        if c.CanvasChart != nil && c.CanvasChart.ctx.Truthy() {
+            c.DrawRegression(c.data, c.pointColor, c.lineColor)
+        }
+    })
     return true
 }
-*/
 
-func (c *RegressionChartComponent) OnUpdate(ctx app.Context) bool {
-    if c.CanvasChart != nil {
-        c.DrawRegression(c.data, c.pointColor, c.lineColor)
-    }
-    return true
+func (c *RegressionChartComponent) Render() app.UI {
+    // You MUST return the internal CanvasChart so it can render the <canvas> tag
+    return c.CanvasChart
 }
 
 // OnDismount - delegate to embedded CanvasChart
@@ -73,20 +61,6 @@ func (c *RegressionChartComponent) ShouldUpdate(next app.Compo) bool {
 		return c.CanvasChart.ShouldUpdate(next)
 	}
 	return true
-}
-
-/*
-// Render implements app.Compo
-func (c *RegressionChartComponent) Render() app.UI {
-	if c.CanvasChart == nil {
-		return app.Div().Text("Chart not initialized")
-	}
-	return c.CanvasChart.Render()
-}
-*/
-
-func (c *RegressionChartComponent) Render() app.UI {
-    return c.CanvasChart
 }
 
 // Custom drawing method
