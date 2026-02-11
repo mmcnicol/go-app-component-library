@@ -245,6 +245,8 @@ func (s *Shell) renderControls() app.UI {
     )
 }
 
+
+/*
 func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
     switch ctrl.Type {
 
@@ -321,3 +323,90 @@ func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
         return app.Text("Unsupported control")
     }
 }
+*/
+
+//func (s *Shell) renderControl(ctrl *Control) app.UI {
+func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
+	switch ctrl.Type {
+	case ControlRange:
+		return app.Input().
+			Type("range").
+			Attr("value", ctrl.Value).
+			// Use OnInput for real-time slider updates
+			OnInput(func(ctx app.Context, e app.Event) {
+				val := ctx.JSSrc().Get("value").String()
+				i, _ := strconv.Atoi(val)
+				ctrl.Value = i
+				s.shouldRender = true
+				ctx.Update()
+			})
+
+	case ControlColor:
+		return app.Input().
+			Type("color").
+			Attr("value", ctrl.Value).
+			// Use OnInput to see the color change as the user picks
+			OnInput(func(ctx app.Context, e app.Event) {
+				ctrl.Value = ctx.JSSrc().Get("value").String()
+				s.shouldRender = true
+				ctx.Update()
+			})
+
+    case ControlBool:
+		return app.Input().
+			Type("checkbox").
+			Checked(ctrl.Value.(bool)).
+			OnChange(func(ctx app.Context, e app.Event) {
+				ctrl.Value = ctx.JSSrc().Get("checked").Bool()
+				s.shouldRender = true
+				ctx.Update()
+			})
+
+	case ControlSelect:
+        // Create options for select
+        var options []app.UI
+        for _, opt := range ctrl.Options {
+            isSelected := opt == ctrl.Value.(string)
+            options = append(options, 
+                app.Option().
+                    Value(opt).
+                    Text(opt).
+                    Selected(isSelected),
+            )
+        }
+        
+        return app.Select().
+            Attr("value", ctrl.Value). // Fixed: Use Attr instead of Value()
+            Disabled(ctrl.ReadOnly).
+            OnChange(func(ctx app.Context, e app.Event) {
+                ctrl.Value = ctx.JSSrc().Get("value").String()
+                s.shouldRender = true
+                ctx.Update()
+            }).
+            Body(options...)
+
+    case ControlText, ControlNumber:
+        return app.Input().
+            Type("text").
+            Attr("value", ctrl.Value). // Fixed: Use Attr instead of Value()
+            Disabled(ctrl.ReadOnly).
+            OnInput(func(ctx app.Context, e app.Event) {
+                val := ctx.JSSrc().Get("value").String()
+                
+                // If it's a number, you might want to convert it back to int/float
+                if ctrl.Type == ControlNumber {
+                    i, _ := strconv.Atoi(val)
+                    ctrl.Value = i
+                } else {
+                    ctrl.Value = val
+                }
+                
+                s.shouldRender = true
+                ctx.Update() // Essential to notify go-app to diff the DOM
+            })
+
+	default:
+		return app.Text("Unsupported control")
+	}
+}
+
