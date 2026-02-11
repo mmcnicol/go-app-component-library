@@ -342,6 +342,16 @@ func (c *CanvasChart) drawAll() {
         // Draw Pie Chart - no axes for pie charts
         c.DrawPieChart(c.config.PieData, c.getPieColors())
         
+    } else if len(c.config.BarData) > 0 {
+        // Draw Bar Chart
+        c.calculateBarChartRange()
+        c.drawAxes()
+        c.DrawBarChart(c.config.BarData, c.config.LineColor, c.config.BarColors)
+        // Draw labels if provided
+        if len(c.config.BarLabels) == len(c.config.BarData) {
+            c.drawBarLabels(c.config.BarLabels)
+        }
+        
     } else if c.config.IsStream {
         // Draw Streaming Chart
         if len(c.currentPoints) > 0 {
@@ -691,4 +701,90 @@ func (c *CanvasChart) resetCanvas() {
 func (c *CanvasChart) ShouldUpdate(next app.Compo) bool {
     // Always update to ensure charts render correctly
     return true
+}
+
+// DrawBarChart enhanced version with optional custom colors
+func (c *CanvasChart) DrawBarChart(values []float64, defaultColor string, customColors []string) {
+	if len(values) == 0 {
+		return
+	}
+
+	chartWidth := float64(c.width) - c.Padding.Left - c.Padding.Right
+	chartHeight := float64(c.height) - c.Padding.Top - c.Padding.Bottom
+	
+	// Calculate width per bar including a 20% gap
+	barWidth := (chartWidth / float64(len(values))) * 0.7
+	gap := (chartWidth / float64(len(values))) * 0.3
+
+	for i, val := range values {
+		// Calculate X position
+		xPos := c.Padding.Left + (float64(i) * (barWidth + gap)) + (gap / 2)
+		
+		// Map the Y value to pixels
+		_, pyValue := c.ToPixels(0, val)
+		_, pyBase := c.ToPixels(0, c.DataRange.MinY)
+
+		barHeight := pyBase - pyValue
+
+		// Set color - use custom color if provided, otherwise default
+		if customColors != nil && i < len(customColors) {
+			c.ctx.Set("fillStyle", customColors[i])
+		} else {
+			c.ctx.Set("fillStyle", defaultColor)
+		}
+
+		// Draw the rectangle
+		c.ctx.Call("fillRect", xPos, pyValue, barWidth, barHeight)
+		
+		// Add a subtle border
+		c.ctx.Set("strokeStyle", "#333")
+		c.ctx.Set("lineWidth", 1)
+		c.ctx.Call("strokeRect", xPos, pyValue, barWidth, barHeight)
+	}
+}
+
+// drawBarLabels adds labels under each bar
+func (c *CanvasChart) drawBarLabels(labels []string) {
+	if len(labels) == 0 {
+		return
+	}
+
+	chartWidth := float64(c.width) - c.Padding.Left - c.Padding.Right
+	barWidth := (chartWidth / float64(len(labels))) * 0.7
+	gap := (chartWidth / float64(len(labels))) * 0.3
+
+	c.ctx.Set("font", "12px sans-serif")
+	c.ctx.Set("fillStyle", "#666")
+	c.ctx.Set("textAlign", "center")
+	c.ctx.Set("textBaseline", "top")
+
+	for i, label := range labels {
+		xPos := c.Padding.Left + (float64(i) * (barWidth + gap)) + (gap / 2) + (barWidth / 2)
+		yPos := float64(c.height) - c.Padding.Bottom + 10
+		c.ctx.Call("fillText", label, xPos, yPos)
+	}
+}
+
+// calculateBarChartRange determines the Y-axis range for bar charts
+func (c *CanvasChart) calculateBarChartRange() {
+	if len(c.config.BarData) == 0 {
+		return
+	}
+	
+	maxY := c.config.BarData[0]
+	for _, val := range c.config.BarData[1:] {
+		if val > maxY {
+			maxY = val
+		}
+	}
+	
+	// Add 10% padding above the highest bar
+	yPadding := maxY * 0.1
+	
+	c.DataRange = DataRange{
+		MinX: 0,
+		MaxX: float64(len(c.config.BarData)),
+		MinY: 0, // Bar charts typically start at 0
+		MaxY: maxY + yPadding,
+	}
 }

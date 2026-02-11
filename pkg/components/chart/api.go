@@ -4,23 +4,12 @@ package chart
 //import "github.com/maxence-charriere/go-app/v10/pkg/app"
 
 // ChartConfig defines the public interface for customization
-/*
-type ChartConfig struct {
-	Title      string
-	LineColor  string
-	Thickness  float64
-	IsStream   bool
-	Capacity   int
-}
-*/
-
 type ChartConfig struct {
 	Title            string
 	LineColor        string
 	Thickness        float64
 	IsStream         bool
 	Capacity         int
-	// Add missing fields for other chart types
 	BoxWidth         float64
 	BoxData          []BoxPlotStats
 	HeatmapMatrix    [][]float64
@@ -28,6 +17,9 @@ type ChartConfig struct {
 	Opacity          float64
 	PieData          []float64
 	InnerRadiusRatio float64
+	BarData          []float64  // Simple bar chart values
+	BarLabels        []string   // Optional labels for bars
+	BarColors        []string   // Optional custom colors per bar
 }
 
 type Option func(*ChartConfig)
@@ -50,5 +42,29 @@ func New(data []Point, opts ...Option) *CanvasChart {
 	return &CanvasChart{
 		currentPoints: data,
 		config:        *config,
+	}
+}
+
+// Bar chart specific option functions
+func WithBarData(data []float64) Option {
+	return func(c *ChartConfig) {
+		c.BarData = data
+		// Clear other chart types
+		c.BoxData = nil
+		c.PieData = nil
+		c.HeatmapMatrix = nil
+		c.IsStream = false
+	}
+}
+
+func WithBarLabels(labels []string) Option {
+	return func(c *ChartConfig) {
+		c.BarLabels = labels
+	}
+}
+
+func WithBarColors(colors []string) Option {
+	return func(c *ChartConfig) {
+		c.BarColors = colors
 	}
 }
