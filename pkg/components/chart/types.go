@@ -4,11 +4,11 @@ package chart
 import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"time"
-	"sync"
-	"math"
+	//"sync"
+	//"math"
 	"fmt"
-	"strings"
-	"sort"
+	//"strings"
+	//"sort"
 )
 
 // Chart types

@@ -78,7 +78,8 @@ func (tm *TooltipManager) findNearestPoint(canvasX, canvasY float64) (*DataPoint
 
 func (tm *TooltipManager) showTooltip(point *DataPoint, datasetIndex int, x, y float64) {
     // Format tooltip content
-    content := tm.formatter.Format(point, datasetIndex, tm.chart.spec.Data)
+    //content := tm.formatter.Format(point, datasetIndex, tm.chart.spec.Data)
+    _ := tm.formatter.Format(point, datasetIndex, tm.chart.spec.Data)
     
     // Update tooltip position and content
     // In go-app v10, we would need to update the component state
