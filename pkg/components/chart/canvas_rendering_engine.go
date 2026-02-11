@@ -53,30 +53,55 @@ func (cr *CanvasRenderer) setupCanvas(ctx app.Context) {
             const canvas = document.getElementById('%s');
             if (!canvas) {
                 console.log('Canvas not found: %s');
+                setTimeout(function() {
+                    // Try again after a short delay
+                    const canvas = document.getElementById('%s');
+                    if (canvas) {
+                        drawChart();
+                    }
+                }, 100);
                 return;
             }
             
-            const container = canvas.parentElement;
-            if (!container) {
-                console.log('Container not found for canvas');
-                return;
+            function drawChart() {
+                const canvas = document.getElementById('%s');
+                const container = canvas.parentElement;
+                
+                if (!container) {
+                    console.log('Container not found for canvas');
+                    return;
+                }
+                
+                // Force container to have dimensions
+                if (container.clientWidth === 0) {
+                    container.style.width = '100%%';
+                    container.style.height = '400px';
+                }
+                
+                // Get container dimensions
+                const width = container.clientWidth || 800;
+                const height = container.clientHeight || 400;
+                
+                // Set canvas dimensions
+                canvas.width = width;
+                canvas.height = height;
+                canvas.style.width = width + 'px';
+                canvas.style.height = height + 'px';
+                
+                // Draw the chart
+                const ctx = canvas.getContext('2d');
+                %s
             }
             
-            // Get container dimensions
-            const width = container.clientWidth || 800;
-            const height = container.clientHeight || 400;
+            // Initial draw
+            drawChart();
             
-            // Set canvas dimensions
-            canvas.width = width;
-            canvas.height = height;
-            canvas.style.width = width + 'px';
-            canvas.style.height = height + 'px';
-            
-            // Draw the chart
-            const ctx = canvas.getContext('2d');
-            %s
+            // Redraw on window resize
+            window.addEventListener('resize', function() {
+                setTimeout(drawChart, 100);
+            });
         })();
-    `, cr.canvasID, cr.canvasID, cr.getDrawScript()))
+    `, cr.canvasID, cr.canvasID, cr.canvasID, cr.canvasID, cr.getDrawScript()))
 }
 
 func (cr *CanvasRenderer) getDrawScript() string {
@@ -288,8 +313,10 @@ func (cr *CanvasRenderer) getBarChartScript() string {
         datasets += fmt.Sprintf(`{
             label: '%s',
             data: [%s],
-            color: '%s'
-        },`, dataset.Label, points, color)
+            color: '%s',
+            borderColor: '%s',
+            borderWidth: %d
+        },`, dataset.Label, points, color, dataset.BorderColor, dataset.BorderWidth)
     }
     
     labels := ""
@@ -300,6 +327,8 @@ func (cr *CanvasRenderer) getBarChartScript() string {
     return fmt.Sprintf(`
         // Draw bar chart
         function drawBarChart(ctx, width, height) {
+            console.log('Drawing bar chart, width:', width, 'height:', height);
+            
             // Clear canvas
             ctx.clearRect(0, 0, width, height);
             
@@ -310,7 +339,9 @@ func (cr *CanvasRenderer) getBarChartScript() string {
             const datasets = [%s];
             const labels = [%s];
             const numDatasets = datasets.length;
-            const numPoints = datasets[0].data.length;
+            const numBars = labels.length;
+            
+            console.log('Datasets:', numDatasets, 'Bars per dataset:', datasets[0]?.data?.length);
             
             // Calculate scales
             let minY = Infinity;
@@ -323,10 +354,12 @@ func (cr *CanvasRenderer) getBarChartScript() string {
                 });
             });
             
+            console.log('Data range - min:', minY, 'max:', maxY);
+            
             // Add padding
             const yPadding = (maxY - minY) * 0.1;
-            minY -= yPadding;
-            maxY += yPadding;
+            minY = Math.max(0, minY - yPadding);  // Ensure minY doesn't go below 0 for bar charts
+            maxY = maxY + yPadding;
             
             // Ensure minY is 0 if BeginAtZero is true
             if (%t && minY < 0) {
@@ -334,12 +367,16 @@ func (cr *CanvasRenderer) getBarChartScript() string {
             }
             
             // Margins
-            const margin = { top: 20, right: 80, bottom: 60, left: 60 };
+            const margin = { top: 40, right: 40, bottom: 60, left: 60 };
             const plotWidth = width - margin.left - margin.right;
             const plotHeight = height - margin.top - margin.bottom;
             
-            // X scale
-            const xScale = (index) => margin.left + (index * plotWidth / numPoints);
+            console.log('Margins - left:', margin.left, 'right:', margin.right, 'plotWidth:', plotWidth);
+            
+            // X scale - fix bar positioning
+            const barGroupWidth = plotWidth / numBars;
+            const barSpacing = barGroupWidth * 0.1; // 10%% spacing between bar groups
+            const barWidth = (barGroupWidth - barSpacing) / numDatasets;
             
             // Y scale (inverted)
             const yScale = (value) => {
@@ -379,47 +416,73 @@ func (cr *CanvasRenderer) getBarChartScript() string {
             ctx.lineTo(width - margin.right, height - margin.bottom);
             ctx.stroke();
             
-            // Draw bars
-            const barWidth = (plotWidth / numPoints) / numDatasets * 0.8;
-            
+            // Draw bars - FIXED POSITIONING
             datasets.forEach((dataset, datasetIdx) => {
                 ctx.fillStyle = dataset.color;
+                ctx.strokeStyle = dataset.borderColor || '#333';
+                ctx.lineWidth = dataset.borderWidth || 1;
                 
                 dataset.data.forEach((point, pointIdx) => {
-                    const xPos = xScale(pointIdx) + 
-                                (datasetIdx * barWidth) - 
-                                (numDatasets * barWidth / 2) + 
-                                (barWidth / 2);
+                    // Calculate bar position - FIXED
+                    const groupCenterX = margin.left + (pointIdx * barGroupWidth) + (barGroupWidth / 2);
+                    const barX = groupCenterX - (numDatasets * barWidth / 2) + (datasetIdx * barWidth);
+                    
                     const yPos = yScale(point.y);
-                    const barHeight = yScale(0) - yPos;
+                    const zeroY = yScale(0);
+                    const barHeight = zeroY - yPos;
                     
-                    // Draw bar
-                    ctx.fillRect(
-                        xPos - barWidth/2,
-                        yPos,
-                        barWidth,
-                        barHeight
-                    );
-                    
-                    // Draw border
-                    ctx.strokeStyle = '#333';
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(
-                        xPos - barWidth/2,
-                        yPos,
-                        barWidth,
-                        barHeight
-                    );
+                    // Only draw if barHeight is positive
+                    if (barHeight > 0) {
+                        // Draw bar
+                        ctx.fillRect(
+                            barX,
+                            yPos,
+                            barWidth,
+                            barHeight
+                        );
+                        
+                        // Draw border
+                        ctx.strokeRect(
+                            barX,
+                            yPos,
+                            barWidth,
+                            barHeight
+                        );
+                        
+                        // Draw value label on top of bar
+                        ctx.fillStyle = '#000000';
+                        ctx.font = '10px Arial';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'bottom';
+                        ctx.fillText(
+                            Math.round(point.y).toString(),
+                            barX + barWidth / 2,
+                            yPos - 5
+                        );
+                        ctx.fillStyle = dataset.color; // Reset fill color
+                    }
                 });
             });
             
-            // Draw labels on X axis
+            // Draw labels on X axis - FIXED
+            ctx.fillStyle = '#000000';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
             labels.forEach((label, i) => {
-                const x = xScale(i);
-                ctx.fillText(label, x, height - margin.bottom + 10);
+                if (i < numBars) {
+                    const x = margin.left + (i * barGroupWidth) + (barGroupWidth / 2);
+                    ctx.fillText(label, x, height - margin.bottom + 10);
+                }
             });
+            
+            // Draw Y axis labels
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'middle';
+            for (let i = 0; i <= 5; i++) {
+                const yValue = minY + ((maxY - minY) * i / 5);
+                const yPos = yScale(yValue);
+                ctx.fillText(Math.round(yValue).toString(), margin.left - 10, yPos);
+            }
             
             // Draw legend
             const legendX = width - margin.right + 10;
@@ -434,17 +497,34 @@ func (cr *CanvasRenderer) getBarChartScript() string {
                 ctx.fillStyle = dataset.color;
                 ctx.fillRect(legendX, y, boxSize, boxSize);
                 
+                // Draw border around box
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(legendX, y, boxSize, boxSize);
+                
                 // Draw label
                 ctx.fillStyle = '#000000';
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'middle';
+                ctx.font = '12px Arial';
                 ctx.fillText(dataset.label, legendX + boxSize + 10, y + boxSize/2);
             });
+            
+            // Draw title if exists
+            if ('%s') {
+                ctx.fillStyle = '#000000';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText('%s', width / 2, 10);
+            }
         }
         
         // Call draw function
         drawBarChart(ctx, width, height);
-    `, datasets, labels, cr.chartSpec.Options.Scales.Y.BeginAtZero)
+    `, datasets, labels, cr.chartSpec.Options.Scales.Y.BeginAtZero, 
+       cr.chartSpec.Options.Plugins.Title.Display, 
+       cr.chartSpec.Options.Plugins.Title.Text)
 }
 
 // Update implements ChartEngine.Update

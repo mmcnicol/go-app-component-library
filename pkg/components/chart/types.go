@@ -61,8 +61,14 @@ type ChartOptions struct {
 }
 
 type ChartPlugins struct {
-	Legend  LegendOptions
-	Tooltip TooltipOptions
+    Legend  LegendOptions
+    Tooltip TooltipOptions
+    Title   TitleOptions
+}
+
+type TitleOptions struct {
+    Display bool
+    Text    string
 }
 
 type ChartScales struct {

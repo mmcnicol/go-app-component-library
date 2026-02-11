@@ -40,6 +40,10 @@ func NewChart(chartType ChartType) *BaseChart {
                 Responsive: true,
                 MaintainAspectRatio: false,
                 Plugins: ChartPlugins{
+                    Title: TitleOptions{
+                        Display: true,
+                        Text:    string(chartType) + " Chart",
+                    },
                     Legend: LegendOptions{
                         Display: true,
                         Position: "top",
@@ -59,9 +63,9 @@ func NewChart(chartType ChartType) *BaseChart {
 
 // Title sets the chart title
 func (bc *BaseChart) Title(title string) *BaseChart {
-    bc.spec.Options.Plugins.Tooltip = TooltipOptions{
-        Enabled: true,
-        IntersectDistance: 10,
+    bc.spec.Options.Plugins.Title = TitleOptions{
+        Display: true,
+        Text:    title,
     }
     return bc
 }
