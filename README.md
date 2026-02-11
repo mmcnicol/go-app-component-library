@@ -44,18 +44,18 @@ Overlay
 - [ ] Dialogue
 - [ ] ConfirmDialogue
 - [ ] ConfirmPopup
+- [ ] Sidebar
+- [ ] Growl
+- [ ] Tooltip
+- [ ] NotificationBar / CookieConsent
 
 Navigation
 - [ ] MenuBar / Navbar
-- [ ] Sidebar
 - [ ] Sidenav?
 
 Messages
 - [x] PhaseBanner
 - [x] StaticMessage
-- [ ] Growl
-- [ ] Tooltip
-- [ ] NotificationBar / CookieConsent
 
 Feedback
 - [x] Progress
