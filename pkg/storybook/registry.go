@@ -121,7 +121,13 @@ func NewBoolControl(defaultValue bool) *Control {
 */
 
 
-
+// NewTextControl creates a control for text input
+func NewTextControl(defaultValue string) *Control {
+	return &Control{
+		Type:  "text",
+		Value: defaultValue,
+	}
+}
 
 // NewRangeControl creates a control for numeric sliders
 func NewRangeControl(min, max, step, defaultValue int) *Control {

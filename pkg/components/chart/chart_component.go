@@ -3,6 +3,7 @@ package chart
 
 import (
 	"fmt"
+	"math"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
