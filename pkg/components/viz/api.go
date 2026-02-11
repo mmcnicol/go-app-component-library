@@ -367,6 +367,7 @@ func ScatterChart(data DataSet) *Chart {
     return New(Spec{Type: ChartTypeScatter, Data: data})
 }
 
+/*
 // StreamingChart creates a chart optimized for streaming data
 func StreamingChart(chartType ChartType) *StreamingChart {
     return &StreamingChart{
@@ -376,3 +377,4 @@ func StreamingChart(chartType ChartType) *StreamingChart {
         dataBuffer:  NewDataBuffer(100),
     }
 }
+*/

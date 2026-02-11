@@ -222,7 +222,7 @@ func init() {
 				})
 			}
 
-			// Return the chart with wrapper for styling
+			// Return the chart with wrapper for styling - FIX app.If usage
 			return app.Div().ID("viz-bar-chart-container").Body(
 				app.Div().Class("viz-chart-wrapper").Body(
 					chart,
@@ -230,8 +230,18 @@ func init() {
 				app.Div().Class("viz-chart-footer").Body(
 					app.Small().Class("text-muted").Body(
 						app.Text(fmt.Sprintf("%d data points • ", len(data))),
-						app.If(interactive, app.Text("Interactive • ")),
-						app.If(animated, app.Text("Animated • ")),
+						func() app.UI {
+							if interactive {
+								return app.Text("Interactive • ")
+							}
+							return app.Text("")
+						}(),
+						func() app.UI {
+							if animated {
+								return app.Text("Animated • ")
+							}
+							return app.Text("")
+						}(),
 						app.Text("Accessible"),
 					),
 				),

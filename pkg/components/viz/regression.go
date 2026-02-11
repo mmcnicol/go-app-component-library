@@ -5,19 +5,6 @@ import (
     "math"
 )
 
-/*
-// Regression types
-type RegressionType string
-
-const (
-    Linear      RegressionType = "linear"
-    Polynomial  RegressionType = "polynomial"
-    Exponential RegressionType = "exponential"
-    Logarithmic RegressionType = "logarithmic"
-    Power       RegressionType = "power"
-)
-*/
-
 // RegressionResult contains regression analysis results
 type RegressionResult struct {
     Type        RegressionType
@@ -31,15 +18,15 @@ type RegressionResult struct {
 // CalculateRegression performs regression analysis on data points
 func CalculateRegression(points []Point, rtype RegressionType, degree int) RegressionResult {
     switch rtype {
-    case Linear:
+    case RegressionTypeLinear:
         return calculateLinearRegression(points)
-    case Polynomial:
+    case RegressionTypePolynomial:
         return calculatePolynomialRegression(points, degree)
-    case Exponential:
+    case RegressionTypeExponential:
         return calculateExponentialRegression(points)
-    case Logarithmic:
+    case RegressionTypeLogarithmic:
         return calculateLogarithmicRegression(points)
-    case Power:
+    case RegressionTypePower:
         return calculatePowerRegression(points)
     default:
         return calculateLinearRegression(points)
@@ -49,7 +36,7 @@ func CalculateRegression(points []Point, rtype RegressionType, degree int) Regre
 func calculateLinearRegression(points []Point) RegressionResult {
     // TODO: Implement
     return RegressionResult{
-        Type:        Linear,
+        Type:        RegressionTypeLinear,
         Coefficients: []float64{0, 1},
         Equation:    "y = x",
         RSquared:    1.0,
@@ -60,20 +47,20 @@ func calculateLinearRegression(points []Point) RegressionResult {
 
 func calculatePolynomialRegression(points []Point, degree int) RegressionResult {
     // TODO: Implement
-    return RegressionResult{Type: Polynomial}
+    return RegressionResult{Type: RegressionTypePolynomial}
 }
 
 func calculateExponentialRegression(points []Point) RegressionResult {
     // TODO: Implement
-    return RegressionResult{Type: Exponential}
+    return RegressionResult{Type: RegressionTypeExponential}
 }
 
 func calculateLogarithmicRegression(points []Point) RegressionResult {
     // TODO: Implement
-    return RegressionResult{Type: Logarithmic}
+    return RegressionResult{Type: RegressionTypeLogarithmic}
 }
 
 func calculatePowerRegression(points []Point) RegressionResult {
     // TODO: Implement
-    return RegressionResult{Type: Power}
+    return RegressionResult{Type: RegressionTypePower}
 }

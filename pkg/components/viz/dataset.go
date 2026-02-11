@@ -5,6 +5,32 @@ import (
     "fmt"
 )
 
+// Stroke defines line styling
+type Stroke struct {
+    Width float64 `json:"width"`
+    Color string  `json:"color"`
+    Dash  []float64 `json:"dash,omitempty"`
+}
+
+// PointStyle defines point marker style
+type PointStyle string
+
+const (
+    PointStyleCircle   PointStyle = "circle"
+    PointStyleSquare   PointStyle = "square"
+    PointStyleTriangle PointStyle = "triangle"
+    PointStyleCross    PointStyle = "cross"
+    PointStyleDiamond  PointStyle = "diamond"
+)
+
+// Node represents a node in hierarchical data structures
+type Node struct {
+    Name     string      `json:"name"`
+    Value    float64     `json:"value,omitempty"`
+    Children []*Node     `json:"children,omitempty"`
+    Data     interface{} `json:"data,omitempty"`
+}
+
 // DataSet represents a complete dataset for visualization
 type DataSet struct {
     // Labels for categories (x-axis, slices, etc)
