@@ -448,7 +448,7 @@ func (c *CanvasChart) OnMouseMove(ctx app.Context, e app.Event) {
         c.showTooltip = false
     }
     
-    c.Update()
+    ctx.Update()
 }
 
 func (c *CanvasChart) OnUpdate(ctx app.Context) {
