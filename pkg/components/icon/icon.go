@@ -43,7 +43,8 @@ func (i *Icon) GetIcon(name string, size int) app.UI {
 	case "file":
 		d = "M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"
 	case "hospital-inpatient":
-		d = "M18 10V7c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v3c-1.1 0-2 .9-2 2v5h1.33L6 19h1l.67-2h8.67l.66 2h1l.67-2H20v-5c0-1.1-.9-2-2-2zm-5 2h-2v-2h2v2zm5 2H6v-2h12v2z"
+		// Person symbol next to a medical cross (Outpatient/Ambulatory care)
+    	d = "M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-2v-4H8v-2h4V8h2v4h4v2zM7 7c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm-2 9v-1c0-1.1.9-2 2-2s2 .9 2 2v1h-4z"
 	case "hospital-outpatient":
 		// Simple: Person + arrow (outpatient concept)
     	d = "M12 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-2 9h4v2h-4zm6-8l-4 4 4 4 1.4-1.4L13.8 12H16v-2h-2.2l1.6-1.6L14 7z"
