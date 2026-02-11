@@ -17,9 +17,9 @@ type BaseChart struct {
     isRendered  bool
     classes     []string
     
-    // DOM elements
-    canvasElem  app.HTMLCanvas
-    tooltipElem app.HTMLDiv
+    // Managers
+    tooltipManager *TooltipManager
+    zoomPanManager *ZoomPanManager
     
     // Event handlers
     onPointClick    func(point DataPoint, datasetIndex int)
@@ -79,10 +79,26 @@ func (bc *BaseChart) WithRegression(regType RegressionType, degree int) *BaseCha
 }
 */
 
-// Render renders the chart (implementation in base_chart.go)
+// Initialize managers in constructor or setup method
+func (bc *BaseChart) setupManagers() {
+    bc.tooltipManager = NewTooltipManager(bc)
+    bc.zoomPanManager = NewZoomPanManager(bc)
+}
+
+// Render renders the chart
 func (bc *BaseChart) Render() app.UI {
-    // Basic implementation - should be overridden by specific chart types
-    return app.Div().Text("Chart would render here")
+    bc.setupManagers()
+    
+    return app.Div().
+        Class(append([]string{"chart-container"}, bc.classes...)...).
+        Body(
+            app.Canvas().
+                ID(bc.containerID + "-canvas").
+                Class("chart-canvas").
+                Style("width", "100%").
+                Style("height", "100%"),
+            bc.tooltipManager.GetTooltipUI(),
+        )
 }
 
 func (bc *BaseChart) calculateTrend() string {
