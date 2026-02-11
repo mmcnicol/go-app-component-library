@@ -14,19 +14,20 @@ type Panel struct {
 
 func (p *Panel) Render() app.UI {
 	return app.Div().
-		Style("border", "1px solid #eee").
-		Style("border-radius", "8px").
+		Style("border", "1px solid #eee"). 
+		Style("border-radius", "8px").     
 		Style("background-color", "inherit").
 		Style("display", "flex").
 		Style("flex-direction", "column").
 		Body(
-			app.If(p.Title != "",
-				app.Div().
+			// Fixed: Wrapped the title UI in an anonymous function
+			app.If(p.Title != "", func() app.UI {
+				return app.Div().
 					Style("padding", "10px 15px").
 					Style("border-bottom", "1px solid #eee").
 					Style("font-weight", "bold").
-					Text(p.Title),
-			),
+					Text(p.Title)
+			}),
 			app.Div().
 				Style("padding", p.getPadding()).
 				Body(p.Content),
