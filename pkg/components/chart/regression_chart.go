@@ -20,9 +20,9 @@ type RegressionChartComponent struct {
 }
 
 func (c *RegressionChartComponent) OnMount(ctx app.Context) {
-    c.CanvasChart.OnMount(ctx) // Let the base class start its setup
-    
-    // Defer our drawing to the next frame
+    // REMOVED: c.CanvasChart.OnMount(ctx) <-- go-app does this automatically!
+
+    // Wait for the CanvasChart (child) to be ready
     ctx.Defer(func(ctx app.Context) {
         c.tryInitialDraw(ctx, 0)
     })
@@ -30,10 +30,10 @@ func (c *RegressionChartComponent) OnMount(ctx app.Context) {
 
 // A simple retry mechanism to handle the race condition
 func (c *RegressionChartComponent) tryInitialDraw(ctx app.Context, attempts int) {
+    // Check if component exists AND if context is ready
     if c.CanvasChart != nil && c.CanvasChart.ctx.Truthy() {
         c.drawRegressionWithEquation()
-    } else if attempts < 5 {
-        // If not ready, wait another frame
+    } else if attempts < 20 { // Increased attempts slightly for safety
         ctx.Defer(func(ctx app.Context) {
             c.tryInitialDraw(ctx, attempts+1)
         })
@@ -41,12 +41,13 @@ func (c *RegressionChartComponent) tryInitialDraw(ctx app.Context, attempts int)
 }
 
 func (c *RegressionChartComponent) OnUpdate(ctx app.Context) bool {
+    // REMOVED: c.CanvasChart.OnUpdate(ctx) <-- go-app handles this!
+    
     if c.CanvasChart == nil {
         return false
     }
 
-    c.CanvasChart.OnUpdate(ctx)
-    
+    // Trigger our drawing logic after the update
     ctx.Defer(func(ctx app.Context) {
         if c.CanvasChart != nil && c.CanvasChart.ctx.Truthy() {
             c.drawRegressionWithEquation()
