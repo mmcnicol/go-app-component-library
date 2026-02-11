@@ -2,9 +2,9 @@
 package chart
 
 import (
-	"fmt"
+    "fmt"
     "math"
-	"github.com/maxence-charriere/go-app/v10/pkg/app"
+    "github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
 // Custom type for canvas context since go-app doesn't expose CanvasRenderingContext2D directly
@@ -32,6 +32,7 @@ func NewCanvasRenderer(containerID string) (*CanvasRenderer, error) {
         Style("display", "block")
     
     // Get rendering context - in go-app, we use JS to get the context
+    // Note: This creates a separate canvas for context, not ideal
     cr.ctx = CanvasRenderingContext2D{Value: app.Window().Get("document").Call("createElement", "canvas").Call("getContext", "2d")}
     
     return cr, nil
@@ -72,15 +73,21 @@ func (cr *CanvasRenderer) setupCanvas(responsive bool) {
         cr.height = 400
     }
     
-    // Set canvas dimensions
-    cr.canvas.SetAttr("width", cr.width)
-    cr.canvas.SetAttr("height", cr.height)
-    cr.canvas.SetStyle("width", fmt.Sprintf("%dpx", cr.width))
-    cr.canvas.SetStyle("height", fmt.Sprintf("%dpx", cr.height))
+    // In go-app v10, we set attributes and styles differently
+    // For canvas, we need to set width/height attributes directly
+    cr.canvas = cr.canvas.
+        Attr("width", fmt.Sprintf("%d", cr.width)).
+        Attr("height", fmt.Sprintf("%d", cr.height)).
+        Style("width", fmt.Sprintf("%dpx", cr.width)).
+        Style("height", fmt.Sprintf("%dpx", cr.height))
 }
 
 func (cr *CanvasRenderer) clearCanvas() {
-    cr.ctx.Call("clearRect", 0, 0, cr.width, cr.height)
+    // Note: In actual implementation, we'd need to get the actual canvas context
+    // This is a placeholder
+    if !cr.ctx.Value.IsUndefined() {
+        cr.ctx.Call("clearRect", 0, 0, cr.width, cr.height)
+    }
 }
 
 func (cr *CanvasRenderer) renderLineChart(chart ChartSpec) error {
@@ -109,17 +116,22 @@ func (cr *CanvasRenderer) renderLineChart(chart ChartSpec) error {
 
 func (cr *CanvasRenderer) calculateXScale(data ChartData) Scale {
     // Simplified implementation
+    numLabels := len(data.Labels)
+    if numLabels == 0 {
+        numLabels = 1
+    }
+    
     return Scale{
         Min: 0,
-        Max: float64(len(data.Labels) - 1),
+        Max: float64(numLabels - 1),
         Convert: func(value float64) float64 {
             // Linear mapping
             rangeSize := float64(cr.width - 100) // Account for margins
-            return 50 + (value / float64(len(data.Labels)-1)) * rangeSize
+            return 50 + (value / float64(numLabels-1)) * rangeSize
         },
         Invert: func(pixel float64) float64 {
             rangeSize := float64(cr.width - 100)
-            return ((pixel - 50) / rangeSize) * float64(len(data.Labels)-1)
+            return ((pixel - 50) / rangeSize) * float64(numLabels-1)
         },
     }
 }
@@ -140,6 +152,12 @@ func (cr *CanvasRenderer) calculateYScale(data ChartData) Scale {
         }
     }
     
+    // If no data points, set defaults
+    if min == math.MaxFloat64 {
+        min = 0
+        max = 100
+    }
+    
     // Add some padding
     rangePadding := (max - min) * 0.1
     min -= rangePadding
@@ -150,22 +168,29 @@ func (cr *CanvasRenderer) calculateYScale(data ChartData) Scale {
         max = min + 1
     }
     
+    finalMin := min
+    finalMax := max
+    
     return Scale{
-        Min: min,
-        Max: max,
+        Min: finalMin,
+        Max: finalMax,
         Convert: func(value float64) float64 {
             // Y axis is inverted (0 at top)
             rangeSize := float64(cr.height - 100)
-            return float64(cr.height) - 50 - ((value - min) / (max - min)) * rangeSize
+            return float64(cr.height) - 50 - ((value - finalMin) / (finalMax - finalMin)) * rangeSize
         },
         Invert: func(pixel float64) float64 {
             rangeSize := float64(cr.height - 100)
-            return min + ((float64(cr.height) - 50 - pixel) / rangeSize) * (max - min)
+            return finalMin + ((float64(cr.height) - 50 - pixel) / rangeSize) * (finalMax - finalMin)
         },
     }
 }
 
 func (cr *CanvasRenderer) drawLineDataset(dataset Dataset, xScale, yScale Scale, datasetIndex int) {
+    if cr.ctx.Value.IsUndefined() {
+        return
+    }
+    
     cr.ctx.Set("lineWidth", float64(dataset.BorderWidth))
     cr.ctx.Set("strokeStyle", dataset.BorderColor)
     cr.ctx.Call("beginPath")
@@ -188,7 +213,11 @@ func (cr *CanvasRenderer) drawLineDataset(dataset Dataset, xScale, yScale Scale,
         
         // Draw points
         if dataset.PointRadius > 0 {
-            cr.drawPoint(x, y, dataset.PointRadius, dataset.BackgroundColor[i])
+            color := dataset.BorderColor
+            if len(dataset.BackgroundColor) > i {
+                color = dataset.BackgroundColor[i]
+            }
+            cr.drawPoint(x, y, dataset.PointRadius, color)
         }
     }
     
@@ -201,6 +230,10 @@ func (cr *CanvasRenderer) drawLineDataset(dataset Dataset, xScale, yScale Scale,
 }
 
 func (cr *CanvasRenderer) drawPoint(x, y float64, radius int, color string) {
+    if cr.ctx.Value.IsUndefined() {
+        return
+    }
+    
     cr.ctx.Set("fillStyle", color)
     cr.ctx.Call("beginPath")
     cr.ctx.Call("arc", x, y, float64(radius), 0, 2*math.Pi)
@@ -208,7 +241,10 @@ func (cr *CanvasRenderer) drawPoint(x, y float64, radius int, color string) {
 }
 
 func (cr *CanvasRenderer) drawBezierCurve(points []DataPoint, i int, xScale, yScale Scale, tension float64) {
-    // Simplified bezier curve implementation
+    if cr.ctx.Value.IsUndefined() || i <= 0 {
+        return
+    }
+    
     p0 := points[i-1]
     p1 := points[i]
     
@@ -217,7 +253,7 @@ func (cr *CanvasRenderer) drawBezierCurve(points []DataPoint, i int, xScale, ySc
     x1 := xScale.Convert(p1.X)
     y1 := yScale.Convert(p1.Y)
     
-    // Calculate control points
+    // Calculate control points (simplified)
     cp1x := x0 + (x1-x0)*tension
     cp1y := y0
     cp2x := x1 - (x1-x0)*tension
@@ -227,6 +263,10 @@ func (cr *CanvasRenderer) drawBezierCurve(points []DataPoint, i int, xScale, ySc
 }
 
 func (cr *CanvasRenderer) fillAreaUnderLine(dataset Dataset, xScale, yScale Scale) {
+    if cr.ctx.Value.IsUndefined() || len(dataset.Data) == 0 {
+        return
+    }
+    
     cr.ctx.Set("fillStyle", dataset.BorderColor+"33") // Add transparency
     cr.ctx.Call("beginPath")
     
@@ -234,15 +274,10 @@ func (cr *CanvasRenderer) fillAreaUnderLine(dataset Dataset, xScale, yScale Scal
     firstPoint := dataset.Data[0]
     cr.ctx.Call("moveTo", xScale.Convert(firstPoint.X), yScale.Convert(firstPoint.Y))
     
-    // Draw line
+    // Draw line through all points
     for i := 1; i < len(dataset.Data); i++ {
         point := dataset.Data[i]
-        if dataset.Tension > 0 && i < len(dataset.Data)-1 {
-            // Need proper bezier implementation for filling
-            cr.ctx.Call("lineTo", xScale.Convert(point.X), yScale.Convert(point.Y))
-        } else {
-            cr.ctx.Call("lineTo", xScale.Convert(point.X), yScale.Convert(point.Y))
-        }
+        cr.ctx.Call("lineTo", xScale.Convert(point.X), yScale.Convert(point.Y))
     }
     
     // Close path to baseline
@@ -254,15 +289,17 @@ func (cr *CanvasRenderer) fillAreaUnderLine(dataset Dataset, xScale, yScale Scal
 }
 
 func (cr *CanvasRenderer) drawGrid(xScale, yScale Scale, grid GridOptions) {
-    if !grid.Display {
+    if !grid.Display || cr.ctx.Value.IsUndefined() {
         return
     }
     
     cr.ctx.Set("strokeStyle", "#e0e0e0")
     cr.ctx.Set("lineWidth", 0.5)
     
-    // Draw horizontal grid lines
-    for y := yScale.Min; y <= yScale.Max; y += (yScale.Max - yScale.Min) / 5 {
+    // Draw horizontal grid lines (5 lines)
+    yRange := yScale.Max - yScale.Min
+    for i := 0; i <= 5; i++ {
+        y := yScale.Min + (yRange * float64(i) / 5)
         yPos := yScale.Convert(y)
         cr.ctx.Call("beginPath")
         cr.ctx.Call("moveTo", 50, yPos)
@@ -270,8 +307,11 @@ func (cr *CanvasRenderer) drawGrid(xScale, yScale Scale, grid GridOptions) {
         cr.ctx.Call("stroke")
     }
     
-    // Draw vertical grid lines
-    for x := xScale.Min; x <= xScale.Max; x += (xScale.Max - xScale.Min) / float64(len(xScale)) {
+    // Draw vertical grid lines - use number of labels if available
+    numLabels := 10 // default
+    xRange := xScale.Max - xScale.Min
+    for i := 0; i <= numLabels; i++ {
+        x := xScale.Min + (xRange * float64(i) / float64(numLabels))
         xPos := xScale.Convert(x)
         cr.ctx.Call("beginPath")
         cr.ctx.Call("moveTo", xPos, 50)
@@ -281,7 +321,7 @@ func (cr *CanvasRenderer) drawGrid(xScale, yScale Scale, grid GridOptions) {
 }
 
 func (cr *CanvasRenderer) drawAxes(xScale, yScale Scale, axes AxesOptions) {
-    if !axes.Display {
+    if !axes.Display || cr.ctx.Value.IsUndefined() {
         return
     }
     
@@ -304,7 +344,7 @@ func (cr *CanvasRenderer) drawAxes(xScale, yScale Scale, axes AxesOptions) {
 }
 
 func (cr *CanvasRenderer) drawLegend(datasets []Dataset, legend LegendOptions) {
-    if !legend.Display {
+    if !legend.Display || cr.ctx.Value.IsUndefined() {
         return
     }
     
@@ -346,4 +386,19 @@ func (cr *CanvasRenderer) renderScatterChart(chart ChartSpec) error {
 
 func (cr *CanvasRenderer) renderHeatmapChart(chart ChartSpec) error {
     return fmt.Errorf("heatmap chart not yet implemented")
+}
+
+// Additional required methods for ChartEngine interface
+func (cr *CanvasRenderer) Update(data ChartData) error {
+    // In a real implementation, this would update the chart data
+    return fmt.Errorf("update not yet implemented")
+}
+
+func (cr *CanvasRenderer) Destroy() error {
+    // Clean up resources
+    return nil
+}
+
+func (cr *CanvasRenderer) GetCanvas() app.UI {
+    return cr.canvas
 }
