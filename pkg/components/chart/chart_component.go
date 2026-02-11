@@ -347,11 +347,14 @@ func (c *CanvasChart) DrawHeatmap(grid [][]float64) {
 	}
 }
 
+/*
 func (c *CanvasChart) StartStreaming(ctx app.Context) {
 	c.isRunning = true
 	c.streamLoop(ctx)
 }
+*/
 
+/*
 func (c *CanvasChart) streamLoop(ctx app.Context) {
 	if !c.isRunning {
 		return
@@ -387,6 +390,7 @@ func (c *CanvasChart) streamLoop(ctx app.Context) {
 		return nil
 	}))
 }
+*/
 
 func (c *CanvasChart) OnMouseMove(ctx app.Context, e app.Event) {
     rect := e.Get("target").Call("getBoundingClientRect")
