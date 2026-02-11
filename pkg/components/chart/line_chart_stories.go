@@ -35,7 +35,7 @@ func init() {
 					c.Thickness = float64(controls["Thickness"].Value.(int))
 				},
 			)
-			return app.Div().Key("line-chart").Body(chart)
+			return app.Div().ID("line-chart-container").Body(chart)
 		},
     )
 }

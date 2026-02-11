@@ -40,7 +40,7 @@ func init() {
                     c.Opacity = float64(controls["Cell Opacity"].Value.(int)) / 100.0
                 },
             )
-            return app.Div().Key("heatmap").Body(chart)
+            return app.Div().ID("heatmap-container").Body(chart)
         },
     )
 }

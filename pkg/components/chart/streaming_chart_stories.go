@@ -31,7 +31,7 @@ func init() {
                     c.Capacity = cap
                 },
             )
-            return app.Div().Key("streaming-chart").Body(chart)
+            return app.Div().ID("streaming-chart-container").Body(chart)
         },
     )
 }

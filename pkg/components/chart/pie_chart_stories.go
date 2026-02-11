@@ -36,7 +36,7 @@ func init() {
                     c.InnerRadiusRatio = float64(controls["Inner Radius"].Value.(int)) / 100.0
                 },
             )
-            return app.Div().Key("pie-chart").Body(chart)
+            return app.Div().ID("pie-chart-container").Body(chart)
         },
     )
 }
