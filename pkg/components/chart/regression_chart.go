@@ -24,11 +24,11 @@ func (c *RegressionChartComponent) OnMount(ctx app.Context) {
         return
     }
     
-    // Call parent OnMount
+    // Initialize the base component
     c.CanvasChart.OnMount(ctx)
     
     ctx.Defer(func(ctx app.Context) {
-        // Double check: is the pointer valid AND is the JS context initialized?
+        // Access the ctx from the embedded CanvasChart specifically
         if c.CanvasChart != nil && c.CanvasChart.ctx.Truthy() {
             c.drawRegressionWithEquation()
         }
@@ -39,7 +39,7 @@ func (c *RegressionChartComponent) OnUpdate(ctx app.Context) bool {
     if c.CanvasChart == nil {
         return false
     }
-    
+
     c.CanvasChart.OnUpdate(ctx)
     
     ctx.Defer(func(ctx app.Context) {
@@ -52,7 +52,7 @@ func (c *RegressionChartComponent) OnUpdate(ctx app.Context) bool {
 
 func (c *RegressionChartComponent) Render() app.UI {
     if c.CanvasChart == nil {
-        return app.Div().Text("Chart not initialized")
+        return app.Div().Text("Loading Chart...")
     }
     return c.CanvasChart
 }
