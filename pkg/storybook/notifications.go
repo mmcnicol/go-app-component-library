@@ -120,28 +120,39 @@ func (n *NotificationComponent) Render() app.UI {
 		return app.Div()
 	}
 	
-	return app.Div().Class("storybook-notifications").Body(
-		app.Range(notificationManager.notifications).Slice(func(i int) app.UI {
-			notification := notificationManager.notifications[i]
-			return app.Div().
-				Key(notification.ID).
-				Class("storybook-notification", "notification-"+notification.Type).
-				Body(
-					app.Div().Class("notification-content").Body(
-						app.Span().Class("notification-message").Text(notification.Message),
-						app.Button().
-							Class("notification-close").
-							Text("×").
-							OnClick(func(ctx app.Context, e app.Event) {
-								RemoveNotification(ctx, notification.ID)
-							}),
-					),
-					app.If(notification.Duration > 0, func() app.UI {
-						// Progress bar for auto-dismiss
-						return app.Div().Class("notification-progress").
-							Style("animation-duration", notification.Duration.String())
+	// Build notification elements
+	notificationElems := make([]app.UI, len(notificationManager.notifications))
+	for i, notification := range notificationManager.notifications {
+		// Create notification div with key as an attribute
+		notificationDiv := app.Div().
+			Class("storybook-notification", "notification-"+notification.Type).
+			Attr("data-key", notification.ID) // Use data attribute for key instead of Key() method
+		
+		// Add content
+		notificationDiv.Body(
+			app.Div().Class("notification-content").Body(
+				app.Span().Class("notification-message").Text(notification.Message),
+				app.Button().
+					Class("notification-close").
+					Text("×").
+					OnClick(func(ctx app.Context, e app.Event) {
+						RemoveNotification(ctx, notification.ID)
 					}),
-				)
-		}),
+			),
+		)
+		
+		// Add progress bar if duration > 0
+		if notification.Duration > 0 {
+			notificationDiv.Body(
+				app.Div().Class("notification-progress").
+					Style("animation-duration", notification.Duration.String()),
+			)
+		}
+		
+		notificationElems[i] = notificationDiv
+	}
+	
+	return app.Div().Class("storybook-notifications").Body(
+		notificationElems...,
 	)
 }
