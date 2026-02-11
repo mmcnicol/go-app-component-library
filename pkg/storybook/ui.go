@@ -251,17 +251,17 @@ func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
 	case ControlRange:
 		return app.Input().
 			Type("range").
-			Value(c.Value).
+			Value(ctrl.Value).
 			OnChange(func(ctx app.Context, e app.Event) {
-				onChange(c.Type, app.Window().Get("parseInt").Invoke(ctx.JSSrc().Get("value")).Int())
+				onChange(ctrl.Type, app.Window().Get("parseInt").Invoke(ctx.JSSrc().Get("value")).Int())
 			})
 
 	case ControlColor:
 		return app.Input().
 			Type("color").
-			Value(c.Value).
+			Value(ctrl.Value).
 			OnChange(func(ctx app.Context, e app.Event) {
-				onChange(c.Type, ctx.JSSrc().Get("value").String())
+				onChange(ctrl.Type, ctx.JSSrc().Get("value").String())
 			})
 
     case ControlBool:

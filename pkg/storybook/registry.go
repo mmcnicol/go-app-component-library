@@ -76,6 +76,7 @@ func GetRegistry() []ComponentContainer {
 	return components
 }
 
+/*
 // NewTextControl creates a control for text input
 func NewTextControl(defaultValue string) *Control {
 	return &Control{
@@ -117,3 +118,43 @@ func NewBoolControl(defaultValue bool) *Control {
 		Value: defaultValue,
 	}
 }
+*/
+
+
+
+
+// NewRangeControl creates a control for numeric sliders
+func NewRangeControl(min, max, step, defaultValue int) *Control {
+	return &Control{
+		Type:  ControlRange,
+		Value: defaultValue,
+		// Note: To use min/max/step in the UI, you'd need to add these fields to the Control struct
+	}
+}
+
+// NewColorControl creates a control for color picking
+func NewColorControl(defaultValue string) *Control {
+	return &Control{
+		Type:  ControlColor,
+		Value: defaultValue,
+	}
+}
+
+// NewSelectControl creates a dropdown for multiple options
+func NewSelectControl(options []string, defaultValue string) *Control {
+	return &Control{
+		Type:    ControlSelect,
+		Value:   defaultValue,
+		Options: options, // This populates the slice for the UI
+	}
+}
+
+// NewBoolControl creates a toggle control
+func NewBoolControl(defaultValue bool) *Control {
+	return &Control{
+		Type:  ControlBool,
+		Value: defaultValue,
+	}
+}
+
+
