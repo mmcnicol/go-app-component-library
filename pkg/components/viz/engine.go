@@ -4,7 +4,6 @@ package viz
 import (
     "fmt"
     "math"
-    mathRand "math/rand"
     "github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
