@@ -9,8 +9,8 @@ import (
 
 // RegressionChartComponent must embed app.Compo to be a valid go-app component
 type RegressionChartComponent struct {
-	// REMOVE app.Compo. It is already inside *CanvasChart.
-	*CanvasChart
+	app.Compo            // 1. MUST be here as a value
+	*CanvasChart         // 2. Embedded as a pointer
 	
 	pointColor   string
 	lineColor    string
@@ -55,8 +55,10 @@ func (c *RegressionChartComponent) OnUpdate(ctx app.Context) {
 }
 
 func (c *RegressionChartComponent) Render() app.UI {
-	// Now this is valid because c.CanvasChart is a pointer
-	return c.CanvasChart 
+    // Return the inner CanvasChart. 
+    // This allows the base chart to handle the HTML/Canvas generation
+    // while this component handles the regression logic.
+    return c.CanvasChart 
 }
 
 // OnDismount - delegate to embedded CanvasChart
