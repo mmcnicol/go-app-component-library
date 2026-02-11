@@ -162,4 +162,14 @@ func calculateRSquared(data []Point, m, b float64) float64 {
 }
 
 // Ensure RegressionChartComponent implements app.Compo
+//var _ app.Compo = (*RegressionChartComponent)(nil)
+
+// Ensure RegressionChartComponent implements app.Compo
 var _ app.Compo = (*RegressionChartComponent)(nil)
+
+func (c *RegressionChartComponent) Render() app.UI {
+    if c.CanvasChart == nil {
+        return app.Div().Text("Chart not initialized")
+    }
+    return c.CanvasChart.Render()
+}
