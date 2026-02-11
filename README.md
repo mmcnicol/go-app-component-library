@@ -67,7 +67,8 @@ Feedback
 - [ ] Meter
 
 Charts
-- [ ] Bar Chart
+- [x] Bar Chart (Single Series)
+- [x] Grouped Bar Chart (Multi-Series)
 - [x] Box Plot Chart
 - [x] Heatmap
 - [x] Line Chart
