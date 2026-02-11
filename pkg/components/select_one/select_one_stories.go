@@ -51,7 +51,7 @@ func init() {
 		func(controls map[string]*storybook.Control) app.UI {
 			promptText := controls["PromptText"].Value.(string)
 			isDisabled := controls["Disabled"].Value.(bool)
-			opts := controls["Options"].Value.(string)
+			opts := controls["Options"].Options.([]string)
             //opts := controls["Options"].Options
             selectedValue := controls["SelectedValue"].Value.(string)
 
