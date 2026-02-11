@@ -22,7 +22,7 @@ func init() {
             },
             */
             "Look":     storybook.NewEnumControl(
-                Label: "Look", 
+                "Look", 
                 []string{"primary", "secondary", "danger"}, 
                 "primary",
             ),
