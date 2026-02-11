@@ -14,11 +14,18 @@ func init() {
         map[string]*storybook.Control{
             "Label":    {Label: "Label", Type: storybook.ControlText, Value: "Click Me"},
             "Disabled": {Label: "Disabled", Type: storybook.ControlBool, Value: false},
+            /*
             "Look":     {
                 Label: "Look", 
                 Type: storybook.ControlText, 
                 Value: "primary", // "secondary", "danger"
             },
+            */
+            "Look":     storybook.NewEnumControl(
+                Label: "Look", 
+                []string{"primary", "secondary", "danger"}, 
+                "primary",
+            ),
         },
         func(controls map[string]*storybook.Control) app.UI {
             return &Button{

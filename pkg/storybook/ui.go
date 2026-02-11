@@ -245,42 +245,43 @@ func (s *Shell) renderControls() app.UI {
     )
 }
 
-
-/*
+//func (s *Shell) renderControl(ctrl *Control) app.UI {
 func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
-    switch ctrl.Type {
-
-	case ControlRange:
-		return app.Input().
-			Type("range").
-			Value(ctrl.Value).
-			OnChange(func(ctx app.Context, e app.Event) {
-				onChange(ctrl.Type, app.Window().Get("parseInt").Invoke(ctx.JSSrc().Get("value")).Int())
-			})
-
-	case ControlColor:
-		return app.Input().
-			Type("color").
-			Value(ctrl.Value).
-			OnChange(func(ctx app.Context, e app.Event) {
-				onChange(ctrl.Type, ctx.JSSrc().Get("value").String())
-			})
-
-    case ControlBool:
-        return app.Input().
-            Type("checkbox").
-            Checked(ctrl.Value.(bool)).
-            Disabled(ctrl.ReadOnly).
-            OnChange(func(ctx app.Context, e app.Event) {
-                ctrl.Value = ctx.JSSrc().Get("checked").Bool()
-                s.shouldRender = true // Trigger Shell update
-            })
-
-    case ControlSelect:
-        // Create options for select
+	switch ctrl.Type {
+	case ControlEnum:
+        // Ensure Value is not nil and is a string
+        var currentValue string
+        if ctrl.Value != nil {
+            currentValue, _ = ctrl.Value.(string)
+        }
+        
+        // Create radio buttons or a select dropdown for enum values
         var options []app.UI
-        for _, opt := range ctrl.Options {
-            isSelected := opt == ctrl.Value.(string)
+        
+        // Option 1: Radio buttons (better for small enums)
+        // for _, opt := range ctrl.Enum {
+        //     isChecked := opt == currentValue
+        //     options = append(options, 
+        //         app.Label().Class("enum-option").Body(
+        //             app.Input().
+        //                 Type("radio").
+        //                 Name(key).
+        //                 Value(opt).
+        //                 Checked(isChecked).
+        //                 OnChange(func(ctx app.Context, e app.Event) {
+        //                     ctrl.Value = ctx.JSSrc().Get("value").String()
+        //                     s.shouldRender = true
+        //                     ctx.Update()
+        //                 }),
+        //             app.Text(" "+opt),
+        //         ),
+        //     )
+        // }
+        // return app.Div().Class("enum-group").Body(options...)
+        
+        // Option 2: Select dropdown (more compact)
+        for _, opt := range ctrl.Enum {
+            isSelected := opt == currentValue
             options = append(options, 
                 app.Option().
                     Value(opt).
@@ -290,7 +291,8 @@ func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
         }
         
         return app.Select().
-            Attr("value", ctrl.Value). // Fixed: Use Attr instead of Value()
+            Class("enum-select").
+            Attr("value", currentValue).
             Disabled(ctrl.ReadOnly).
             OnChange(func(ctx app.Context, e app.Event) {
                 ctrl.Value = ctx.JSSrc().Get("value").String()
@@ -298,36 +300,6 @@ func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
                 ctx.Update()
             }).
             Body(options...)
-
-    case ControlText, ControlNumber:
-        return app.Input().
-            Type("text").
-            Attr("value", ctrl.Value). // Fixed: Use Attr instead of Value()
-            Disabled(ctrl.ReadOnly).
-            OnInput(func(ctx app.Context, e app.Event) {
-                val := ctx.JSSrc().Get("value").String()
-                
-                // If it's a number, you might want to convert it back to int/float
-                if ctrl.Type == ControlNumber {
-                    i, _ := strconv.Atoi(val)
-                    ctrl.Value = i
-                } else {
-                    ctrl.Value = val
-                }
-                
-                s.shouldRender = true
-                ctx.Update() // Essential to notify go-app to diff the DOM
-            })
-
-    default:
-        return app.Text("Unsupported control")
-    }
-}
-*/
-
-//func (s *Shell) renderControl(ctrl *Control) app.UI {
-func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
-	switch ctrl.Type {
 	case ControlRange:
 		return app.Input().
 			Type("range").

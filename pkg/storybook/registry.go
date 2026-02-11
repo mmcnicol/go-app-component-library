@@ -15,6 +15,7 @@ const (
 	ControlSelect ControlType = "select"
 	ControlColor  ControlType = "color"
 	ControlRange  ControlType = "range"
+	ControlEnum   ControlType = "enum"
 )
 
 type Control struct {
@@ -22,6 +23,7 @@ type Control struct {
 	Type     ControlType
 	Value    any
 	Options  []string // For select inputs
+	Enum     []string // For enum inputs (distinct from Options)
 	ReadOnly bool
 }
 
@@ -160,5 +162,15 @@ func NewBoolControl(defaultValue bool) *Control {
 	return &Control{
 		Type:  ControlBool,
 		Value: defaultValue,
+	}
+}
+
+// NewEnumControl creates a dropdown for enum values (like button looks)
+func NewEnumControl(label string, options []string, defaultValue string) *Control {
+	return &Control{
+		Label:   label,
+		Type:    ControlEnum,
+		Value:   defaultValue,
+		Enum:    options, // Store enum options separately
 	}
 }
