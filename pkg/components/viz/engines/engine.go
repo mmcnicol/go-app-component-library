@@ -3,7 +3,7 @@ package engines
 
 import (
     "github.com/maxence-charriere/go-app/v10/pkg/app"
-    "github.com/yourlib/pkg/components/viz"
+    "github.com/mmcnicol/go-app-component-library/pkg/components/viz"
 )
 
 // Engine defines the chart rendering interface
