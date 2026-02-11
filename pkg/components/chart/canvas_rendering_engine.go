@@ -3,7 +3,7 @@ package chart
 
 import (
     "fmt"
-    "math"
+    //"math"
     "github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
@@ -76,7 +76,8 @@ func (cr *CanvasRenderer) getBarChartScript(chart ChartSpec) string {
     
     // Prepare data for JavaScript
     datasets := ""
-    for i, dataset := range data.Datasets {
+    //for i, dataset := range data.Datasets {
+    for _, dataset := range data.Datasets {
         points := ""
         for _, point := range dataset.Data {
             points += fmt.Sprintf("{x: %f, y: %f},", point.X, point.Y)
