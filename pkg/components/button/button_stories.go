@@ -16,7 +16,7 @@ func init() {
         map[string]*storybook.Control{
             "Label":    {Label: "Label", Type: storybook.ControlText, Value: "Click Me"},
             "Disabled": {Label: "Disabled", Type: storybook.ControlBool, Value: false},
-            "Look":     {Label: "Look", Type: storybook.ControlSelect, Value: selectOptions},
+            "Look":     {Label: "Look", Type: storybook.ControlSelect, Options: selectOptions},
         },
         func(controls map[string]*storybook.Control) app.UI {
             return &Button{

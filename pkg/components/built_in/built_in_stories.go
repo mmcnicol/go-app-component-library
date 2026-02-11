@@ -47,7 +47,7 @@ func init() {
 			"PromptText": {Label: "Prompt Text", Type: storybook.ControlText, Value: "Choose an option..."},
 			"Disabled":   {Label: "Disabled", Type: storybook.ControlBool, Value: false},
 			// Make sure to set the Value field so the type assertion doesn't panic
-			"Options":    {Label: "Options", Type: storybook.ControlSelect, Value: selectOptions}, 
+			"Options":    {Label: "Options", Type: storybook.ControlSelect, Options: selectOptions}, 
 			"SelectedValue": {Label: "Selected Value", Type: storybook.ControlText, Value: ""}, 
 		},
 		func(controls map[string]*storybook.Control) app.UI {
