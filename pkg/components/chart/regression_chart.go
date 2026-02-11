@@ -20,10 +20,15 @@ type RegressionChartComponent struct {
 }
 
 func (c *RegressionChartComponent) OnMount(ctx app.Context) {
+    if c.CanvasChart == nil {
+        return
+    }
+    
+    // Call parent OnMount
     c.CanvasChart.OnMount(ctx)
     
     ctx.Defer(func(ctx app.Context) {
-        // Use c.CanvasChart.ctx instead of c.CanvasChart.ctx
+        // Double check: is the pointer valid AND is the JS context initialized?
         if c.CanvasChart != nil && c.CanvasChart.ctx.Truthy() {
             c.drawRegressionWithEquation()
         }
@@ -31,11 +36,13 @@ func (c *RegressionChartComponent) OnMount(ctx app.Context) {
 }
 
 func (c *RegressionChartComponent) OnUpdate(ctx app.Context) bool {
-    // CanvasChart.OnUpdate returns void, so we just call it
+    if c.CanvasChart == nil {
+        return false
+    }
+    
     c.CanvasChart.OnUpdate(ctx)
     
     ctx.Defer(func(ctx app.Context) {
-        // Use c.CanvasChart.ctx instead of c.CanvasChart.ctx
         if c.CanvasChart != nil && c.CanvasChart.ctx.Truthy() {
             c.drawRegressionWithEquation()
         }
@@ -44,7 +51,9 @@ func (c *RegressionChartComponent) OnUpdate(ctx app.Context) bool {
 }
 
 func (c *RegressionChartComponent) Render() app.UI {
-    // You MUST return the internal CanvasChart so it can render the <canvas> tag
+    if c.CanvasChart == nil {
+        return app.Div().Text("Chart not initialized")
+    }
     return c.CanvasChart
 }
 
