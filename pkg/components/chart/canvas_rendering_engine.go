@@ -50,47 +50,48 @@ func (cr *CanvasRenderer) setupCanvas(ctx app.Context) {
     
     fmt.Printf("Setting up canvas for %s chart\n", cr.chartSpec.Type)
     
-    // Get the draw script
-    drawScript := cr.getDrawScript()
-    
-    // Simple JavaScript without syntax errors
+    // Create a VERY simple JavaScript that won't have syntax errors
     jsCode := fmt.Sprintf(`
+        console.log('Setting up canvas: %s');
+        
         try {
             const canvas = document.getElementById('%s');
             if (!canvas) {
-                console.error('Canvas element not found: %s');
+                console.error('Canvas not found');
                 return;
             }
             
-            // Set canvas dimensions
-            canvas.width = canvas.clientWidth || 800;
-            canvas.height = canvas.clientHeight || 400;
+            // Set dimensions
+            canvas.width = 800;
+            canvas.height = 400;
             
-            // Get context
             const ctx = canvas.getContext('2d');
             if (!ctx) {
-                console.error('Could not get 2D context');
+                console.error('No 2D context');
                 return;
             }
             
-            // Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw background
+            // Draw something simple to verify it works
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Draw the chart
-            %s
+            ctx.fillStyle = '#4A90E2';
+            ctx.fillRect(50, 50, 100, 200);
             
-            console.log('Chart drawn successfully');
-        } catch (error) {
-            console.error('Error drawing chart:', error);
+            ctx.fillStyle = '#000000';
+            ctx.font = '16px Arial';
+            ctx.fillText('Simple Test - Chart Type: %s', 50, 30);
+            
+            console.log('Simple test drawn');
+        } catch(e) {
+            console.error('Error in simple test:', e);
         }
-    `, cr.canvasID, cr.canvasID, drawScript)
+    `, cr.canvasID, cr.canvasID, cr.chartSpec.Type)
     
-    // Execute the JavaScript
-    app.Window().Call("eval", jsCode)
+    // Use Dispatch to execute JavaScript in the main thread
+    ctx.Dispatch(func(ctx app.Context) {
+        app.Window().Call("eval", jsCode)
+    })
 }
 
 func (cr *CanvasRenderer) getDrawScript() string {

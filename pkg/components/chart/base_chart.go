@@ -93,36 +93,18 @@ func (bc *BaseChart) OnMount(ctx app.Context) {
     bc.isRendered = false
     bc.setupManagers()
     
-    // Initialize the render engine using the wrapper
-    engine, err := NewChartEngineWrapper(bc.containerID)
-    if err != nil {
-        fmt.Printf("Error creating chart engine: %v\n", err)
-        return
-    }
-    
-    bc.engine = engine
-    
-    // Use Defer to ensure rendering happens after component is fully mounted
+    // Simple approach - draw directly without engine
     ctx.Defer(func(ctx app.Context) {
-        // Double-check we have data
         if len(bc.spec.Data.Datasets) == 0 {
             fmt.Println("No datasets to render")
             return
         }
         
-        // Wait a bit to ensure DOM is ready
-        ctx.After(100*time.Millisecond, func(ctx app.Context) {
-            fmt.Printf("Rendering %s chart with %d datasets\n", 
-                bc.spec.Type, len(bc.spec.Data.Datasets))
-            
-            err := bc.engine.Render(bc.spec)
-            if err != nil {
-                fmt.Printf("Error rendering chart: %v\n", err)
-            } else {
-                bc.isRendered = true
-                fmt.Println("Chart rendered successfully")
-            }
-        })
+        fmt.Printf("Rendering %s chart with %d datasets (simple approach)\n", 
+            bc.spec.Type, len(bc.spec.Data.Datasets))
+        
+        // Draw directly using JavaScript
+        bc.drawSimpleChart(ctx)
     })
 }
 
@@ -315,4 +297,62 @@ func (bc *BaseChart) Style(name, value string) *BaseChart {
 func (bc *BaseChart) Style(name, value string) *BaseChart {
     bc.styles[name] = value
     return bc
+}
+
+func (bc *BaseChart) drawSimpleChart(ctx app.Context) {
+    canvasID := bc.containerID + "-canvas"
+    
+    jsCode := fmt.Sprintf(`
+        console.log('Drawing simple chart for:', '%s');
+        
+        const canvas = document.getElementById('%s');
+        if (!canvas) {
+            console.error('Canvas not found');
+            return;
+        }
+        
+        // Ensure dimensions
+        if (canvas.width === 0 || canvas.height === 0) {
+            canvas.width = canvas.clientWidth || 800;
+            canvas.height = canvas.clientHeight || 400;
+        }
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            console.error('No 2D context');
+            return;
+        }
+        
+        // Clear and draw background
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw title
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 18px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('%s Chart - Simple Render', canvas.width / 2, 30);
+        
+        // Draw a test pattern
+        ctx.fillStyle = '#4A90E2';
+        for (let i = 0; i < 5; i++) {
+            const x = 100 + i * 100;
+            const y = 200;
+            const width = 60;
+            const height = 50 + i * 20;
+            
+            ctx.fillRect(x, y - height, width, height);
+            
+            // Draw label
+            ctx.fillStyle = '#000';
+            ctx.font = '12px Arial';
+            ctx.fillText('Bar ' + (i+1), x + width/2, y + 20);
+            ctx.fillStyle = '#4A90E2';
+        }
+        
+        console.log('Simple chart drawn successfully');
+    `, canvasID, canvasID, bc.spec.Type)
+    
+    app.Window().Call("eval", jsCode)
 }
