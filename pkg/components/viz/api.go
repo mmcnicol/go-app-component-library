@@ -378,3 +378,81 @@ func StreamingChart(chartType ChartType) *StreamingChart {
     }
 }
 */
+
+
+// Render implements the app.Compo Render method
+func (c *Chart) Render() app.UI {
+    // Create a unique ID for the canvas
+    canvasID := "chart-canvas"
+    if c.spec.ID != "" {
+        canvasID = c.spec.ID + "-canvas"
+    }
+    
+    // Initialize engine if not already done
+    if c.engine == nil {
+        c.engine = AutoEngine(c.spec)
+    }
+    
+    // Create the canvas element
+    canvas := app.Canvas().
+        ID(canvasID).
+        Width(c.spec.Width).
+        Height(c.spec.Height).
+        Style("width", "100%").
+        Style("height", "100%").
+        Style("display", "block")
+    
+    // Add event listeners for interactivity
+    if c.spec.Interactive.Enabled {
+        if c.spec.Interactive.OnClick != nil {
+            canvas = canvas.OnClick(func(ctx app.Context, e app.Event) {
+                // Get click coordinates relative to canvas
+                rect := ctx.JSSrc().Get("target").Call("getBoundingClientRect")
+                x := e.Get("clientX").Float() - rect.Get("left").Float()
+                y := e.Get("clientY").Float() - rect.Get("top").Float()
+                
+                // Perform hit testing
+                if points, seriesIdx, err := c.engine.HitTest(x, y); err == nil && len(points) > 0 {
+                    c.spec.Interactive.OnClick(ctx, e, points)
+                }
+            })
+        }
+    }
+    
+    // Use Mount lifecycle to initialize and render
+    return canvas
+}
+
+// OnMount initializes the chart when mounted
+func (c *Chart) OnMount(ctx app.Context) {
+    // Get the canvas element
+    canvasID := "chart-canvas"
+    if c.spec.ID != "" {
+        canvasID = c.spec.ID + "-canvas"
+    }
+    
+    canvas := app.Window().GetElementByID(canvasID)
+    if !canvas.Truthy() {
+        app.Log("Canvas element not found:", canvasID)
+        return
+    }
+    
+    // Initialize engine
+    if c.engine == nil {
+        c.engine = AutoEngine(c.spec)
+    }
+    
+    // Initialize with canvas
+    err := c.engine.Init(canvas)
+    if err != nil {
+        app.Log("Failed to initialize engine:", err)
+        return
+    }
+    
+    // Render the chart
+    err = c.engine.Render(c.spec)
+    if err != nil {
+        app.Log("Failed to render chart:", err)
+    }
+}
+
