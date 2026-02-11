@@ -39,81 +39,90 @@ func init() {
     
     // 1. Basic Line Chart Story
     storybook.Register("Visualization", "Line Chart - Basic",
-        map[string]*storybook.Control{
-            "Title":      storybook.NewTextControl("Sine Wave"),
-            "Show Grid":  storybook.NewBoolControl(true),
-            "Show Points": storybook.NewBoolControl(false),
-            "Animated":   storybook.NewBoolControl(true),
-            "Interactive": storybook.NewBoolControl(true),
-        },
-        func(controls map[string]*storybook.Control) app.UI {
-            showGrid := controls["Show Grid"].Value.(bool)
-            showPoints := controls["Show Points"].Value.(bool)
-            
-            pointSize := 0
-            if showPoints {
-                pointSize = 4
-            }
-            
-            dataset := DataSet{
-                Labels: sinLabels,
-                Series: []Series{
-                    {
-                        Label:     "sin(x)",
-                        Points:    sinData,
-                        Color:     "#4f46e5",
-                        Stroke:    Stroke{Width: 2},
-                        PointSize: pointSize,
-                        Fill:      false,
-                    },
-                },
-            }
-            
-            spec := Spec{
-                Type:   ChartTypeLine,
-                Title:  controls["Title"].Value.(string),
-                Data:   dataset,
-                Width:  800,
-                Height: 400,
-                Theme:  &CustomTheme{BaseTheme: DefaultTheme()},
-                Axes: AxesConfig{
-                    X: AxisConfig{
-                        Visible: true,
-                        Title:   "x",
-                        Grid:    GridConfig{Visible: showGrid},
-                    },
-                    Y: AxisConfig{
-                        Visible:     true,
-                        Title:       "sin(x)",
-                        Grid:        GridConfig{Visible: showGrid},
-                        BeginAtZero: false,
-                    },
-                },
-                Interactive: InteractiveConfig{
-                    Enabled: controls["Interactive"].Value.(bool),
-                    Tooltip: TooltipConfig{
-                        Enabled: true,
-                        Mode:    TooltipModeNearest,
-                        Format: func(p Point, s Series) string {
-                            return fmt.Sprintf("%s: (%.2f, %.2f)", s.Label, p.X, p.Y)
-                        },
-                    },
-                },
-                Animated: controls["Animated"].Value.(bool),
-            }
-            
-            chart := New(spec)
-            
-            return app.Div().ID("viz-line-basic-container").Body(
-                app.Div().Class("viz-chart-wrapper").Body(chart),
-                app.Div().Class("viz-chart-footer").Body(
-                    app.Small().Class("text-muted").Body(
-                        app.Text(fmt.Sprintf("%d data points", len(sinData))),
-                    ),
-                ),
-            )
-        },
-    )
+		map[string]*storybook.Control{
+			"Title":      storybook.NewTextControl("Sine Wave"),
+			"Show Grid":  storybook.NewBoolControl(true),
+			"Show Points": storybook.NewBoolControl(false),
+			"Animated":   storybook.NewBoolControl(true),
+			"Interactive": storybook.NewBoolControl(true),
+		},
+		func(controls map[string]*storybook.Control) app.UI {
+			showGrid := controls["Show Grid"].Value.(bool)
+			showPoints := controls["Show Points"].Value.(bool)
+			
+			pointSize := 0
+			if showPoints {
+				pointSize = 4
+			}
+			
+			// Ensure we have labels
+			if len(sinLabels) == 0 {
+				sinLabels = make([]string, len(sinData))
+				for i := range sinData {
+					sinLabels[i] = fmt.Sprintf("%.1f", sinData[i].X)
+				}
+			}
+			
+			dataset := DataSet{
+				Labels: sinLabels,
+				Series: []Series{
+					{
+						Label:     "sin(x)",
+						Points:    sinData,
+						Color:     "#4f46e5",
+						Stroke:    Stroke{Width: 2},
+						PointSize: pointSize,
+						Fill:      false,
+					},
+				},
+			}
+			
+			// Use nil theme first to see if that's the issue
+			spec := Spec{
+				Type:   ChartTypeLine,
+				Title:  controls["Title"].Value.(string),
+				Data:   dataset,
+				Width:  800,
+				Height: 400,
+				Theme:  nil, // Try without custom theme first
+				Axes: AxesConfig{
+					X: AxisConfig{
+						Visible: true,
+						Title:   "x",
+						Grid:    GridConfig{Visible: showGrid},
+					},
+					Y: AxisConfig{
+						Visible:     true,
+						Title:       "sin(x)",
+						Grid:        GridConfig{Visible: showGrid},
+						BeginAtZero: false,
+					},
+				},
+				Interactive: InteractiveConfig{
+					Enabled: controls["Interactive"].Value.(bool),
+					Tooltip: TooltipConfig{
+						Enabled: true,
+						Mode:    TooltipModeNearest,
+						Format: func(p Point, s Series) string {
+							return fmt.Sprintf("%s: (%.2f, %.2f)", s.Label, p.X, p.Y)
+						},
+					},
+				},
+				Animated: controls["Animated"].Value.(bool),
+			}
+			
+			chart := New(spec)
+			
+			return app.Div().ID("viz-line-basic-container").Body(
+				app.Div().Class("viz-chart-wrapper").Body(chart),
+				app.Div().Class("viz-chart-footer").Body(
+					app.Small().Class("text-muted").Body(
+						app.Text(fmt.Sprintf("%d data points", len(sinData))),
+					),
+				),
+			)
+		},
+	)
     
     // 2. Multi-Series Line Chart
     storybook.Register("Visualization", "Line Chart - Multi Series",
@@ -264,6 +273,7 @@ func init() {
             data := generateSineWave(15, 0, 2*math.Pi, 1.0)
             
             dataset := DataSet{
+				Labels: sinLabels,
                 Series: []Series{
                     {
                         Label:      "Sample Data",
@@ -319,6 +329,7 @@ func init() {
             }
             
             dataset := DataSet{
+				Labels: sinLabels,
                 Series: []Series{
                     {
                         Label:  "Noisy Signal",
