@@ -26,8 +26,8 @@ Form
 - [x] InputTextArea
 - [x] Button
 - [x] ToggleSwitch
-- [x] SelectOne (PicklistOne)
-- [ ] SelectMany (PicklistManyCheckbox)
+- [x] SelectOne (a picklist)
+- [ ] SelectMany (a picklist which uses checkboxes to allow multi-selection)
 - [ ] DatePicker
 - [ ] Time
 - [ ] AutoComplete
