@@ -296,12 +296,14 @@ func (e *CanvasEngine) renderLineChart(spec *Spec, ctx app.Value) error {
             ctx.Set("lineWidth", 2)
         }
         
+        /*
         // Set line dash if specified
         if len(series.Stroke.Dash) > 0 {
             ctx.Set("lineDash", series.Stroke.Dash)
         } else {
             ctx.Set("lineDash", []float64{})
         }
+        */
         
         // Draw the path
         ctx.Call("beginPath")
