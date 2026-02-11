@@ -205,3 +205,12 @@ type ChartStatistics struct {
 	Max  float64
 	Mean float64
 }
+
+type ChartData struct {
+    Labels   []string
+    Datasets []Dataset
+    Data     [][]float64  // For box plot
+    XLabels  []string     // For heatmap
+    YLabels  []string     // For heatmap
+    Metadata map[string]interface{}
+}

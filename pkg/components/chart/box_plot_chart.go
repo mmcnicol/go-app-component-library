@@ -68,3 +68,12 @@ func (bpc *BoxPlotChart) calculateStatistics(data [][]float64) []BoxPlotStats {
     
     return stats
 }
+
+func (bpc *BoxPlotChart) calculateMean(data []float64) float64 {
+    return bpc.BaseChart.calculateMean(data)
+}
+
+// Add these methods to BoxPlotChart
+func (bpc *BoxPlotChart) calculatePercentile(sorted []float64, percentile float64) float64 {
+    return bpc.BaseChart.calculatePercentile(sorted, percentile)
+}

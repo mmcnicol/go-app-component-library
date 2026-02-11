@@ -15,10 +15,9 @@ type BaseChart struct {
     containerID string
     engine      ChartEngine
     isRendered  bool
+    classes     []string
     
-    // Refs
-    //canvasRef   app.Ref
-    //tooltipRef  app.Ref
+    // DOM elements
     canvasElem  app.HTMLCanvas
     tooltipElem app.HTMLDiv
     
@@ -26,6 +25,62 @@ type BaseChart struct {
     onPointClick    func(point DataPoint, datasetIndex int)
     onZoom          func(domain AxisRange)
     onHover         func(point DataPoint, datasetIndex int)
+}
+
+// NewChart creates a new chart of the specified type
+func NewChart(chartType ChartType) *BaseChart {
+    return &BaseChart{
+        spec: ChartSpec{
+            Type: chartType,
+            Data: ChartData{},
+            Options: ChartOptions{
+                Responsive: true,
+                MaintainAspectRatio: false,
+                Plugins: ChartPlugins{
+                    Legend: LegendOptions{
+                        Display: true,
+                        Position: "top",
+                    },
+                    Tooltip: TooltipOptions{
+                        Enabled: true,
+                        IntersectDistance: 10,
+                    },
+                },
+            },
+            Engine: EngineTypeCanvas,
+        },
+    }
+}
+
+// Title sets the chart title
+func (bc *BaseChart) Title(title string) *BaseChart {
+    // Add title to chart
+    // You might want to add a title field to ChartSpec
+    return bc
+}
+
+// Data sets the chart data
+func (bc *BaseChart) Data(data ChartData) *BaseChart {
+    bc.spec.Data = data
+    return bc
+}
+
+// Options sets the chart options
+func (bc *BaseChart) Options(options ChartOptions) *BaseChart {
+    bc.spec.Options = options
+    return bc
+}
+
+// WithRegression adds regression to a scatter chart
+func (bc *BaseChart) WithRegression(regType RegressionType, degree int) *BaseChart {
+    // This will be used by ScatterChart
+    return bc
+}
+
+// Render renders the chart (implementation in base_chart.go)
+func (bc *BaseChart) Render() app.UI {
+    // Basic implementation - should be overridden by specific chart types
+    return app.Div().Text("Chart would render here")
 }
 
 func (bc *BaseChart) calculateTrend() string {
@@ -83,10 +138,50 @@ func (bc *BaseChart) updateScales(xMin, xMax, yMin, yMax float64) {
     // Implementation depends on your scale system
 }
 
+// Class sets CSS classes
+func (bc *BaseChart) Class(classes ...string) *BaseChart {
+    bc.classes = append(bc.classes, classes...)
+    return bc
+}
+
 func (bc *BaseChart) WithRegression(regType RegressionType, degree int) *ScatterChart {
     // Return a scatter chart with regression
     return &ScatterChart{
         BaseChart: *bc,
         showRegression: true,
     }
+}
+
+// Helper methods for box plot chart
+func (bc *BaseChart) calculatePercentile(sorted []float64, percentile float64) float64 {
+    if len(sorted) == 0 {
+        return 0
+    }
+    
+    if len(sorted) == 1 {
+        return sorted[0]
+    }
+    
+    index := (percentile / 100) * float64(len(sorted)-1)
+    lower := int(index)
+    upper := lower + 1
+    
+    if upper >= len(sorted) {
+        return sorted[lower]
+    }
+    
+    weight := index - float64(lower)
+    return sorted[lower]*(1-weight) + sorted[upper]*weight
+}
+
+func (bc *BaseChart) calculateMean(data []float64) float64 {
+    if len(data) == 0 {
+        return 0
+    }
+    
+    var sum float64
+    for _, v := range data {
+        sum += v
+    }
+    return sum / float64(len(data))
 }

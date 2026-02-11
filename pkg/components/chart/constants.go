@@ -1,11 +1,7 @@
 // pkg/components/chart/constants.go
 package chart
 
-var userActivity = [][]float64{
-	{10, 20, 30, 40, 50, 60, 70, 80},
-	{15, 25, 35, 45, 55, 65, 75, 85},
-	{5, 15, 25, 35, 45, 55, 65, 75},
-}
+import "math"
 
 func generateRandomData(count int) []DataPoint {
 	var points []DataPoint

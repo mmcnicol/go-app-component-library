@@ -4,7 +4,7 @@ package chart
 import (
     "fmt"
     "strings"
-	"github.com/maxence-charriere/go-app/v10/pkg/app"
+    "github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
 type AccessibleChart struct {
@@ -31,9 +31,7 @@ func (ac *AccessibleChart) Render() app.UI {
             app.Div().
                 ID(ac.ariaDescribedBy).
                 Class("sr-only").
-                Body(
-                    ac.generateChartDescription(),
-                ),
+                Text(ac.generateChartDescription()), // Use Text() instead of Body() with string
         )
 }
 
