@@ -36,8 +36,9 @@ Data
 - [x] Sortable Table
 - [x] Data Grid
 
-Panel
-- [ ] Panel
+Layout
+- [x] Panel
+- [ ] Card
 
 Overlay
 - [ ] Dialogue
