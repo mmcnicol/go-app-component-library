@@ -44,81 +44,148 @@ func (cr *CanvasRenderer) RenderChart(chart ChartSpec) error {
 
 func (cr *CanvasRenderer) setupCanvas(ctx app.Context) {
     if cr.chartSpec.Type == "" {
-        return // No chart to render
+        fmt.Println("No chart spec to render")
+        return
     }
     
-    // Set canvas dimensions after mount
-    app.Window().Call("eval", fmt.Sprintf(`
-        (function() {
+    fmt.Printf("Setting up canvas for %s chart\n", cr.chartSpec.Type)
+    
+    // Use JavaScript to draw the chart
+    jsCode := fmt.Sprintf(`
+        try {
             const canvas = document.getElementById('%s');
             if (!canvas) {
-                console.log('Canvas not found: %s');
-                setTimeout(function() {
-                    // Try again after a short delay
-                    const canvas = document.getElementById('%s');
-                    if (canvas) {
-                        drawChart();
-                    }
-                }, 100);
+                console.error('Canvas element not found: %s');
                 return;
             }
             
-            function drawChart() {
-                const canvas = document.getElementById('%s');
-                const container = canvas.parentElement;
-                
-                if (!container) {
-                    console.log('Container not found for canvas');
-                    return;
-                }
-                
-                // Force container to have dimensions
+            // Ensure canvas parent has dimensions
+            const container = canvas.parentElement;
+            if (container) {
                 if (container.clientWidth === 0) {
                     container.style.width = '100%%';
-                    container.style.height = '400px';
+                    container.style.minHeight = '400px';
                 }
-                
-                // Get container dimensions
-                const width = container.clientWidth || 800;
-                const height = container.clientHeight || 400;
-                
-                // Set canvas dimensions
-                canvas.width = width;
-                canvas.height = height;
-                canvas.style.width = width + 'px';
-                canvas.style.height = height + 'px';
-                
-                // Draw the chart
-                const ctx = canvas.getContext('2d');
-                %s
             }
             
-            // Initial draw
-            drawChart();
+            // Force canvas dimensions
+            canvas.width = canvas.clientWidth || 800;
+            canvas.height = canvas.clientHeight || 400;
             
-            // Redraw on window resize
-            window.addEventListener('resize', function() {
-                setTimeout(drawChart, 100);
-            });
-        })();
-    `, cr.canvasID, cr.canvasID, cr.canvasID, cr.canvasID, cr.getDrawScript()))
+            // Get context and draw
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.error('Could not get 2D context');
+                return;
+            }
+            
+            // Clear and draw background
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw a test rectangle to verify canvas is working
+            ctx.fillStyle = '#f0f0f0';
+            ctx.fillRect(10, 10, canvas.width - 20, canvas.height - 20);
+            ctx.strokeStyle = '#ccc';
+            ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+            
+            // Draw chart type text
+            ctx.fillStyle = '#333';
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('%s Chart - Canvas Ready', canvas.width / 2, 30);
+            
+            // Now draw the actual chart
+            %s
+            
+        } catch (error) {
+            console.error('Error in chart rendering:', error);
+        }
+    `, cr.canvasID, cr.canvasID, cr.chartSpec.Type, cr.getDrawScript())
+    
+    app.Window().Call("eval", jsCode)
 }
 
+// pkg/components/chart/canvas_rendering_engine.go
+// Update getDrawScript to ensure something is drawn:
+
 func (cr *CanvasRenderer) getDrawScript() string {
-    if cr.chartSpec.Type == "" {
-        return "console.log('No chart spec available');"
-    }
+    // First, let's just draw a simple test pattern
+    testScript := `
+        // Simple test drawing
+        ctx.fillStyle = '#4A90E2';
+        
+        // Draw some shapes based on chart type
+        const width = canvas.width;
+        const height = canvas.height;
+        
+        if ('%s' === 'bar') {
+            // Draw test bars
+            for (let i = 0; i < 5; i++) {
+                const barWidth = 40;
+                const barHeight = 50 + Math.random() * 100;
+                const x = 100 + i * 80;
+                const y = height - 100 - barHeight;
+                
+                ctx.fillRect(x, y, barWidth, barHeight);
+                ctx.strokeStyle = '#333';
+                ctx.strokeRect(x, y, barWidth, barHeight);
+            }
+            ctx.fillStyle = '#000';
+            ctx.font = '14px Arial';
+            ctx.fillText('Bar Chart Test', width/2, 50);
+        } 
+        else if ('%s' === 'line') {
+            // Draw test line
+            ctx.beginPath();
+            ctx.moveTo(50, height - 100);
+            for (let i = 1; i < 6; i++) {
+                ctx.lineTo(50 + i * 80, height - 100 - Math.sin(i) * 50);
+            }
+            ctx.strokeStyle = '#FF6384';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            ctx.fillStyle = '#000';
+            ctx.font = '14px Arial';
+            ctx.fillText('Line Chart Test', width/2, 50);
+        }
+        else if ('%s' === 'pie') {
+            // Draw test pie
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(width, height) * 0.3;
+            
+            const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'];
+            let startAngle = 0;
+            
+            for (let i = 0; i < 4; i++) {
+                const sliceAngle = Math.PI * 2 / 4;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
+                ctx.closePath();
+                ctx.fillStyle = colors[i];
+                ctx.fill();
+                startAngle += sliceAngle;
+            }
+            ctx.fillStyle = '#000';
+            ctx.font = '14px Arial';
+            ctx.fillText('Pie Chart Test', width/2, 50);
+        }
+        else {
+            // Default drawing
+            ctx.fillStyle = '#333';
+            ctx.font = '14px Arial';
+            ctx.fillText('%s Chart - Drawing not implemented', width/2, 50);
+        }
+    `
     
-    switch cr.chartSpec.Type {
-    case ChartTypeBar:
-        return cr.getBarChartScript()
-    case ChartTypeLine:
-        return cr.getLineChartScript()
-    case ChartTypePie:
-        return cr.getPieChartScript()
-    default:
-        return cr.getBarChartScript()
-    }
+    return fmt.Sprintf(testScript, 
+        string(cr.chartSpec.Type), 
+        string(cr.chartSpec.Type), 
+        string(cr.chartSpec.Type),
+        string(cr.chartSpec.Type))
 }
 
 func (cr *CanvasRenderer) getLineChartScript() string {

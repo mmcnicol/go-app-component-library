@@ -88,32 +88,44 @@ func (bc *BaseChart) setupManagers() {
     bc.zoomPanManager = NewZoomPanManager(bc)
 }
 
+// pkg/components/chart/base_chart.go
+// Update the OnMount method completely:
+
 func (bc *BaseChart) OnMount(ctx app.Context) {
     bc.isRendered = false
     bc.setupManagers()
     
     // Initialize the render engine using the wrapper
     engine, err := NewChartEngineWrapper(bc.containerID)
-    if err == nil {
-        bc.engine = engine
-        
-        // Use Defer to ensure rendering happens after component is fully mounted
-        ctx.Defer(func(ctx app.Context) {
-            // Wait a bit to ensure DOM is ready
-            ctx.After(50*time.Millisecond, func(ctx app.Context) {
-                // Render the chart if we have data
-                if len(bc.spec.Data.Datasets) > 0 {
-                    err := bc.engine.Render(bc.spec)
-                    if err != nil {
-                        // Handle error if needed
-                        fmt.Printf("Error rendering chart: %v\n", err)
-                    } else {
-                        bc.isRendered = true
-                    }
-                }
-            })
-        })
+    if err != nil {
+        fmt.Printf("Error creating chart engine: %v\n", err)
+        return
     }
+    
+    bc.engine = engine
+    
+    // Use Defer to ensure rendering happens after component is fully mounted
+    ctx.Defer(func(ctx app.Context) {
+        // Double-check we have data
+        if len(bc.spec.Data.Datasets) == 0 {
+            fmt.Println("No datasets to render")
+            return
+        }
+        
+        // Wait a bit to ensure DOM is ready
+        ctx.After(100*time.Millisecond, func(ctx app.Context) {
+            fmt.Printf("Rendering %s chart with %d datasets\n", 
+                bc.spec.Type, len(bc.spec.Data.Datasets))
+            
+            err := bc.engine.Render(bc.spec)
+            if err != nil {
+                fmt.Printf("Error rendering chart: %v\n", err)
+            } else {
+                bc.isRendered = true
+                fmt.Println("Chart rendered successfully")
+            }
+        })
+    })
 }
 
 // OnNav is called when the component is navigated to

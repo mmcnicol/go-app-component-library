@@ -78,4 +78,33 @@ func init() {
                 Class("dashboard-card", "chart-bar")
         },
     )
+
+    // Add a simple test chart
+    storybook.Register("Chart", "Test Bar Chart", 
+        nil,
+        func(controls map[string]*storybook.Control) app.UI {
+            // Very simple test data
+            return app.Div().Body(
+                app.H2().Text("Simple Test Bar Chart"),
+                app.P().Text("This should show a basic chart"),
+                NewChart(ChartTypeBar).
+                    Data(ChartData{
+                        Labels: []string{"A", "B", "C", "D"},
+                        Datasets: []Dataset{{
+                            Label: "Test Data",
+                            Data: []DataPoint{
+                                {X: 0, Y: 10},
+                                {X: 1, Y: 20},
+                                {X: 2, Y: 15},
+                                {X: 3, Y: 25},
+                            },
+                            BackgroundColor: []string{"#4A90E2"},
+                        }},
+                    }).
+                    Class("test-chart").
+                    Style("border", "1px solid #ccc").
+                    Style("padding", "20px"),
+            )
+        },
+    )
 }
