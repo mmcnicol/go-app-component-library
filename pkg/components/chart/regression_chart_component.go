@@ -42,6 +42,29 @@ func (c *RegressionChartComponent) OnUpdate(ctx app.Context) {
 	})
 }
 
+// OnDismount - delegate to embedded CanvasChart
+func (c *RegressionChartComponent) OnDismount() {
+	if c.CanvasChart != nil {
+		c.CanvasChart.OnDismount()
+	}
+}
+
+// ShouldUpdate - delegate to embedded CanvasChart
+func (c *RegressionChartComponent) ShouldUpdate(next app.Compo) bool {
+	if c.CanvasChart != nil {
+		return c.CanvasChart.ShouldUpdate(next)
+	}
+	return true
+}
+
+// Render implements app.Compo
+func (c *RegressionChartComponent) Render() app.UI {
+	if c.CanvasChart == nil {
+		return app.Div().Text("Chart not initialized")
+	}
+	return c.CanvasChart.Render()
+}
+
 // Custom drawing method
 func (c *RegressionChartComponent) drawRegressionWithEquation() {
 	if !c.ctx.Truthy() || len(c.data) == 0 {
@@ -162,14 +185,4 @@ func calculateRSquared(data []Point, m, b float64) float64 {
 }
 
 // Ensure RegressionChartComponent implements app.Compo
-//var _ app.Compo = (*RegressionChartComponent)(nil)
-
-// Ensure RegressionChartComponent implements app.Compo
 var _ app.Compo = (*RegressionChartComponent)(nil)
-
-func (c *RegressionChartComponent) Render() app.UI {
-    if c.CanvasChart == nil {
-        return app.Div().Text("Chart not initialized")
-    }
-    return c.CanvasChart.Render()
-}
