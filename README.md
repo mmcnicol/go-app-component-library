@@ -5,6 +5,8 @@ TODO List:
 Built In
 - [x] Div
 - [x] InputText
+- [ ] InputCheckbox
+- [ ] InputRadio
 - [x] InputTextArea
 - [x] Select
 - [x] Button
@@ -19,10 +21,13 @@ Built In
 Form
 - [x] Label
 - [x] InputText
+- [ ] InputCheckbox
+- [ ] InputRadio
 - [x] InputTextArea
 - [x] Button
 - [x] ToggleSwitch
-- [x] SelectOne
+- [x] SelectOne (PicklistOne)
+- [ ] SelectMany (PicklistManyCheckbox)
 - [ ] DatePicker
 - [ ] Time
 - [ ] AutoComplete
