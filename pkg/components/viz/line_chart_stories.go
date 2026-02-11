@@ -13,16 +13,26 @@ import (
     "github.com/mmcnicol/go-app-component-library/pkg/storybook"
 )
 
+// Generate shared datasets once
+var (
+    sinData   []Point
+    cosData   []Point
+    sinLabels []string
+)
+
 func init() {
-    // Sample datasets
-    sinData := generateSineWave(50, 0, 4*math.Pi, 1.0)
-    cosData := generateSineWave(50, 0, 4*math.Pi, 1.0)
-    for i := range cosData {
-        cosData[i].Y = math.Cos(cosData[i].X)
+    // Initialize shared datasets
+    sinData = generateSineWave(50, 0, 4*math.Pi, 1.0)
+    cosData = make([]Point, len(sinData))
+    for i := range sinData {
+        cosData[i] = Point{
+            X: sinData[i].X,
+            Y: math.Cos(sinData[i].X),
+            Label: sinData[i].Label,
+        }
     }
     
-    // Generate labels for x-axis
-    sinLabels := make([]string, len(sinData))
+    sinLabels = make([]string, len(sinData))
     for i := range sinLabels {
         sinLabels[i] = fmt.Sprintf("%.1f", sinData[i].X)
     }
