@@ -43,13 +43,14 @@ func (i *Icon) GetIcon(name string, size int) app.UI {
 	case "file":
 		d = "M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"
 	case "hospital-inpatient":
-		// Person symbol next to a medical cross (Outpatient/Ambulatory care)
-    	d = "M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-2v-4H8v-2h4V8h2v4h4v2zM7 7c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm-2 9v-1c0-1.1.9-2 2-2s2 .9 2 2v1h-4z"
+		// Consistent: Hospital bed (inpatient) with medical weight
+		d = "M18 10h-5V5h-2v5H6v2h5v5h2v-5h5v-2zm3 7H3v-2h18v2zm-2-5h-2v3H7v-3H5v6h14v-6z"
 	case "hospital-outpatient":
-		// Simple: Person + arrow (outpatient concept)
-    	d = "M12 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-2 9h4v2h-4zm6-8l-4 4 4 4 1.4-1.4L13.8 12H16v-2h-2.2l1.6-1.6L14 7z"
+		// Consistent: Medical box/cross with a walking figure (ambulatory)
+		d = "M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-2v-4H8v-2h4V8h2v4h4v2zM7 7c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm-2 9v-1c0-1.1.9-2 2-2s2 .9 2 2v1h-4z"
 	case "hospital-alert-covid":
-		d = "M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13h-2v2h-2v-2h-2v-2h2v-2h2v2h2v2zm-4.88-6.42L11 8.5V6h2v2.5l-.88.08zM7 13v-2h2.5l.08.88.08.12H7zm5 6v-2.5l.88-.08.12-.08V19h-2zm5-6h-2.5l-.08-.88-.08-.12H17v2z"
+		// Improved: Medical cross with a central 'virus' alert point to match the outpatient style
+		d = "M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-3.12c-.22-.61-.69-1.12-1.32-1.38V9h2v2h2v2h-2v1zm-6-5h2v2.62c-.63.26-1.1.77-1.32 1.38H9V11h2V9zm-2 4h3.12c.22.61.69 1.12 1.32 1.38V18h-2v-2H9v-2h2v-1zm6 5h-2v-2.62c.63-.26 1.1-.77 1.32-1.38H18v2h-2v2h-1z"
 	case "spinner":
 		d = "M12 4V2C6.48 2 2 6.48 2 12h2c0-4.41 3.59-8 8-8z"
 	}
