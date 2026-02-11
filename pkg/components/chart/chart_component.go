@@ -81,6 +81,7 @@ func (c *CanvasChart) OnMount(ctx app.Context) {
 }
 */
 
+/*
 func (c *CanvasChart) OnMount(ctx app.Context) {
 	// 1. Get the Canvas Element using JSSrc()
 	c.canvas = ctx.JSSrc()
@@ -98,7 +99,46 @@ func (c *CanvasChart) OnMount(ctx app.Context) {
 	c.resize()
 	c.drawAxes()
 }
+*/
 
+func (c *CanvasChart) OnMount(ctx app.Context) {
+    // 1. Wait for the next frame to ensure the DOM is fully rendered
+    ctx.Defer(func(ctx app.Context) {
+        // 2. Explicitly find the canvas element by its ID
+        // Note: In a library, you should generate a unique ID, 
+        // but for now we use the ID defined in Render()
+        canvasJS := app.Window().GetElementByID("main-chart")
+        
+        if !canvasJS.Truthy() {
+            app.Log("Error: Canvas element not found")
+            return
+        }
+
+        c.canvas = canvasJS
+        c.ctx = c.canvas.Call("getContext", "2d")
+
+        // 3. Setup Display Density
+        c.dpr = app.Window().Get("devicePixelRatio").Float()
+        if c.dpr == 0 {
+            c.dpr = 1.0
+        }
+
+        c.ctx.Set("imageSmoothingEnabled", true)
+
+        // 4. Initialize layout and draw
+        c.resize()
+        c.drawAxes()
+        
+        // Trigger specific painters based on config
+        if len(c.config.BoxData) > 0 {
+            // Draw your box plots here
+            for i, stats := range c.config.BoxData {
+                xPos := float64(i+1) * 100.0 // Example spacing
+                c.DrawBoxPlot(stats, xPos, c.config.BoxWidth)
+            }
+        }
+    })
+}
 
 
 func (c *CanvasChart) drawPoints(data []Point, color string) {
@@ -231,11 +271,10 @@ func (c *CanvasChart) Render() app.UI {
 	return app.Div().Class("chart-wrapper").Body(
 		app.Canvas().
 			Class("chart-canvas").
-			ID("main-chart").
-			// Width and Height in v10 take ints
+			ID("main-chart"). // This must match GetElementByID
 			Width(c.width).
 			Height(c.height).
-			OnMouseMove(c.OnMouseMove), 
+			OnMouseMove(c.OnMouseMove),
 
 		app.If(c.showTooltip, func() app.UI {
 			return app.Div().
