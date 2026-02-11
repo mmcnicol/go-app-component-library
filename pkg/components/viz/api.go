@@ -412,7 +412,7 @@ func (c *Chart) Render() app.UI {
                 y := e.Get("clientY").Float() - rect.Get("top").Float()
                 
                 // Perform hit testing
-                if points, seriesIdx, err := c.engine.HitTest(x, y); err == nil && len(points) > 0 {
+                if points, _, err := c.engine.HitTest(x, y); err == nil && len(points) > 0 {
                     c.spec.Interactive.OnClick(ctx, e, points)
                 }
             })
@@ -456,3 +456,7 @@ func (c *Chart) OnMount(ctx app.Context) {
     }
 }
 
+func AutoEngine(spec *Spec) Engine {
+    // For now, always return CanvasEngine since we're fixing the implementation
+    return NewCanvasEngine()
+}
