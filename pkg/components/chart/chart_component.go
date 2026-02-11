@@ -688,8 +688,8 @@ func (c *CanvasChart) resetCanvas() {
 }
 
 // ShouldUpdate implements the app.Compo interface
-func (c *CanvasChart) ShouldUpdate(ctx app.Context, new app.Compo) bool {
-    newChart, ok := new.(*CanvasChart)
+func (c *CanvasChart) ShouldUpdate(ctx app.Context, newComponent app.Compo) bool {
+    newChart, ok := newComponent.(*CanvasChart)
     if !ok {
         return true
     }
