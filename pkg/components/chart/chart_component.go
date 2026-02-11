@@ -712,7 +712,7 @@ func (c *CanvasChart) DrawBarChart(values []float64, defaultColor string, custom
 	}
 
 	chartWidth := float64(c.width) - c.Padding.Left - c.Padding.Right
-	chartHeight := float64(c.height) - c.Padding.Top - c.Padding.Bottom
+	//chartHeight := float64(c.height) - c.Padding.Top - c.Padding.Bottom
 	
 	// Calculate width per bar including a 20% gap
 	barWidth := (chartWidth / float64(len(values))) * 0.7
