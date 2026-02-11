@@ -13,6 +13,8 @@ const (
 	ControlBool   ControlType = "bool"
 	ControlNumber ControlType = "number"
 	ControlSelect ControlType = "select"
+	ControlColor  ControlType = "color"
+	ControlRange  ControlType = "range"
 )
 
 type Control struct {
@@ -72,4 +74,46 @@ func GetRegistry() []ComponentContainer {
 		return components[i].Name < components[j].Name
 	})
 	return components
+}
+
+// NewTextControl creates a control for text input
+func NewTextControl(defaultValue string) *Control {
+	return &Control{
+		Type:  "text",
+		Value: defaultValue,
+	}
+}
+
+// NewRangeControl creates a control for numeric sliders
+func NewRangeControl(min, max, step, defaultValue int) *Control {
+	return &Control{
+		Type:  "range",
+		Value: defaultValue,
+		Label: "range", // Internal hint for the UI to render a slider
+	}
+}
+
+// NewColorControl creates a control for color picking
+func NewColorControl(defaultValue string) *Control {
+	return &Control{
+		Type:  "color",
+		Value: defaultValue,
+	}
+}
+
+// NewSelectControl creates a dropdown for multiple options
+func NewSelectControl(options []string, defaultValue string) *Control {
+	return &Control{
+		Type:  "select",
+		Value: defaultValue,
+		Label: "options", // We'll use Label or a new field to store the options list
+	}
+}
+
+// NewBoolControl creates a toggle/checkbox control
+func NewBoolControl(defaultValue bool) *Control {
+	return &Control{
+		Type:  "bool",
+		Value: defaultValue,
+	}
 }

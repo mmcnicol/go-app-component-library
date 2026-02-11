@@ -4,12 +4,30 @@ package chart
 import "github.com/maxence-charriere/go-app/v10/pkg/app"
 
 // ChartConfig defines the public interface for customization
+/*
 type ChartConfig struct {
 	Title      string
 	LineColor  string
 	Thickness  float64
 	IsStream   bool
 	Capacity   int
+}
+*/
+
+type ChartConfig struct {
+	Title            string
+	LineColor        string
+	Thickness        float64
+	IsStream         bool
+	Capacity         int
+	// Add missing fields for other chart types
+	BoxWidth         float64
+	BoxData          []BoxPlotStats
+	HeatmapMatrix    [][]float64
+	ColorScheme      string
+	Opacity          float64
+	PieData          []float64
+	InnerRadiusRatio float64
 }
 
 type Option func(*ChartConfig)

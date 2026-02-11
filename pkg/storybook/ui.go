@@ -247,6 +247,23 @@ func (s *Shell) renderControls() app.UI {
 
 func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
     switch ctrl.Type {
+
+	case ControlRange:
+		return app.Input().
+			Type("range").
+			Value(c.Value).
+			OnChange(func(ctx app.Context, e app.Event) {
+				onChange(c.Type, app.Window().Get("parseInt").Invoke(ctx.JSSrc().Get("value")).Int())
+			})
+
+	case ControlColor:
+		return app.Input().
+			Type("color").
+			Value(c.Value).
+			OnChange(func(ctx app.Context, e app.Event) {
+				onChange(c.Type, ctx.JSSrc().Get("value").String())
+			})
+
     case ControlBool:
         return app.Input().
             Type("checkbox").
@@ -256,6 +273,7 @@ func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
                 ctrl.Value = ctx.JSSrc().Get("checked").Bool()
                 s.shouldRender = true // Trigger Shell update
             })
+
     case ControlSelect:
         // Create options for select
         var options []app.UI
@@ -278,6 +296,7 @@ func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
                 ctx.Update()
             }).
             Body(options...)
+
     case ControlText, ControlNumber:
         return app.Input().
             Type("text").
@@ -297,6 +316,7 @@ func (s *Shell) renderControlInput(key string, ctrl *Control) app.UI {
                 s.shouldRender = true
                 ctx.Update() // Essential to notify go-app to diff the DOM
             })
+
     default:
         return app.Text("Unsupported control")
     }

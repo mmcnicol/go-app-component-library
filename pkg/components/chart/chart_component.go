@@ -10,19 +10,24 @@ type CanvasChart struct {
 	app.Compo
 
 	// Internal state
-	canvas  app.Value
-	ctx     app.Value
-	width   int
-	height  int
-	dpr     float64
-	streamData StreamingData
-	isRunning  bool
+	canvas      app.Value
+	ctx         app.Value
+	width       int
+	height      int
+	dpr         float64
+	streamData  StreamingData
+	isRunning   bool
 	hoverX      float64
-    hoverY      float64
-    showTooltip bool
-    activePoint Point
-}
+	hoverY      float64
+	showTooltip bool
+	activePoint Point
 
+	// Configuration and Data
+	config        ChartConfig
+	currentPoints []Point
+	Padding       Padding
+	DataRange     DataRange
+}
 
 /*
 func (c *CanvasChart) OnMount(ctx app.Context) {
@@ -40,9 +45,10 @@ func (c *CanvasChart) OnMount(ctx app.Context) {
 }
 */
 
+/*
 func (c *CanvasChart) OnMount(ctx app.Context) {
 	// 1. Get the Canvas Element
-	c.canvas = ctx.SrcElement()
+	c.canvas = ctx.JSSrc()
 	c.ctx = c.canvas.Call("getContext", "2d")
 
 	// 2. Determine Display Density
@@ -52,25 +58,6 @@ func (c *CanvasChart) OnMount(ctx app.Context) {
 	}
 
 	ctx.Set("imageSmoothingEnabled", true)
-
-	/*
-	// Sample Data: A simple upward trend with some noise
-	sampleData := []Point{
-		{X: 0, Y: 10}, {X: 10, Y: 25}, {X: 20, Y: 15},
-		{X: 30, Y: 45}, {X: 40, Y: 38}, {X: 50, Y: 60},
-		{X: 60, Y: 55}, {X: 70, Y: 80}, {X: 80, Y: 75},
-		{X: 90, Y: 95}, {X: 100, Y: 90},
-	}
-
-	c.resize()
-	c.drawAxes()
-	
-	// Draw the line in "Chart Blue"
-	c.DrawLine(sampleData, "#007bff", 3.0)
-	
-	// Optional: Draw points on top of the line
-	c.drawPoints(sampleData, "#007bff")
-	*/
 
 	// Test Data for Bars
     barData := []float64{45, 80, 55, 92, 30, 66, 78}
@@ -91,6 +78,27 @@ func (c *CanvasChart) OnMount(ctx app.Context) {
     // Start the animation
     c.StartStreaming(ctx)
 }
+*/
+
+func (c *CanvasChart) OnMount(ctx app.Context) {
+	// 1. Get the Canvas Element using JSSrc()
+	c.canvas = ctx.JSSrc()
+	c.ctx = c.canvas.Call("getContext", "2d")
+
+	// 2. Determine Display Density
+	c.dpr = app.Window().Get("devicePixelRatio").Float()
+	if c.dpr == 0 {
+		c.dpr = 1.0
+	}
+
+	// Set property on the JS Context, not the app.Context
+	c.ctx.Set("imageSmoothingEnabled", true)
+
+	c.resize()
+	c.drawAxes()
+}
+
+
 
 func (c *CanvasChart) drawPoints(data []Point, color string) {
 	c.ctx.Set("fillStyle", "white")
@@ -177,6 +185,7 @@ func (c *CanvasChart) Render() app.UI {
 }
 */
 
+/*
 func (c *CanvasChart) Render() app.UI {
 	px, py := c.ToPixels(c.activePoint.X, c.activePoint.Y)
 
@@ -213,6 +222,34 @@ func (c *CanvasChart) Render() app.UI {
 		),
 	)
 }
+*/
+
+func (c *CanvasChart) Render() app.UI {
+	px, py := c.ToPixels(c.activePoint.X, c.activePoint.Y)
+
+	return app.Div().Class("chart-wrapper").Body(
+		app.Canvas().
+			Class("chart-canvas").
+			ID("main-chart").
+			// Width and Height in v10 take ints
+			Width(c.width).
+			Height(c.height).
+			OnMouseMove(c.OnMouseMove), 
+
+		app.If(c.showTooltip, func() app.UI {
+			return app.Div().
+				Class("chart-tooltip").
+				Style("left", fmt.Sprintf("%fpx", px+15)).
+				Style("top", fmt.Sprintf("%fpx", py-50)).
+				Body(
+					app.Div().Class("tooltip-header").Text("Data Point"),
+					app.Div().Class("tooltip-value").Text(
+						fmt.Sprintf("X: %.1f | Y: %.1f", c.activePoint.X, c.activePoint.Y),
+					),
+				)
+		}),
+	)
+}
 
 // Padding defines the drawing area boundaries
 type Padding struct {
@@ -223,20 +260,6 @@ type Padding struct {
 type DataRange struct {
 	MinX, MaxX float64
 	MinY, MaxY float64
-}
-
-// Update your CanvasChart struct
-type CanvasChart struct {
-	app.Compo
-	canvas  app.Value
-	ctx     app.Value
-	width   int
-	height  int
-	dpr     float64
-
-	// New Phase B Fields
-	Padding   Padding
-	DataRange DataRange
 }
 
 // ToPixels converts a data point (x, y) to canvas coordinates
