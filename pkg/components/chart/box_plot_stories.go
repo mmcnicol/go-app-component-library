@@ -32,7 +32,7 @@ func init() {
 					c.HeatmapMatrix = nil  // Clear any heatmap data
 				},
 			)
-			return chart.Key("box-plot")
+			return app.Div().Key("box-plot").Body(chart)
 		},
 	)
 }
