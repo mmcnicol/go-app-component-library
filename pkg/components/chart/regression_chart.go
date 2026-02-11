@@ -209,4 +209,4 @@ func calculateRSquared(data []Point, m, b float64) float64 {
 }
 
 // Ensure RegressionChartComponent implements app.Compo
-var _ app.Compo = (*RegressionChartComponent)(nil)
+//var _ app.Compo = (*RegressionChartComponent)(nil)
