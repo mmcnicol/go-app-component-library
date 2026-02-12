@@ -242,24 +242,20 @@ func (e *CanvasEngine) renderBarChart(spec *Spec, ctx app.Value) error {
 }
 
 func (e *CanvasEngine) renderLineChart(spec *Spec, ctx app.Value) error {
-    app.Log("debug 1")
     data := spec.Data
     if len(data.Series) == 0 || len(data.Series[0].Points) == 0 {
         return e.renderPlaceholder(spec, ctx)
     }
 
-    app.Log("debug 2")
     theme := spec.Theme
     if theme == nil {
         theme = DefaultTheme()
     }
     
-    app.Log("debug 3")
     // Set background
     ctx.Set("fillStyle", spec.Theme.GetBackgroundColor())
     ctx.Call("fillRect", 0, 0, e.width, e.height)
     
-    app.Log("debug 4")
     // Calculate scales using all points from all series
     allPoints := []Point{}
     for _, series := range data.Series {
@@ -322,7 +318,6 @@ func (e *CanvasEngine) renderLineChart(spec *Spec, ctx app.Value) error {
         }
         */
 
-        app.Log("debug 50")
         // Set line dash if specified
         if len(series.Stroke.Dash) > 0 {
             // Convert []float64 to app.Value properly
@@ -334,8 +329,7 @@ func (e *CanvasEngine) renderLineChart(spec *Spec, ctx app.Value) error {
         } else {
             ctx.Set("lineDash", []interface{}{})
         }
-        app.Log("debug 51")
-
+    
         // Draw the path
         ctx.Call("beginPath")
         
@@ -393,7 +387,6 @@ func (e *CanvasEngine) renderLineChart(spec *Spec, ctx app.Value) error {
         }
     }
     
-    app.Log("debug 90")
     // Draw title
     if spec.Title != "" {
         ctx.Set("fillStyle", spec.Theme.GetTextColor())
@@ -402,13 +395,11 @@ func (e *CanvasEngine) renderLineChart(spec *Spec, ctx app.Value) error {
         ctx.Call("fillText", spec.Title, float64(e.width)/2, 25)
     }
     
-    app.Log("debug 91")
     // Draw legend if enabled
     if spec.Legend.Visible && len(data.Series) > 1 {
         e.drawLegend(ctx, spec)
     }
     
-    app.Log("debug 92")
     return nil
 }
 
