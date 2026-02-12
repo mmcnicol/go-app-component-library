@@ -1,7 +1,7 @@
 
 github.com/mmcnicol/go-app-component-library/pkg/components/vizzy/
 
-a chart/visualization library
+a Chart/Visualization library
 
 goals:
 * Separation of Concerns: Chart logic vs rendering logic
@@ -26,6 +26,26 @@ render_canvas_line.go     # Line chart renderer
 render_canvas_...
 render_svg_...
 component_chart.go        # app.UI wrapper
+
+
+Storybook stories for Bar charts
+Storybook stories for Grouped Bar charts
+Storybook stories for Horizontal Bar charts
+Storybook stories for Line charts (Basic, Multi Series, Area Chart)
+Storybook stories for Pie charts
+Storybook stories for Donut charts
+Storybook stories for Scatter plots
+Storybook stories for Box plots
+Storybook stories for Heatmaps
+Storybook stories for Regression analysis
+Storybook stories for Radar Charts
+Storybook stories for Candlestick Charts
+Storybook stories for Tree maps
+Storybook stories for Gantt charts
+Storybook stories for Sunburst diagrams
+Storybook stories for Network graphs
+Storybook stories for 3D Surface plots
+
 
 
 this chart/visualization library is inspired by this book chapter:
