@@ -82,7 +82,7 @@ Viz
 - [x] Grouped Bar Chart
 - [ ] Stacked Bar Charts
 - [ ] Horizontal Bar Chart
-- [x] Line Chart
+- [x] Line Chart // WIP
 - [ ] Pie/Donut Chart
 - [ ] Scatter/Bubble Chart
 - [ ] Streaming Chart
