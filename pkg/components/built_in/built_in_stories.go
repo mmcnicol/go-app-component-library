@@ -349,7 +349,7 @@ func init() {
 		},
 	)
 
-	storybook.Register("Built In", "Checkbox", 
+	storybook.Register("Built In", "InputCheckbox", 
         map[string]*storybook.Control{
             "Checked": {
                 Label: "Checked", 

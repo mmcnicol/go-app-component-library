@@ -21,7 +21,7 @@ Built In
 Form
 - [x] Label
 - [x] InputText
-- [ ] InputCheckbox
+- [x] InputCheckbox
 - [ ] InputRadio
 - [x] InputTextArea
 - [x] Button
@@ -67,30 +67,19 @@ Feedback
 - [ ] Meter
 
 Charts
-- [x] Bar Chart (Single Series)
-- [x] Grouped Bar Chart (Multi-Series)
-- [x] Box Plot Chart
-- [x] Heatmap
-- [x] Line Chart
-- [x] Pie Chart
-- [x] Streaming Chart
-- [x] Regression Chart
-- [ ] Accessible Chart
-
-Viz
-- [x] Bar Chart
-- [x] Grouped Bar Chart
+- [ ] Bar Chart (Single Series)
+- [ ] Grouped Bar Chart (Multi-Series)
 - [ ] Stacked Bar Charts
 - [ ] Horizontal Bar Chart
-- [x] Line Chart // WIP
-- [ ] Pie/Donut Chart
+- [ ] Line Chart
+- [ ] Pie Chart
 - [ ] Scatter/Bubble Chart
+- [ ] Box Plot Chart
+- [ ] Histogram
+- [ ] Heatmap
 - [ ] Streaming Chart
 - [ ] Regression Chart
 - [ ] Accessible Chart
-- [ ] Box plot
-- [ ] Histogram
-- [ ] Heatmap
 
 Misc
 - [x] Icons
