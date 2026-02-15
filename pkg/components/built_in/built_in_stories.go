@@ -442,7 +442,7 @@ func init() {
                 radioButtons[idx] = radioContainer
             }
             
-            return app.Div().Body(radioButtons...),
+            return app.Div().Body(radioButtons...)
         }
     )
 
