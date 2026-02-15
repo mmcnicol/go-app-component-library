@@ -391,14 +391,6 @@ func init() {
                 Value: "",
                 Enum: []string{"Red", "Yellow", "Green"},
             },
-			/*
-            "Options": {
-                Label: "Options", 
-                Type: storybook.ControlSelect, 
-                Value: "",
-                Options: []string{"Red", "Yellow", "Green"},
-            },
-			*/
 			"Options": {Label: "Options", Type: storybook.ControlText, Value: []string{"Red", "Yellow", "Green"} }, 
             "Disabled": {
                 Label: "Disabled", 
