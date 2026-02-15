@@ -5,7 +5,7 @@ TODO List:
 Built In
 - [x] Div
 - [x] InputText
-- [ ] InputCheckbox
+- [x] InputCheckbox
 - [ ] InputRadio
 - [x] InputTextArea
 - [x] Select
@@ -58,7 +58,7 @@ Navigation
 - [ ] MenuBar / Navbar
 - [ ] Sidenav?
 
-Messages
+Message
 - [x] PhaseBanner
 - [x] StaticMessage
 
@@ -66,7 +66,7 @@ Feedback
 - [x] Progress
 - [ ] Meter
 
-Charts
+Chart
 - [ ] Bar Chart (Single Series)
 - [ ] Grouped Bar Chart (Multi-Series)
 - [ ] Stacked Bar Charts
