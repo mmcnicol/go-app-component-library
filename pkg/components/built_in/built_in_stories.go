@@ -443,7 +443,7 @@ func init() {
             }
             
             return app.Div().Body(radioButtons...)
-        }
+        },
     )
 
 }
