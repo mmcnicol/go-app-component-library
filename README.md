@@ -38,7 +38,7 @@ Data
 - [x] Tree
 - [ ] TreeTable
 - [x] Table (Base)
-- [x] Sortable Table
+- [x] Sortable Table // WIP
 - [x] Data Grid
 
 Layout
