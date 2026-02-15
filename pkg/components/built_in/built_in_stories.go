@@ -349,4 +349,38 @@ func init() {
 		},
 	)
 
+	storybook.Register("Built In", "Checkbox", 
+        map[string]*storybook.Control{
+            "Checked": {
+                Label: "Checked", 
+                Type: storybook.ControlBool, 
+                Value: false,
+            },
+            "Disabled": {
+                Label: "Disabled", 
+                Type: storybook.ControlBool, 
+                Value: false,
+            },
+        },
+        func(controls map[string]*storybook.Control) app.UI {
+            isChecked := controls["Checked"].Value.(bool)
+            isDisabled := controls["Disabled"].Value.(bool) 
+
+            // Return a container with checkbox and label
+            return app.Div().Body(
+                app.Input().
+					Type("checkbox").
+					Checked(isChecked).
+					Disabled(isDisabled).
+					OnChange(func(ctx app.Context, e app.Event) {
+						// Update the Checked control when checkbox is toggled
+						newChecked := ctx.JSSrc().Get("checked").Bool()
+						controls["Checked"].Value = newChecked
+						
+						ctx.Update()
+					}),
+            )
+        },
+    )
+
 }
