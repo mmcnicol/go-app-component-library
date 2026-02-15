@@ -6,7 +6,7 @@ Built In
 - [x] Div
 - [x] InputText
 - [x] InputCheckbox
-- [ ] InputRadio
+- [x] InputRadio
 - [x] InputTextArea
 - [x] Select
 - [x] Button
@@ -21,7 +21,7 @@ Built In
 Form
 - [x] Label
 - [x] InputText
-- [x] InputCheckbox
+- [ ] InputCheckbox
 - [ ] InputRadio
 - [x] InputTextArea
 - [x] Button

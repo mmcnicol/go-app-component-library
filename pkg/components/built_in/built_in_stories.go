@@ -383,4 +383,67 @@ func init() {
         },
     )
 
+	storybook.Register("Built In", "InputRadio", 
+        map[string]*storybook.Control{
+            "Selected": {
+                Label: "Selected Option", 
+                Type: storybook.ControlEnum, 
+                Value: "",
+                Enum: []string{"Red", "Yellow", "Green"},
+            },
+            "Options": {
+                Label: "Options", 
+                Type: storybook.ControlSelect, 
+                Value: "",
+                Options: []string{"Red", "Yellow", "Green"},
+            },
+            "Disabled": {
+                Label: "Disabled", 
+                Type: storybook.ControlBool, 
+                Value: false,
+            },
+        },
+        func(controls map[string]*storybook.Control) app.UI {
+            selectedOption := controls["Selected"].Value.(string)
+            opts := controls["Options"].Value.([]string)
+            isDisabled := controls["Disabled"].Value.(bool)
+            
+            // Build radio buttons
+            radioButtons := make([]app.UI, len(opts))
+            for i := 0; i < len(opts); i++ {
+                idx := i // Capture for closure
+                value := opts[idx]
+                label := opts[idx]
+                               
+                // Create radio input
+                radioInput := app.Input().
+                    Type("radio").
+                    Name("demo-radio-group").
+                    Value(value).
+                    Checked(selectedOption == value).
+                    Disabled(isDisabled).
+                    OnChange(func(ctx app.Context, e app.Event) {
+                        if !isDisabled {
+                            newValue := ctx.JSSrc().Get("value").String()
+                            controls["Selected"].Value = newValue
+                            ctx.Update()
+                        }
+                    })
+                
+                // Create container for this radio option
+                radioContainer := app.Div().Body(
+                    radioInput,
+                    app.Label().
+                        Body(
+                            app.Text(label),
+                        ),
+                )
+                
+                radioButtons[idx] = radioContainer
+            }
+            
+            return app.Div().Body(radioButtons...),
+        },
+    )
+
 }
